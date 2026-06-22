@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabase-server'
-import { twilioClient } from '@/lib/twilio'
+import { supabase } from '@/lib/integrations/supabase'
+import { twilioClient } from '@/lib/integrations/twilio'
 import type { NextRequest } from 'next/server'
 
 export async function POST(
@@ -55,16 +55,26 @@ export async function POST(
     })
   }
 
+  // Supabase returns the FK-joined tenant as a single object (not an array)
+  const tenantPhone = (conversation.tenants as { phone: string } | null)?.phone
+  if (!tenantPhone) {
+    return new Response(JSON.stringify({ error: 'Tenant phone not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   // Send SMS via Twilio and capture the SID for deduplication
   let twilioSid: string
   try {
     const outbound = await twilioClient.messages.create({
       body: body,
       from: client.twilio_number,
-      to: (conversation.tenants as { phone: string }[])[0].phone,
+      to: tenantPhone,
     })
     twilioSid = outbound.sid
-  } catch {
+  } catch (err) {
+    console.error('Failed to send SMS via Twilio:', err)
     return new Response(JSON.stringify({ error: 'Failed to send SMS' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

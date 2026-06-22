@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/supabase-server'
-import MessageInput from '@/components/MessageInput'
-import RefreshButton from '@/components/RefreshButton'
+import { supabase } from '@/lib/integrations/supabase'
+import MessageInput from '@/components/conversations/MessageInput'
+import RefreshButton from '@/components/ui/RefreshButton'
 import styles from './conversation.module.css'
 
 type Message = {

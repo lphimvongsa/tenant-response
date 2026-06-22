@@ -1,5 +1,6 @@
-import { supabase } from '@/lib/supabase-server'
-import ConversationList, { type Conversation } from '@/components/ConversationList'
+import { supabase } from '@/lib/integrations/supabase'
+import ConversationList from '@/components/conversations/ConversationList'
+import type { Conversation } from '@/types'
 import styles from './dashboard.module.css'
 
 export default async function DashboardLayout({

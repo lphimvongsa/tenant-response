@@ -2,35 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { timeAgo } from '@/lib/timeAgo'
+import { timeAgo } from '@/lib/utils/time'
+import type { Conversation } from '@/types'
 import styles from './ConversationList.module.css'
-
-type Message = {
-  body: string
-  direction: string
-  created_at: string
-}
-
-type Tenant = {
-  id: string
-  phone: string
-  name: string | null
-}
-
-export type Conversation = {
-  id: string
-  status: string
-  created_at: string
-  last_message_at: string | null
-  tenants: Tenant | null
-  messages: Message[]
-}
 
 type Props = {
   conversations: Conversation[]
 }
 
-function getLastMessage(messages: Message[]): Message | null {
+function getLastMessage(messages: Conversation['messages']): Conversation['messages'][number] | null {
   if (!messages || messages.length === 0) return null
   return [...messages].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
