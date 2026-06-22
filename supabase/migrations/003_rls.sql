@@ -76,3 +76,5 @@ CREATE POLICY "manager_read_own_actions_log"
 CREATE POLICY "manager_read_own_row"
   ON managers FOR SELECT TO authenticated
   USING (supabase_user_id = auth.uid());
+
+
