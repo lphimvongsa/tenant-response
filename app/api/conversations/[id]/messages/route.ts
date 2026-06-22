@@ -61,7 +61,7 @@ export async function POST(
     const outbound = await twilioClient.messages.create({
       body: body,
       from: client.twilio_number,
-      to: (conversation.tenants as { phone: string }).phone,
+      to: (conversation.tenants as { phone: string }[])[0].phone,
     })
     twilioSid = outbound.sid
   } catch {
