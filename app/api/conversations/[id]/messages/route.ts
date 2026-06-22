@@ -56,7 +56,7 @@ export async function POST(
   }
 
   // Supabase returns the FK-joined tenant as a single object (not an array)
-  const tenantPhone = (conversation.tenants as { phone: string } | null)?.phone
+  const tenantPhone = (conversation.tenants as unknown as { phone: string } | null)?.phone
   if (!tenantPhone) {
     return new Response(JSON.stringify({ error: 'Tenant phone not found' }), {
       status: 404,

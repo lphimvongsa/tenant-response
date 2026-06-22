@@ -20,3 +20,30 @@ export type Conversation = {
   tenants: ConversationTenant | null
   messages: ConversationMessage[]
 }
+
+// Property management types
+
+export type PropertyTenant = {
+  id: string
+  name: string | null
+  phone: string
+}
+
+export type PropertyUnit = {
+  id: string
+  unit_number: string
+  tenants: PropertyTenant[]
+}
+
+export type Property = {
+  id: string
+  name: string
+  address: string
+  created_at: string
+  units: PropertyUnit[]
+}
+
+export type PropertySummary = {
+  id: string
+  name: string
+}
