@@ -18,6 +18,13 @@ export default function SidebarTabs({ conversations, properties }: Props) {
 
   return (
     <>
+      <div className={styles.brand}>
+        <span className={styles.brandName}>
+          Tena<span>Timmy</span>
+        </span>
+        <img src="/tenatimmy_solo.png" alt="logo" width={40} height={40}/>
+      </div>
+
       <div className={styles.tabs}>
         <Link
           href="/dashboard"
@@ -32,6 +39,7 @@ export default function SidebarTabs({ conversations, properties }: Props) {
           Properties
         </Link>
       </div>
+
       {onProperties
         ? <PropertyNav properties={properties} />
         : <ConversationList conversations={conversations} />

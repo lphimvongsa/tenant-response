@@ -1,52 +1,71 @@
 @import "tailwindcss";
 
 :root {
+  /* ── Brand ── */
+  --color-brand:          #1976d2;
+  --color-brand-dark:     #1565c0;
+  --color-brand-light:    #42a5f5;
+  --color-brand-gradient: linear-gradient(135deg, #42a5f5 0%, #1565c0 100%);
+  --color-brand-shadow:   0 4px 12px rgba(25, 118, 210, 0.35);
+
   /* ── Background layers ── */
-  --color-bg-base:     #0d0d0d;   /* page canvas */
-  --color-bg-surface:  #181818;   /* sidebar, header, input bar */
-  --color-bg-elevated: #242424;   /* active item, cards */
-  --color-bg-hover:    #1e1e1e;   /* hover state */
+  --color-bg-base:     #f0f4f8;   /* page canvas — soft cool blue-gray */
+  --color-bg-surface:  #ffffff;   /* sidebar, cards, panels */
+  --color-bg-elevated: #e8f0fe;   /* active item highlight */
+  --color-bg-hover:    #f5f8ff;   /* hover state */
 
   /* ── Borders ── */
-  --color-border:        #2e2e2e;
-  --color-border-subtle: #1e1e1e;
+  --color-border:        rgba(52, 71, 103, 0.12);
+  --color-border-subtle: rgba(52, 71, 103, 0.06);
 
   /* ── Text ── */
-  --color-text-primary:   #e2e2e2;
-  --color-text-secondary: #8a8a8a;
-  --color-text-muted:     #4a4a4a;
+  --color-text-primary:   #344767;   /* dark blue-navy */
+  --color-text-secondary: #7b809a;
+  --color-text-muted:     #b0b7c3;
 
-  /* ── Message bubbles ──
-     Tenant (inbound):  dark bg + muted gray text  → passive / received
-     Staff  (outbound): lighter bg + bright text   → active / sent      */
-  --color-bubble-inbound-bg:   #141414;
-  --color-bubble-inbound-text: #dedede;
-  --color-bubble-outbound-bg:  #303030;
-  --color-bubble-outbound-text: #dedede;
+  /* ── Message bubbles ── */
+  --color-bubble-inbound-bg:    #f0f4f8;
+  --color-bubble-inbound-text:  #344767;
+  --color-bubble-outbound-bg:   var(--color-brand-gradient);
+  --color-bubble-outbound-text: #ffffff;
 
   /* ── Controls ── */
-  --color-btn-bg:           #2a2a2a;
-  --color-btn-bg-hover:     #383838;
-  --color-btn-text:         #cccccc;
-  --color-input-bg:         #111111;
-  --color-input-border:     #2a2a2a;
-  --color-input-border-focus: #505050;
+  --color-btn-bg:              var(--color-brand-gradient);
+  --color-btn-bg-hover:        linear-gradient(135deg, #64b5f6 0%, #1976d2 100%);
+  --color-btn-text:            #ffffff;
+  --color-input-bg:            #f8fafc;
+  --color-input-border:        rgba(52, 71, 103, 0.2);
+  --color-input-border-focus:  #1976d2;
 
   /* ── Semantic ── */
-  --color-error: #e57373;
+  --color-error:   #ef5350;
+  --color-success: #4caf50;
+
+  /* ── Shadows ── */
+  --shadow-card:    0 4px 24px rgba(52, 71, 103, 0.10);
+  --shadow-sidebar: 4px 0 20px rgba(52, 71, 103, 0.07);
+  --shadow-button:  0 4px 12px rgba(25, 118, 210, 0.35);
 
   /* ── Layout ── */
-  --sidebar-width:  320px;
-  --header-height:  48px;
+  --sidebar-width:  280px;
+  --header-height:  52px;
 
   /* ── Radius ── */
-  --radius-sm:     0.375rem;
-  --radius-md:     0.5rem;
-  --radius-bubble: 0.75rem;
+  --radius-sm:     0.625rem;   /* 10px */
+  --radius-md:     0.875rem;   /* 14px */
+  --radius-lg:     1.25rem;    /* 20px */
+  --radius-bubble: 1rem;       /* 16px */
+  --radius-pill:   9999px;
 }
 
 body {
   background-color: var(--color-bg-base);
   color: var(--color-text-primary);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar        { width: 5px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(52, 71, 103, 0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(25, 118, 210, 0.4); }
