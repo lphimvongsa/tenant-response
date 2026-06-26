@@ -4,6 +4,7 @@ export type ConversationMessage = {
   body: string
   direction: string
   created_at: string
+  is_read: boolean
 }
 
 export type ConversationTenant = {

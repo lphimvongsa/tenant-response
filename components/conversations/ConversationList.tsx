@@ -8,6 +8,7 @@ import styles from './ConversationList.module.css'
 
 type Props = {
   conversations: Conversation[]
+  basePath?: string
 }
 
 function getLastMessage(messages: Conversation['messages']): Conversation['messages'][number] | null {
@@ -21,13 +22,14 @@ function truncate(text: string, max: number): string {
   return text.length > max ? text.slice(0, max) + '…' : text
 }
 
-export default function ConversationList({ conversations }: Props) {
+export default function ConversationList({ conversations, basePath = '/dashboard/conversations' }: Props) {
   const pathname = usePathname()
 
   return (
     <nav className={styles.list}>
       {conversations.map((conv) => {
-        const isActive = pathname === `/dashboard/${conv.id}`
+        const href = `${basePath}/${conv.id}`
+        const isActive = pathname === href
         const tenant = conv.tenants
         const displayName = tenant?.name
           ? `${tenant.name} · ${tenant.phone}`
@@ -38,15 +40,24 @@ export default function ConversationList({ conversations }: Props) {
           : 'No messages yet'
         const timeLabel = last ? timeAgo(last.created_at) : timeAgo(conv.created_at)
 
+        const unreadCount = conv.messages.filter(
+          m => m.direction === 'inbound' && !m.is_read
+        ).length
+
         return (
           <Link
             key={conv.id}
-            href={`/dashboard/${conv.id}`}
+            href={href}
             className={`${styles.item} ${isActive ? styles.itemActive : ''}`}
           >
             <div className={styles.itemHeader}>
               <span className={styles.itemName}>{displayName}</span>
-              <span className={styles.itemTime}>{timeLabel}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', flexShrink: 0 }}>
+                {unreadCount > 0 && (
+                  <span className={styles.unreadBadge}>{unreadCount}</span>
+                )}
+                <span className={styles.itemTime}>{timeLabel}</span>
+              </div>
             </div>
             <span className={styles.itemPreview}>{preview}</span>
           </Link>
