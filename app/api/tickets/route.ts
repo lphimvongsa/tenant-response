@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { isMaintenanceCategory } from '@/lib/maintenance-categories'
 import type { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,7 @@ export async function POST(request: NextRequest) {
 
   let body: {
     unit_id: string
+    title: string
     category?: string
     severity?: 'mild' | 'moderate' | 'severe' | null
     location?: string | null
@@ -29,10 +31,18 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const { unit_id, category, severity, location, description, assigned_to, status } = body
+  const { unit_id, title, category, severity, location, description, assigned_to, status } = body
 
-  if (!unit_id || !description?.trim()) {
-    return new Response(JSON.stringify({ error: 'unit_id and description are required' }), {
+  if (!unit_id || !title?.trim() || !description?.trim()) {
+    return new Response(JSON.stringify({ error: 'unit_id, title, and description are required' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const normalizedCategory = category?.trim().toLowerCase() || null
+  if (normalizedCategory && !isMaintenanceCategory(normalizedCategory)) {
+    return new Response(JSON.stringify({ error: 'Invalid category' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     })
@@ -58,7 +68,8 @@ export async function POST(request: NextRequest) {
     .insert({
       client_id: manager.clientId,
       unit_id,
-      category: category?.trim() || null,
+      title: title.trim(),
+      category: normalizedCategory,
       severity: severity ?? null,
       location: location?.trim() || null,
       description: description.trim(),

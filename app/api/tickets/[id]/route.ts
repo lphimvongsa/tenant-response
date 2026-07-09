@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { isMaintenanceCategory } from '@/lib/maintenance-categories'
 import type { NextRequest } from 'next/server'
 
 const VALID_STATUSES = ['open', 'in_progress', 'in_review', 'resolved', 'closed']
@@ -18,7 +19,12 @@ export async function PATCH(
 
   const { id } = await params
 
-  let body: { status?: string; assigned_to?: string | null }
+  let body: {
+    status?: string
+    assigned_to?: string | null
+    title?: string
+    category?: string | null
+  }
   try {
     body = await request.json()
   } catch {
@@ -35,7 +41,20 @@ export async function PATCH(
     })
   }
 
-  if (body.status === undefined && body.assigned_to === undefined) {
+  const normalizedCategory = body.category?.trim().toLowerCase() || null
+  if (body.category !== undefined && normalizedCategory && !isMaintenanceCategory(normalizedCategory)) {
+    return new Response(JSON.stringify({ error: 'Invalid category' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (
+    body.status === undefined &&
+    body.assigned_to === undefined &&
+    body.title === undefined &&
+    body.category === undefined
+  ) {
     return new Response(JSON.stringify({ error: 'No fields to update' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
@@ -60,6 +79,8 @@ export async function PATCH(
   const updates: Record<string, string | null> = {}
   if (body.status !== undefined) updates.status = body.status
   if (body.assigned_to !== undefined) updates.assigned_to = body.assigned_to?.trim() || null
+  if (body.title !== undefined) updates.title = body.title?.trim() || null
+  if (body.category !== undefined) updates.category = normalizedCategory
 
   const { data, error } = await supabase
     .from('tickets')

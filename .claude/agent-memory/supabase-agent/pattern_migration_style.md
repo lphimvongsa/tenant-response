@@ -26,3 +26,13 @@ Formatting conventions observed across 002/003/004/007/009/010:
 
 Also see [[decision_auth_and_join_codes]] for the first migration/lib work related to real
 Supabase Auth login.
+
+Adding a CHECK constraint to an already-populated column with unvalidated legacy data
+(011_ticket_taxonomy.sql, tickets.category): use `DROP CONSTRAINT IF EXISTS` +
+`ADD CONSTRAINT ... CHECK (...) NOT VALID`. NOT VALID skips scanning/enforcing existing rows
+at ADD time (so the migration can't fail on legacy garbage), but the constraint is still fully
+enforced on all new INSERTs and on any UPDATE touching an existing row — it only defers
+validation of pre-existing rows. Do NOT immediately run `VALIDATE CONSTRAINT` in the same
+migration if legacy data isn't known-clean — that forces the full-table scan/enforcement
+immediately and defeats the purpose. Leave validation for a separate follow-up migration once
+legacy data has been audited/backfilled to match.

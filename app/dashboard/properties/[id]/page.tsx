@@ -13,7 +13,7 @@ export default async function PropertyDetailPage({
   const { data } = await supabase
     .from('properties')
     .select(
-      'id, name, address, photo_url, created_at, units(id, unit_number, tenants(id, name, phone), tickets(id, status))',
+      'id, name, address, photo_url, created_at, units(id, unit_number, tenants(id, name, phone), tickets(id, title, category, location, severity, description, status, photo_url, assigned_to, created_at, tenants(id, name, phone)))',
     )
     .eq('id', id)
     .single()

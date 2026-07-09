@@ -36,8 +36,7 @@ export default function TopHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <p className={styles.greeting}>{greeting}</p>
-        <p className={styles.subtitle}>Here&apos;s what&apos;s happening across your properties today</p>
+        <p className={styles.greeting}>TenaTimmy</p>
       </div>
 
       <div className={styles.actions}>
@@ -48,11 +47,6 @@ export default function TopHeader() {
         <button className={styles.iconBtn} aria-label="Settings" type="button">
           {SettingsIcon}
         </button>
-        <form action={signOut} className={styles.signOutForm}>
-          <button className={styles.iconBtn} aria-label="Sign out" type="submit">
-            {SignOutIcon}
-          </button>
-        </form>
         <div className={styles.avatar} role="img" aria-label="User profile">LP</div>
       </div>
     </header>

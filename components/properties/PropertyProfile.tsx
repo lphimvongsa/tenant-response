@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Property, PropertyUnit, PropertyTenant, TenantDirectoryEntry } from '@/types'
+import TicketBoard, { type Ticket as MaintenanceTicket, type TicketStatus } from '@/components/maintenance/TicketList'
 import PropertyPhotoPlaceholder from './PropertyPhotoPlaceholder'
 import styles from './PropertyProfile.module.css'
 
@@ -25,8 +26,32 @@ function countOpenTickets(units: PropertyUnit[]): number {
   )
 }
 
+// Tickets are nested under units in the fetched Property shape — flatten them
+// into the shared maintenance board's Ticket shape, attaching each ticket's
+// unit/property back-pointer since the board's cards/filters key off it.
+function flattenTickets(property: Property): MaintenanceTicket[] {
+  const units = property.units ?? []
+  return units.flatMap((u) =>
+    (Array.isArray(u.tickets) ? u.tickets : []).map((t) => ({
+      id: t.id,
+      title: t.title,
+      category: t.category,
+      location: t.location,
+      severity: t.severity as MaintenanceTicket['severity'],
+      description: t.description,
+      status: t.status as TicketStatus,
+      photo_url: t.photo_url,
+      assigned_to: t.assigned_to,
+      created_at: t.created_at,
+      tenants: t.tenants,
+      units: { id: u.id, unit_number: u.unit_number, properties: { id: property.id, name: property.name } },
+    })),
+  )
+}
+
 export default function PropertyProfile({ property }: Props) {
   const router = useRouter()
+  const units = property.units ?? []
 
   function refresh() {
     router.refresh()
@@ -44,7 +69,18 @@ export default function PropertyProfile({ property }: Props) {
         </Link>
 
         <ProfileCard property={property} onRefresh={refresh} />
-        <UnitList propertyId={property.id} units={property.units ?? []} onRefresh={refresh} />
+        <UnitList propertyId={property.id} units={units} onRefresh={refresh} />
+
+        <section className={styles.section}>
+          <TicketBoard
+            tickets={flattenTickets(property)}
+            scopeProperty={{
+              id: property.id,
+              name: property.name,
+              units: units.map((u) => ({ id: u.id, unit_number: u.unit_number })),
+            }}
+          />
+        </section>
       </div>
     </div>
   )

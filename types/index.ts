@@ -30,11 +30,25 @@ export type PropertyTenant = {
   phone: string
 }
 
+export type PropertyTicket = {
+  id: string
+  title: string | null
+  category: string | null
+  location: string | null
+  severity: string | null
+  description: string | null
+  status: string
+  photo_url: string | null
+  assigned_to: string | null
+  created_at: string
+  tenants: { id: string; name: string | null; phone: string } | null
+}
+
 export type PropertyUnit = {
   id: string
   unit_number: string
   tenants: PropertyTenant[]
-  tickets: { id: string; status: string }[]
+  tickets: PropertyTicket[]
 }
 
 export type Property = {

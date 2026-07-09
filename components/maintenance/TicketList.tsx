@@ -1,7 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import {
+  MAINTENANCE_CATEGORIES,
+  maintenanceCategoryLabel,
+  type MaintenanceCategory,
+} from '@/lib/maintenance-categories'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -9,6 +14,7 @@ export type TicketStatus = 'open' | 'in_progress' | 'in_review' | 'resolved' | '
 
 export type Ticket = {
   id: string
+  title: string | null
   category: string | null
   location: string | null
   severity: 'mild' | 'moderate' | 'severe' | null
@@ -50,13 +56,23 @@ function statusLabel(status: TicketStatus): string {
 // dot + label badge. null severity is treated as the "Normal" default.
 
 const PRIORITY: Record<'mild' | 'moderate' | 'severe', { label: string; dot: string; text: string }> = {
-  mild: { label: 'Low', dot: '#4caf50', text: '#0f9d58' },
-  moderate: { label: 'Normal', dot: '#42a5f5', text: '#1565c0' },
-  severe: { label: 'High', dot: '#ef5350', text: '#d93025' },
+  mild: { label: 'Mild', dot: '#4caf50', text: '#0f9d58' },
+  moderate: { label: 'Moderate', dot: '#42a5f5', text: '#1565c0' },
+  severe: { label: 'Severe', dot: '#ef5350', text: '#d93025' },
 }
 
+const SEVERITY_OPTIONS: { value: 'mild' | 'moderate' | 'severe'; label: string }[] = [
+  { value: 'mild', label: 'Mild' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'severe', label: 'Severe' },
+]
+
+// severity is AI-generated free text with no DB-level enum, so it isn't always
+// exactly 'mild' | 'moderate' | 'severe' — fall back to showing the raw value.
 function priorityOf(severity: Ticket['severity']) {
-  return (severity && PRIORITY[severity]) || PRIORITY.moderate
+  if (!severity) return PRIORITY.moderate
+  if (PRIORITY[severity]) return PRIORITY[severity]
+  return { label: severity.charAt(0).toUpperCase() + severity.slice(1), dot: '#90a4ae', text: '#546575' }
 }
 
 function PriorityBadge({ severity }: { severity: Ticket['severity'] }) {
@@ -117,8 +133,17 @@ function ticketRef(id: string): string {
   return `#${id.slice(0, 6).toUpperCase()}`
 }
 
+// `title` is a short human-written summary (AI-generated for tenant-reported
+// tickets, staff-entered for manual ones). Older tickets predate this column, so
+// fall back to deriving one from the free-text description, then category.
 function ticketTitle(ticket: Ticket): string {
-  return ticket.category?.trim() ? ticket.category : 'Maintenance Request'
+  if (ticket.title?.trim()) return ticket.title.trim()
+  // Older tickets had "| Severity: ..." folded into the description before severity
+  // became its own field — strip it so legacy tickets render cleanly too.
+  const summary = ticket.description?.replace(/\s*\|\s*Severity:\s*\S+\s*$/i, '').trim()
+  if (summary) return summary.length > 64 ? `${summary.slice(0, 61)}…` : summary
+  if (ticket.category?.trim()) return maintenanceCategoryLabel(ticket.category)
+  return 'Maintenance Request'
 }
 
 function propertyName(ticket: Ticket): string {
@@ -226,7 +251,19 @@ function TicketCard({
       className="w-full cursor-pointer rounded-xl border border-[rgba(52,71,103,0.08)] bg-white p-3 text-left shadow-[0_1px_3px_rgba(52,71,103,0.08)] transition hover:border-[rgba(25,118,210,0.35)] hover:shadow-[0_4px_16px_rgba(52,71,103,0.12)]"
     >
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="text-xs font-semibold text-[#7b809a]">{ticketRef(ticket.id)}</span>
+        <span className="flex items-center gap-1.5 text-xs font-semibold text-[#7b809a]">
+          {ticketRef(ticket.id)}
+          {ticket.photo_url && (
+            <svg
+              width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              aria-label="Photo attached"
+            >
+              <title>Photo attached</title>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          )}
+        </span>
         <KebabMenu
           ticket={ticket}
           open={menuOpen}
@@ -236,11 +273,16 @@ function TicketCard({
         />
       </div>
 
-      <p className="text-sm font-bold capitalize text-[#1e293b]">{ticketTitle(ticket)}</p>
+      <p className="line-clamp-2 text-sm font-bold text-[#1e293b]">{ticketTitle(ticket)}</p>
       <p className="mt-0.5 truncate text-xs text-[#7b809a]">{propertyName(ticket)}</p>
 
-      <div className="mt-2.5">
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         <PriorityBadge severity={ticket.severity} />
+        {ticket.category?.trim() && (
+          <span className="inline-flex rounded-full bg-[#f0f4f8] px-2.5 py-0.5 text-xs font-semibold text-[#7b809a]">
+            {maintenanceCategoryLabel(ticket.category)}
+          </span>
+        )}
       </div>
 
       <div className="mt-3 border-t border-[rgba(52,71,103,0.06)] pt-2.5">
@@ -313,12 +355,16 @@ function TicketModal({
     ticket.status === 'closed' ? 'resolved' : ticket.status,
   )
   const [assignedTo, setAssignedTo] = useState(ticket.assigned_to ?? '')
+  const [title, setTitle] = useState(ticket.title ?? '')
+  const [category, setCategory] = useState(ticket.category?.toLowerCase() ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const dirty =
     status !== (ticket.status === 'closed' ? 'resolved' : ticket.status) ||
-    assignedTo.trim() !== (ticket.assigned_to ?? '')
+    assignedTo.trim() !== (ticket.assigned_to ?? '') ||
+    title.trim() !== (ticket.title ?? '') ||
+    category !== (ticket.category?.toLowerCase() ?? '')
 
   async function handleSave() {
     setSaving(true)
@@ -327,7 +373,12 @@ function TicketModal({
       const res = await fetch(`/api/tickets/${ticket.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, assigned_to: assignedTo.trim() || null }),
+        body: JSON.stringify({
+          status,
+          assigned_to: assignedTo.trim() || null,
+          title: title.trim() || null,
+          category: category || null,
+        }),
       })
       if (!res.ok) {
         const data = (await res.json().catch(() => null)) as { error?: string } | null
@@ -355,7 +406,7 @@ function TicketModal({
         <div className="flex items-start justify-between border-b border-[rgba(52,71,103,0.08)] px-6 py-4">
           <div>
             <p className="text-xs font-semibold text-[#7b809a]">{ticketRef(ticket.id)}</p>
-            <h2 className="mt-0.5 text-base font-bold capitalize text-[#1e293b]">{ticketTitle(ticket)}</h2>
+            <h2 className="mt-0.5 text-base font-bold text-[#1e293b]">{ticketTitle(ticket)}</h2>
             <p className="mt-0.5 text-sm text-[#7b809a]">{propertyName(ticket)}</p>
           </div>
           <button
@@ -426,22 +477,49 @@ function TicketModal({
             </div>
           )}
 
-          {/* Editable status + assignee */}
-          <div className="grid grid-cols-2 gap-4 rounded-xl bg-[#f8fafc] px-4 py-3">
+          {/* Editable title / category / status / assignee */}
+          <div className="space-y-3 rounded-xl bg-[#f8fafc] px-4 py-3">
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Status</span>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TicketStatus)}
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Title</span>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Short summary"
                 className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
-              >
-                {STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
+            <div className="grid grid-cols-2 gap-4">
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Category</span>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+                >
+                  <option value="">—</option>
+                  {MAINTENANCE_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {maintenanceCategoryLabel(c)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Status</span>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as TicketStatus)}
+                  className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Assigned to</span>
               <input
@@ -490,13 +568,32 @@ type PropertyOption = {
   units: { id: string; unit_number: string }[] | null
 }
 
-function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [properties, setProperties] = useState<PropertyOption[] | null>(null)
+// When set, the board (and this modal) is scoped to a single property: the
+// property picker is hidden/locked and only that property's units are offered.
+export type ScopedProperty = {
+  id: string
+  name: string
+  units: { id: string; unit_number: string }[]
+}
+
+function NewTicketModal({
+  onClose,
+  onSaved,
+  scopedProperty,
+}: {
+  onClose: () => void
+  onSaved: () => void
+  scopedProperty?: ScopedProperty
+}) {
+  const [properties, setProperties] = useState<PropertyOption[] | null>(
+    scopedProperty ? [scopedProperty] : null,
+  )
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  const [propertyId, setPropertyId] = useState('')
+  const [propertyId, setPropertyId] = useState(scopedProperty?.id ?? '')
   const [unitId, setUnitId] = useState('')
-  const [category, setCategory] = useState('')
+  const [title, setTitle] = useState('')
+  const [category, setCategory] = useState<MaintenanceCategory | ''>('')
   const [description, setDescription] = useState('')
   const [severity, setSeverity] = useState<'mild' | 'moderate' | 'severe'>('moderate')
   const [assignedTo, setAssignedTo] = useState('')
@@ -505,6 +602,7 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (scopedProperty) return  // units are already known — no fetch needed
     let cancelled = false
     async function load() {
       try {
@@ -523,15 +621,15 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [scopedProperty])
 
   const selectedProperty = properties?.find((p) => p.id === propertyId) ?? null
   const units = selectedProperty?.units ?? []
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!unitId || !description.trim()) {
-      setSubmitError('Unit and description are required.')
+    if (!unitId || !title.trim() || !description.trim()) {
+      setSubmitError('Unit, title, and description are required.')
       return
     }
     setSubmitting(true)
@@ -542,7 +640,8 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           unit_id: unitId,
-          category: category.trim() || null,
+          title: title.trim(),
+          category: category || null,
           severity,
           description: description.trim(),
           assigned_to: assignedTo.trim() || null,
@@ -592,24 +691,31 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
           <div className="px-6 py-10 text-center text-sm text-[#7b809a]">Loading properties…</div>
         ) : (
           <form onSubmit={handleSubmit} className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5">
-            <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Property</span>
-              <select
-                value={propertyId}
-                onChange={(e) => {
-                  setPropertyId(e.target.value)
-                  setUnitId('')
-                }}
-                className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-2 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
-              >
-                <option value="">Select a property…</option>
-                {properties.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {scopedProperty ? (
+              <div className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Property</span>
+                <p className="mt-1 text-sm font-medium text-[#1e293b]">{scopedProperty.name}</p>
+              </div>
+            ) : (
+              <label className="block">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Property</span>
+                <select
+                  value={propertyId}
+                  onChange={(e) => {
+                    setPropertyId(e.target.value)
+                    setUnitId('')
+                  }}
+                  className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-2 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+                >
+                  <option value="">Select a property…</option>
+                  {properties.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <label className="block">
               <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Unit</span>
@@ -629,14 +735,33 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
             </label>
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Category</span>
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">
+                Title <span className="text-[#d93025]">*</span>
+              </span>
               <input
                 type="text"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g. Plumbing"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                placeholder="e.g. Leaking faucet"
                 className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-2 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
               />
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Category</span>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as MaintenanceCategory | '')}
+                className="mt-1 w-full rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-2 text-sm text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+              >
+                <option value="">Select a category…</option>
+                {MAINTENANCE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {maintenanceCategoryLabel(c)}
+                  </option>
+                ))}
+              </select>
             </label>
 
             <label className="block">
@@ -713,6 +838,7 @@ function matchesSearch(ticket: Ticket, query: string): boolean {
   const haystack = [
     ticket.tenants?.name,
     ticket.tenants?.phone,
+    ticket.title,
     ticket.category,
     propertyName(ticket),
     ticket.assigned_to,
@@ -724,11 +850,23 @@ function matchesSearch(ticket: Ticket, query: string): boolean {
   return haystack.includes(q)
 }
 
-export default function TicketBoard({ tickets }: { tickets: Ticket[] }) {
+export default function TicketBoard({
+  tickets,
+  scopeProperty,
+}: {
+  tickets: Ticket[]
+  // When set, the board is scoped to a single property: the property filter is
+  // hidden and "New Ticket" skips property selection, offering only its units.
+  scopeProperty?: ScopedProperty
+}) {
   const router = useRouter()
   const [selected, setSelected] = useState<Ticket | null>(null)
   const [showNew, setShowNew] = useState(false)
   const [search, setSearch] = useState('')
+  const [propertyFilter, setPropertyFilter] = useState('')
+  const [unitFilter, setUnitFilter] = useState('')
+  const [severityFilter, setSeverityFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [moveError, setMoveError] = useState<string | null>(null)
@@ -746,7 +884,56 @@ export default function TicketBoard({ tickets }: { tickets: Ticket[] }) {
     return () => document.removeEventListener('mousedown', onDocClick)
   }, [openMenuId])
 
-  const filtered = tickets.filter((t) => matchesSearch(t, search))
+  // Filter option lists are derived from the tickets actually on the board, so a
+  // property/unit only shows up as a filter once it has a ticket.
+  const propertyOptions = useMemo(() => {
+    const byId = new Map<string, string>()
+    for (const t of tickets) {
+      const p = t.units?.properties
+      if (p) byId.set(p.id, p.name)
+    }
+    return Array.from(byId, ([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name))
+  }, [tickets])
+
+  const unitOptions = useMemo(() => {
+    const byId = new Map<string, { unitNumber: string; propertyName: string | null }>()
+    for (const t of tickets) {
+      if (!t.units) continue
+      if (propertyFilter && t.units.properties?.id !== propertyFilter) continue
+      byId.set(t.units.id, {
+        unitNumber: t.units.unit_number,
+        propertyName: t.units.properties?.name ?? null,
+      })
+    }
+    return Array.from(byId, ([id, v]) => ({ id, ...v })).sort((a, b) =>
+      a.unitNumber.localeCompare(b.unitNumber),
+    )
+  }, [tickets, propertyFilter])
+
+  // Reset the unit filter if it no longer belongs to the selected property.
+  useEffect(() => {
+    if (unitFilter && !unitOptions.some((u) => u.id === unitFilter)) {
+      setUnitFilter('')
+    }
+  }, [unitOptions, unitFilter])
+
+  const filtered = tickets.filter((t) => {
+    if (!matchesSearch(t, search)) return false
+    if (propertyFilter && t.units?.properties?.id !== propertyFilter) return false
+    if (unitFilter && t.units?.id !== unitFilter) return false
+    if (severityFilter && t.severity !== severityFilter) return false
+    if (categoryFilter && t.category?.toLowerCase() !== categoryFilter) return false
+    return true
+  })
+
+  const filtersActive = Boolean(propertyFilter || unitFilter || severityFilter || categoryFilter)
+
+  function clearFilters() {
+    setPropertyFilter('')
+    setUnitFilter('')
+    setSeverityFilter('')
+    setCategoryFilter('')
+  }
 
   async function handleMove(id: string, status: TicketStatus) {
     setOpenMenuId(null)
@@ -805,6 +992,69 @@ export default function TicketBoard({ tickets }: { tickets: Ticket[] }) {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {!scopeProperty && (
+          <select
+            value={propertyFilter}
+            onChange={(e) => setPropertyFilter(e.target.value)}
+            className="rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+          >
+            <option value="">All properties</option>
+            {propertyOptions.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
+        <select
+          value={unitFilter}
+          onChange={(e) => setUnitFilter(e.target.value)}
+          className="rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+        >
+          <option value="">All units</option>
+          {unitOptions.map((u) => (
+            <option key={u.id} value={u.id}>
+              {propertyFilter || !u.propertyName ? u.unitNumber : `${u.unitNumber} — ${u.propertyName}`}
+            </option>
+          ))}
+        </select>
+        <select
+          value={severityFilter}
+          onChange={(e) => setSeverityFilter(e.target.value)}
+          className="rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+        >
+          <option value="">All severities</option>
+          {SEVERITY_OPTIONS.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="rounded-lg border border-[rgba(52,71,103,0.18)] bg-white px-2.5 py-1.5 text-xs font-medium text-[#1e293b] focus:border-[#1976d2] focus:outline-none"
+        >
+          <option value="">All categories</option>
+          {MAINTENANCE_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {maintenanceCategoryLabel(c)}
+            </option>
+          ))}
+        </select>
+        {filtersActive && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-xs font-semibold text-[#1565c0] transition hover:underline"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {moveError && (
         <p className="mb-3 rounded-lg bg-[#fce8e6] px-3 py-2 text-sm text-[#d93025]">{moveError}</p>
       )}
@@ -837,7 +1087,11 @@ export default function TicketBoard({ tickets }: { tickets: Ticket[] }) {
       )}
 
       {showNew && (
-        <NewTicketModal onClose={() => setShowNew(false)} onSaved={() => router.refresh()} />
+        <NewTicketModal
+          onClose={() => setShowNew(false)}
+          onSaved={() => router.refresh()}
+          scopedProperty={scopeProperty}
+        />
       )}
     </div>
   )

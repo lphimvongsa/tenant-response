@@ -1,5 +1,6 @@
 import { deepseek, DEEPSEEK_MODEL } from './deepseek'
 import type { BusinessHours } from '../utils/time'
+import { MAINTENANCE_CATEGORIES } from '../maintenance-categories'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -9,6 +10,7 @@ export type ActionData = {
   // maintenance
   ticketReady?: boolean
   maintenanceType?: string
+  maintenanceTitle?: string
   maintenanceLocation?: string
   maintenanceSeverity?: string
   maintenanceDescription?: string
@@ -43,9 +45,10 @@ type RouterInput = {
 }
 
 // ─── Maintenance intake script ────────────────────────────────────────────────
+// Issue type is inferred by the AI from the tenant's own words — never asked for.
 
 export const MAINTENANCE_INTAKE_SCRIPT =
-  "I'm sorry for the inconvenience. Please answer these questions so I can submit a maintenance ticket request:\n(1) What type of issue is this?\n(2) Where is the issue located?\n(3) How severe is the issue?\n(4) Are you able to send a photo?"
+  "I'm sorry for the inconvenience. Please answer these questions so I can submit a maintenance ticket request:\n(1) Where is the issue located?\n(2) How severe is the issue? (Mild, Moderate, Severe)\n(3) Are you able to send a photo?"
 
 // ─── Tool definition ──────────────────────────────────────────────────────────
 
@@ -71,11 +74,16 @@ const ROUTE_TOOL = {
           properties: {
             ticket_ready: {
               type: 'boolean',
-              description: 'maintenance only — true once you have type, location, AND severity',
+              description: 'maintenance only — true once you have location AND severity (issue type and title are yours to infer, never ask the tenant for them)',
             },
             maintenance_type: {
               type: 'string',
-              description: 'maintenance only — plumbing, electrical, HVAC, appliance, gas, pest, other',
+              enum: [...MAINTENANCE_CATEGORIES],
+              description: "maintenance only — infer this yourself from what the tenant describes; do NOT ask the tenant to pick one. Use 'other' only if nothing else fits.",
+            },
+            maintenance_title: {
+              type: 'string',
+              description: "maintenance only — a short 2-5 word ticket title summarizing the issue, written by you (e.g. 'Leaking faucet', 'Paint chipping', 'Lawn mowing'). This is NOT the full description — keep it brief, do not include location or severity.",
             },
             maintenance_location: {
               type: 'string',
@@ -87,7 +95,7 @@ const ROUTE_TOOL = {
             },
             maintenance_description: {
               type: 'string',
-              description: 'maintenance only — full description combining type, location, and severity',
+              description: 'maintenance only — the fuller description of the issue in the tenant\'s own words (distinct from maintenance_title, which is a short summary)',
             },
             needs_photo: {
               type: 'boolean',
@@ -121,11 +129,12 @@ INTENT CLASSIFICATION RULES:
   → Your FIRST reply MUST be this exact text, word-for-word (this message is allowed to exceed 160 chars):
     "${MAINTENANCE_INTAKE_SCRIPT}"
   → Set needs_photo=true when sending that message.
-  → Set ticket_ready=true once you have type, location, AND severity — a photo is optional, do not block the ticket on it.
+  → Do NOT ask the tenant what type of issue it is — infer maintenance_type and write maintenance_title yourself from their own description, as soon as you have enough detail to do so.
+  → Set ticket_ready=true once you have location AND severity — a photo is optional, do not block the ticket on it.
   → Once ticket_ready=true, confirm the ticket has been submitted.
 - maintenance_update: Tenant is referencing an issue they already reported — they are changing the severity, sending a new photo, or saying the issue is resolved / no longer a problem.
   → Do NOT send the intake questions again.
-  → If updating severity or adding details: acknowledge the update, set the relevant fields (maintenance_severity, maintenance_description, etc.) and set ticket_ready=true.
+  → If updating severity or adding details: acknowledge the update, set the relevant fields (maintenance_severity, maintenance_description, maintenance_type/maintenance_title if the new details change what the issue actually is, etc.) and set ticket_ready=true.
   → If tenant says the issue is fixed or no longer a problem: acknowledge and set ticket_resolved=true.
 - emergency: Tenant reports a life-safety issue (gas leak, fire, flooding, no heat below freezing, break-in, medical).
   → Respond immediately with urgency. Do NOT ask clarifying questions.
@@ -185,6 +194,7 @@ export async function runAiRouter(input: RouterInput): Promise<RouterOutput> {
     action_data?: {
       ticket_ready?: boolean
       maintenance_type?: string
+      maintenance_title?: string
       maintenance_location?: string
       maintenance_severity?: string
       maintenance_description?: string
@@ -200,6 +210,7 @@ export async function runAiRouter(input: RouterInput): Promise<RouterOutput> {
     actionData: {
       ticketReady: raw.action_data?.ticket_ready,
       maintenanceType: raw.action_data?.maintenance_type,
+      maintenanceTitle: raw.action_data?.maintenance_title,
       maintenanceLocation: raw.action_data?.maintenance_location,
       maintenanceSeverity: raw.action_data?.maintenance_severity,
       maintenanceDescription: raw.action_data?.maintenance_description,

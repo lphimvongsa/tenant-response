@@ -1,4 +1,4 @@
-// Hand-rolled inline SVG dual-line area chart (no chart library installed).
+// Hand-rolled inline SVG triple-line area chart (no chart library installed).
 // Pure presentational — receives pre-bucketed data as props, computes geometry
 // from props only (no impure calls), so it is safe in a server component.
 
@@ -13,10 +13,11 @@ type Pt = { x: number; y: number }
 // ── Geometry constants ──────────────────────────────────────────────────────
 const W = 640
 const H = 240
-const PAD_L = 12
+const PAD_L = 34
 const PAD_R = 16
-const PAD_T = 28
+const PAD_T = 18
 const PAD_B = 30
+const TICKS = 4
 
 // Cardinal-spline smoothing: turn a set of points into a smooth cubic-bezier path.
 function smoothPath(points: Pt[]): string {
@@ -50,30 +51,26 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
   const plotH = H - PAD_T - PAD_B
   const baselineY = PAD_T + plotH
 
-  // Scale: headroom above the peak so the callout has breathing room.
-  const rawMax = data.reduce((m, d) => Math.max(m, d.inbound, d.outbound), 0)
-  const maxScale = Math.max(4, Math.ceil((rawMax * 1.25) / 2) * 2)
+  const totals = data.map((d) => d.inbound + d.outbound)
+
+  // Scale to a round number divisible by TICKS so gridline labels are clean.
+  const rawMax = Math.max(0, ...totals)
+  const maxScale = Math.max(TICKS, Math.ceil((rawMax * 1.25) / TICKS) * TICKS)
 
   const n = data.length
   const xFor = (i: number) => (n <= 1 ? PAD_L + plotW / 2 : PAD_L + (plotW * i) / (n - 1))
   const yFor = (v: number) => PAD_T + plotH - (v / maxScale) * plotH
 
+  const totalPts: Pt[] = data.map((d, i) => ({ x: xFor(i), y: yFor(d.inbound + d.outbound) }))
   const inboundPts: Pt[] = data.map((d, i) => ({ x: xFor(i), y: yFor(d.inbound) }))
   const outboundPts: Pt[] = data.map((d, i) => ({ x: xFor(i), y: yFor(d.outbound) }))
 
-  // Peak inbound point → callout.
-  let peakIdx = 0
-  for (let i = 1; i < data.length; i++) {
-    if (data[i].inbound > data[peakIdx].inbound) peakIdx = i
-  }
-  const peak = data[peakIdx]
-  const peakPt = inboundPts[peakIdx]
-  const showCallout = data.length > 0 && peak.inbound > 0
+  // Y-axis gridlines at even increments of maxScale.
+  const yTicks = Array.from({ length: TICKS + 1 }, (_, i) => (maxScale / TICKS) * i)
 
-  // Keep the callout box inside the viewBox horizontally.
-  const calloutW = 58
-  const calloutX = peakPt ? Math.min(Math.max(peakPt.x - calloutW / 2, PAD_L), W - PAD_R - calloutW) : 0
-  const calloutY = peakPt ? Math.max(peakPt.y - 40, 2) : 0
+  // Thin x-axis labels when there are many points (e.g. a 31-day month view)
+  // so timestamps don't overlap. Always keep the first and last.
+  const labelStep = n > 12 ? Math.ceil(n / 8) : 1
 
   return (
     <div className="w-full">
@@ -82,22 +79,39 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
         className="h-auto w-full"
         preserveAspectRatio="none"
         role="img"
-        aria-label="Inbound versus outbound message volume over the last 7 days"
+        aria-label="Total, inbound, and outbound message volume over time"
       >
         <defs>
-          <linearGradient id="trend-inbound-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1565c0" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#1565c0" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="trend-outbound-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7b809a" stopOpacity="0.14" />
-            <stop offset="100%" stopColor="#7b809a" stopOpacity="0" />
+          <linearGradient id="trend-total-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#344767" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="#344767" stopOpacity="0" />
           </linearGradient>
         </defs>
 
-        {/* Area fills */}
-        <path d={areaPath(outboundPts, baselineY)} fill="url(#trend-outbound-fill)" />
-        <path d={areaPath(inboundPts, baselineY)} fill="url(#trend-inbound-fill)" />
+        {/* Y-axis gridlines + labels */}
+        {yTicks.map((v) => {
+          const y = yFor(v)
+          return (
+            <g key={v}>
+              <line
+                x1={PAD_L}
+                y1={y}
+                x2={W - PAD_R}
+                y2={y}
+                stroke="#e3e8ef"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+                vectorEffect="non-scaling-stroke"
+              />
+              <text x={PAD_L - 8} y={y + 3} textAnchor="end" fontSize="10" fill="#b0b7c3">
+                {Math.round(v)}
+              </text>
+            </g>
+          )
+        })}
+
+        {/* Area fill (total only, to keep the chart from looking cluttered) */}
+        <path d={areaPath(totalPts, baselineY)} fill="url(#trend-total-fill)" />
 
         {/* Lines */}
         <path
@@ -113,55 +127,31 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
           d={smoothPath(inboundPts)}
           fill="none"
           stroke="#1565c0"
-          strokeWidth="2.5"
+          strokeWidth="2.25"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
-
-        {/* Peak marker + callout */}
-        {showCallout && peakPt && (
-          <>
-            <line
-              x1={peakPt.x}
-              y1={peakPt.y}
-              x2={peakPt.x}
-              y2={baselineY}
-              stroke="#1565c0"
-              strokeWidth="1"
-              strokeDasharray="3 3"
-              opacity="0.4"
-              vectorEffect="non-scaling-stroke"
-            />
-            <circle cx={peakPt.x} cy={peakPt.y} r="5" fill="#ffffff" stroke="#1565c0" strokeWidth="2.5" />
-            <g>
-              <rect
-                x={calloutX}
-                y={calloutY}
-                width={calloutW}
-                height="26"
-                rx="8"
-                fill="#1565c0"
-              />
-              <text
-                x={calloutX + calloutW / 2}
-                y={calloutY + 17}
-                textAnchor="middle"
-                fill="#ffffff"
-                fontSize="12"
-                fontWeight="700"
-              >
-                {peak.inbound} in
-              </text>
-            </g>
-          </>
-        )}
+        <path
+          d={smoothPath(totalPts)}
+          fill="none"
+          stroke="#344767"
+          strokeWidth="2.75"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
 
-      {/* X-axis labels */}
-      <div className="mt-1 flex justify-between px-1 text-[11px] font-medium text-[#b0b7c3]">
-        {data.map((d, i) => (
-          <span key={`${d.label}-${i}`}>{d.label}</span>
-        ))}
+      {/* X-axis timestamps */}
+      <div className="mt-1 flex pl-[34px] pr-4 text-[11px] font-medium text-[#b0b7c3]">
+        {data.map((d, i) => {
+          const show = i % labelStep === 0 || i === n - 1
+          const align = i === 0 ? 'text-left' : i === n - 1 ? 'text-right' : 'text-center'
+          return (
+            <span key={`${d.label}-${i}`} className={`flex-1 ${align}`}>
+              {show ? d.label : ' '}
+            </span>
+          )
+        })}
       </div>
     </div>
   )

@@ -2,3 +2,4 @@
 - [public vs private bucket decision](decision_public_vs_private_storage_buckets.md) — when to make a bucket public, and how that shapes path convention + RLS design
 - [migration style pattern](pattern_migration_style.md) — numbering, section dividers, idempotency guards, RLS policy naming conventions
 - [auth + join codes decision](decision_auth_and_join_codes.md) — clients.join_code invite signup; session-client vs service-role split for getCurrentManager()
+- [tickets schema](schema_tickets.md) — tickets columns, category taxonomy CHECK (NOT VALID), title column, indexes

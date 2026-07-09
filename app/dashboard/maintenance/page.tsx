@@ -14,7 +14,7 @@ export default async function MaintenancePage() {
   const { data, error } = await supabase
     .from('tickets')
     .select(
-      'id, category, location, severity, description, status, photo_url, assigned_to, created_at, unit_id, tenants(id, name, phone), units(id, unit_number, properties(id, name))',
+      'id, title, category, location, severity, description, status, photo_url, assigned_to, created_at, unit_id, tenants(id, name, phone), units(id, unit_number, properties(id, name))',
     )
     .eq('client_id', manager.clientId)
     .order('created_at', { ascending: false })

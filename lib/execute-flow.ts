@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { RouterOutput } from './ai/router'
+import { isMaintenanceCategory } from './maintenance-categories'
 
 type FlowContext = {
   supabase: SupabaseClient
@@ -19,13 +20,17 @@ async function handleMaintenance(ctx: FlowContext): Promise<void> {
 
   if (!actionData.ticketReady) return  // still gathering info — no ticket yet
 
-  const category = actionData.maintenanceType ?? 'other'
+  // The tool schema constrains maintenance_type to the known enum, but treat that as
+  // a hint, not a guarantee — fall back to 'other' rather than write a value the DB's
+  // category CHECK constraint would reject.
+  const rawCategory = actionData.maintenanceType?.toLowerCase().trim()
+  const category = rawCategory && isMaintenanceCategory(rawCategory) ? rawCategory : 'other'
+  const title = actionData.maintenanceTitle?.trim() || null
   const location = actionData.maintenanceLocation ?? 'unspecified'
   const severity = actionData.maintenanceSeverity ?? 'moderate'
-  const description = [
-    actionData.maintenanceDescription,
-    severity ? `Severity: ${severity}` : null,
-  ].filter(Boolean).join(' | ') || '(no description)'
+  // Severity is a structured field on the ticket now (shown as its own badge on the
+  // dashboard) — don't fold it back into the free-text description.
+  const description = actionData.maintenanceDescription?.trim() || '(no description)'
 
   // Check for an existing open ticket for this exact issue (same category + location
   // in this conversation). If found, update it — the tenant may be adding info or
@@ -45,6 +50,7 @@ async function handleMaintenance(ctx: FlowContext): Promise<void> {
       .update({
         description,
         severity,
+        ...(title ? { title } : {}),
         ...(uploadedPhotoUrl ? { photo_url: uploadedPhotoUrl } : {}),
       })
       .eq('id', existing.id)
@@ -57,12 +63,21 @@ async function handleMaintenance(ctx: FlowContext): Promise<void> {
     return
   }
 
+  // The ticket belongs to whichever unit the tenant is currently assigned to.
+  const { data: tenant } = await supabase
+    .from('tenants')
+    .select('unit_id')
+    .eq('id', tenantId)
+    .single()
+
   // No existing ticket — create a new one
   const { error } = await supabase.from('tickets').insert({
     client_id: clientId,
     tenant_id: tenantId,
+    unit_id: tenant?.unit_id ?? null,
     conversation_id: conversationId,
     category,
+    title,
     location,
     description,
     severity,
@@ -112,10 +127,15 @@ async function handleMaintenanceUpdate(ctx: FlowContext): Promise<void> {
     return
   }
 
-  // Severity / photo / description update
+  // Severity / photo / description / type / title update
   const updates: Record<string, unknown> = {}
   if (actionData.maintenanceSeverity) updates.severity = actionData.maintenanceSeverity
   if (actionData.maintenanceDescription) updates.description = actionData.maintenanceDescription
+  if (actionData.maintenanceTitle?.trim()) updates.title = actionData.maintenanceTitle.trim()
+  if (actionData.maintenanceType) {
+    const rawCategory = actionData.maintenanceType.toLowerCase().trim()
+    if (isMaintenanceCategory(rawCategory)) updates.category = rawCategory
+  }
   if (uploadedPhotoUrl) updates.photo_url = uploadedPhotoUrl
 
   if (Object.keys(updates).length === 0) return
