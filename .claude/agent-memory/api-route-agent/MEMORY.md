@@ -1,0 +1,2 @@
+- [Conversation escalation workflow](project_conversation-escalation.md) — status='escalated' guard in twilio webhook + resolve endpoint, split across two agents
+- [Twilio route ownership boundary](feedback_ownership-boundary-twilio.md) — never edit app/api/twilio/route.ts myself, delegate to twilio-agent instead

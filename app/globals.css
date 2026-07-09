@@ -7,25 +7,31 @@
   --color-brand-light:    #42a5f5;
   --color-brand-gradient: linear-gradient(135deg, #42a5f5 0%, #1565c0 100%);
   --color-brand-shadow:   0 4px 12px rgba(25, 118, 210, 0.35);
+  --color-brand-border:   rgba(25, 118, 210, 0.35); /* translucent brand outline for dashed/outline buttons */
 
   /* ── Background layers ── */
-  --color-bg-base:     #f0f4f8;   /* page canvas — soft cool blue-gray */
-  --color-bg-surface:  #ffffff;   /* sidebar, cards, panels */
-  --color-bg-elevated: #e8f0fe;   /* active item highlight */
-  --color-bg-hover:    #f5f8ff;   /* hover state */
+  --color-bg-base:     #ffffff;
+  --color-bg-surface:  #ffffff;
+  --color-bg-elevated: #e8f0fe;
+  --color-bg-hover:    #f5f8ff;
+
+  /* ── Overlays (modal / drawer scrims) ── */
+  --color-overlay:        rgba(15, 23, 42, 0.5);
+  --color-overlay-subtle: rgba(15, 23, 42, 0.3);
 
   /* ── Borders ── */
-  --color-border:        rgba(52, 71, 103, 0.12);
-  --color-border-subtle: rgba(52, 71, 103, 0.06);
+  --color-border:          rgba(52, 71, 103, 0.10);
+  --color-border-subtle:   rgba(52, 71, 103, 0.05);
+  --color-border-on-brand: rgba(255, 255, 255, 0.4); /* translucent divider/spinner track over brand surfaces */
 
   /* ── Text ── */
-  --color-text-primary:   #344767;   /* dark blue-navy */
+  --color-text-primary:   #1e293b;
   --color-text-secondary: #7b809a;
   --color-text-muted:     #b0b7c3;
 
   /* ── Message bubbles ── */
   --color-bubble-inbound-bg:    #f0f4f8;
-  --color-bubble-inbound-text:  #344767;
+  --color-bubble-inbound-text:  #1e293b;
   --color-bubble-outbound-bg:   var(--color-brand-gradient);
   --color-bubble-outbound-text: #ffffff;
 
@@ -34,38 +40,65 @@
   --color-btn-bg-hover:        linear-gradient(135deg, #64b5f6 0%, #1976d2 100%);
   --color-btn-text:            #ffffff;
   --color-input-bg:            #f8fafc;
-  --color-input-border:        rgba(52, 71, 103, 0.2);
+  --color-input-border:        rgba(52, 71, 103, 0.18);
   --color-input-border-focus:  #1976d2;
 
   /* ── Semantic ── */
-  --color-error:   #ef5350;
-  --color-success: #4caf50;
+  --color-error:      #ef5350;  /* soft red — subtle delete affordances */
+  --color-error-bg-hover: rgba(239, 83, 80, 0.08); /* translucent --color-error — delete/remove hover bg */
+  --color-success:    #4caf50;  /* green — success text / icons */
+  --color-danger:     #d93025;  /* strong red — escalation / alert badges & error boxes */
+  --color-danger-bg:  #fce8e6;  /* pale red — alert badge / error box background */
+  --color-success-bg: #e6f4ea;  /* pale green — "clear" / success badge background */
+  --color-warning:    #9a3412;  /* amber-brown — maintenance "needs attention" text */
+  --color-warning-bg: #ffedd5;  /* pale amber — "needs attention" badge background */
 
   /* ── Shadows ── */
-  --shadow-card:    0 4px 24px rgba(52, 71, 103, 0.10);
-  --shadow-sidebar: 4px 0 20px rgba(52, 71, 103, 0.07);
+  --shadow-hairline: 0 1px 0 rgba(52, 71, 103, 0.04);   /* 1px bottom hairline under headers */
+  --shadow-xs:      0 1px 3px rgba(52, 71, 103, 0.12);
+  --shadow-sm:      0 1px 4px rgba(52, 71, 103, 0.15);
+  --shadow-card:    0 2px 12px rgba(52, 71, 103, 0.08);
+  --shadow-card-hover: 0 6px 24px rgba(52, 71, 103, 0.14);
+  --shadow-sidebar: 2px 0 12px rgba(0, 0, 0, 0.12);
+  --shadow-drawer:  -8px 0 32px rgba(52, 71, 103, 0.12); /* right-edge slide-out drawer */
   --shadow-button:  0 4px 12px rgba(25, 118, 210, 0.35);
+  --shadow-button-hover: 0 6px 16px rgba(25, 118, 210, 0.45); /* lifted brand button on hover */
+  --shadow-tooltip: 0 4px 12px rgba(0, 0, 0, 0.25); /* dark chrome tooltip */
+  --shadow-focus:   0 0 0 3px rgba(25, 118, 210, 0.12); /* input focus ring */
+
+  /* ── Sidebar chrome (self-contained dark surface) ── */
+  --color-sidebar-bg:           #1a2332;
+  --color-sidebar-border:       rgba(255, 255, 255, 0.04);
+  --color-sidebar-hover-bg:     rgba(255, 255, 255, 0.07);
+  --color-sidebar-hover-text:   #cbd5e1;
+  --color-sidebar-tooltip-bg:   #0f172a;
+  --color-sidebar-tooltip-text: #e2e8f0;
+
+  /* ── Accents (one-off surfaces) ── */
+  --color-avatar-staff-start: #334155;  /* start stop of staff avatar slate gradient */
+  --color-highlight:          #fff176;  /* search-match highlight yellow */
 
   /* ── Layout ── */
-  --sidebar-width:  280px;
-  --header-height:  52px;
+  --header-height:  64px;
 
   /* ── Radius ── */
   --radius-sm:     0.625rem;   /* 10px */
   --radius-md:     0.875rem;   /* 14px */
   --radius-lg:     1.25rem;    /* 20px */
+  --radius-xl:     1.5rem;     /* 24px */
   --radius-bubble: 1rem;       /* 16px */
   --radius-pill:   9999px;
 }
 
 body {
-  background-color: var(--color-bg-base);
+  background: var(--color-bg-base);
   color: var(--color-text-primary);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Subtle custom scrollbar */
-::-webkit-scrollbar        { width: 5px; }
+::-webkit-scrollbar        { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(52, 71, 103, 0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(25, 118, 210, 0.4); }
+::-webkit-scrollbar-thumb  { background: rgba(52, 71, 103, 0.18); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(25, 118, 210, 0.38); }

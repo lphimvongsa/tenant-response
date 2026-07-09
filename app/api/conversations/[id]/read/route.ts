@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
@@ -7,10 +8,19 @@ export async function PATCH(
 ) {
   const { id } = await params
 
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { error } = await supabase
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', id)
+    .eq('client_id', manager.clientId)
     .eq('direction', 'inbound')
     .eq('is_read', false)
 

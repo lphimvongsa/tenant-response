@@ -1,13 +1,22 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
-  let body: { name?: string; address?: string }
+  let body: { name?: string; address?: string; photo_url?: string | null }
   try {
     body = await request.json()
   } catch {
@@ -17,9 +26,10 @@ export async function PATCH(
     })
   }
 
-  const updates: Record<string, string> = {}
+  const updates: Record<string, string | null> = {}
   if (body.name?.trim()) updates.name = body.name.trim()
   if (body.address?.trim()) updates.address = body.address.trim()
+  if ('photo_url' in body) updates.photo_url = body.photo_url ?? null
 
   if (Object.keys(updates).length === 0) {
     return new Response(JSON.stringify({ error: 'Nothing to update' }), {
@@ -32,6 +42,7 @@ export async function PATCH(
     .from('properties')
     .update(updates)
     .eq('id', id)
+    .eq('client_id', manager.clientId)
     .select()
     .single()
 
@@ -52,9 +63,21 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
-  const { error } = await supabase.from('properties').delete().eq('id', id)
+  const { error } = await supabase
+    .from('properties')
+    .delete()
+    .eq('id', id)
+    .eq('client_id', manager.clientId)
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

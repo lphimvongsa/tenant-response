@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import { twilioClient } from '@/lib/integrations/twilio'
 import type { NextRequest } from 'next/server'
 
@@ -6,6 +7,14 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
   // Parse and validate body
@@ -27,11 +36,14 @@ export async function POST(
     })
   }
 
-  // Fetch conversation with tenant phone and ai_enabled flag
+  // Fetch conversation with tenant phone and ai_enabled flag — scoped to the
+  // caller's client so a guessed/enumerated conversation id from another
+  // tenant can't be read or sent to.
   const { data: conversation } = await supabase
     .from('conversations')
     .select('id, client_id, ai_enabled, tenants(phone)')
     .eq('id', id)
+    .eq('client_id', manager.clientId)
     .single()
 
   if (!conversation) {

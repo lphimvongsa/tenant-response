@@ -1,19 +1,11 @@
 import { supabase } from '@/lib/integrations/supabase'
-import MessageInput from '@/components/conversations/MessageInput'
-import RefreshButton from '@/components/ui/RefreshButton'
-import MessageThread from '@/components/conversations/MessageThread'
+import ConversationView from '@/components/conversations/ConversationView'
 import type { ThreadMessage } from '@/components/conversations/MessageThread'
-import styles from '../../[conversationId]/conversation.module.css'
 
-type Tenant = {
-  phone: string
-  name: string | null
-}
-
-type ConversationDetail = {
-  id: string
-  tenants: Tenant | null
-}
+type TenantRow = { id: string; name: string | null; phone: string; unit_id: string | null }
+type UnitRow = { id: string; unit_number: string }
+type PropertyRow = { id: string; name: string; units: UnitRow[] }
+type ConvRow = { id: string; status: string | null; tenants: TenantRow | null }
 
 export default async function ConversationPage({
   params,
@@ -22,7 +14,7 @@ export default async function ConversationPage({
 }) {
   const { conversationId } = await params
 
-  const [{ data: messages }, { data: conversation }] = await Promise.all([
+  const [{ data: messages }, { data: conversation }, { data: propertiesData }] = await Promise.all([
     supabase
       .from('messages')
       .select('id, direction, body, created_at, is_read')
@@ -30,31 +22,28 @@ export default async function ConversationPage({
       .order('created_at', { ascending: true }),
     supabase
       .from('conversations')
-      .select('id, tenants(phone, name)')
+      .select('id, status, tenants(id, phone, name, unit_id)')
       .eq('id', conversationId)
       .single(),
+    supabase
+      .from('properties')
+      .select('id, name, units(id, unit_number)')
+      .order('name', { ascending: true }),
   ])
 
   const initialMessages = (messages ?? []) as unknown as ThreadMessage[]
-  const typedConversation = conversation as ConversationDetail | null
-
-  const tenant = typedConversation?.tenants
-  const displayName = tenant?.name
-    ? `${tenant.name} · ${tenant.phone}`
-    : tenant?.phone ?? 'Unknown'
+  const conv = conversation as ConvRow | null
+  const tenant = conv?.tenants ?? null
+  const isEscalated = conv?.status === 'escalated'
+  const properties = (propertiesData ?? []) as unknown as PropertyRow[]
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <p className={styles.headerName}>{displayName}</p>
-        <RefreshButton />
-      </header>
-
-      <MessageThread conversationId={conversationId} initialMessages={initialMessages} />
-
-      <div className={styles.inputArea}>
-        <MessageInput conversationId={conversationId} />
-      </div>
-    </div>
+    <ConversationView
+      conversationId={conversationId}
+      initialMessages={initialMessages}
+      tenant={tenant}
+      isEscalated={isEscalated}
+      properties={properties}
+    />
   )
 }

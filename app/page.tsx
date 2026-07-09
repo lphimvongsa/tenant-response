@@ -1,3 +1,5 @@
+import AuthForms from '@/components/auth/AuthForms'
+
 export default function Home() {
   return (
     <div
@@ -56,40 +58,14 @@ export default function Home() {
           style={{
             fontSize: '0.9375rem',
             color: '#7b809a',
-            margin: '0 0 2.25rem',
+            margin: '0 0 2rem',
             lineHeight: 1.6,
           }}
         >
           AI-powered tenant communication, simplified.
         </p>
 
-        <a
-          href="/dashboard"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.75rem 2rem',
-            background: 'linear-gradient(135deg, #42a5f5 0%, #1565c0 100%)',
-            color: '#ffffff',
-            fontWeight: 600,
-            fontSize: '0.9375rem',
-            borderRadius: '9999px',
-            textDecoration: 'none',
-            boxShadow: '0 4px 14px rgba(25, 118, 210, 0.4)',
-            transition: 'opacity 0.15s, transform 0.15s',
-          }}
-          onMouseOver={e => {
-            (e.currentTarget as HTMLAnchorElement).style.opacity = '0.9'
-            ;(e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-1px)'
-          }}
-          onMouseOut={e => {
-            (e.currentTarget as HTMLAnchorElement).style.opacity = '1'
-            ;(e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(0)'
-          }}
-        >
-          Go to Dashboard →
-        </a>
+        <AuthForms />
       </div>
     </div>
   )

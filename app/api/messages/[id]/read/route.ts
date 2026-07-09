@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
@@ -6,6 +7,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
+
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   let is_read: boolean
   try {
@@ -23,6 +32,7 @@ export async function PATCH(
     .from('messages')
     .update({ is_read })
     .eq('id', id)
+    .eq('client_id', manager.clientId)
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

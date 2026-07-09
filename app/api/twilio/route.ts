@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
   const { data: existingConv } = await supabase
     .from('conversations')
-    .select('id, ai_enabled')
+    .select('id, ai_enabled, status')
     .eq('tenant_id', tenant.id)
     .eq('client_id', client.id)
     .in('status', ['active', 'escalated'])
@@ -168,10 +168,12 @@ export async function POST(request: NextRequest) {
 
   let conversationId: string
   let aiEnabled: boolean
+  let wasEscalated = false
 
   if (existingConv) {
     conversationId = existingConv.id
     aiEnabled = existingConv.ai_enabled
+    wasEscalated = existingConv.status === 'escalated'
   } else {
     const { data: newConv, error: convError } = await supabase
       .from('conversations')
@@ -219,6 +221,13 @@ export async function POST(request: NextRequest) {
 
   if (!aiEnabled) {
     console.log(`[${client.id}] AI disabled for conversation ${conversationId}`)
+    return emptyTwiML
+  }
+
+  // ── STAGE 2B: Guard — conversation escalated (emergency intent) ────────────
+
+  if (wasEscalated) {
+    console.log(`[${client.id}] Conversation ${conversationId} is escalated — skipping AI`)
     return emptyTwiML
   }
 

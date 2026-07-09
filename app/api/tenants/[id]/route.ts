@@ -1,13 +1,22 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
-  let body: { name?: string; phone?: string }
+  let body: { name?: string; phone?: string; unit_id?: string | null }
   try {
     body = await request.json()
   } catch {
@@ -20,6 +29,23 @@ export async function PATCH(
   const updates: Record<string, string | null> = {}
   if (body.phone?.trim()) updates.phone = body.phone.trim()
   if ('name' in body) updates.name = body.name?.trim() || null
+  if ('unit_id' in body) updates.unit_id = body.unit_id || null
+
+  if (updates.unit_id) {
+    const { data: unit, error: unitError } = await supabase
+      .from('units')
+      .select('id')
+      .eq('id', updates.unit_id)
+      .eq('client_id', manager.clientId)
+      .single()
+
+    if (unitError || !unit) {
+      return new Response(JSON.stringify({ error: 'Unit not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+  }
 
   if (Object.keys(updates).length === 0) {
     return new Response(JSON.stringify({ error: 'Nothing to update' }), {
@@ -32,6 +58,7 @@ export async function PATCH(
     .from('tenants')
     .update(updates)
     .eq('id', id)
+    .eq('client_id', manager.clientId)
     .select()
     .single()
 
@@ -58,9 +85,21 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
-  const { error } = await supabase.from('tenants').delete().eq('id', id)
+  const { error } = await supabase
+    .from('tenants')
+    .delete()
+    .eq('id', id)
+    .eq('client_id', manager.clientId)
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

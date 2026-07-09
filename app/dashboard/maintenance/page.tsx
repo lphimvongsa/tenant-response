@@ -1,11 +1,22 @@
+import { redirect } from 'next/navigation'
 import { supabase } from '@/lib/integrations/supabase'
-import TicketList from '@/components/maintenance/TicketList'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import TicketBoard from '@/components/maintenance/TicketList'
 import type { Ticket } from '@/components/maintenance/TicketList'
 
 export default async function MaintenancePage() {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    // proxy.ts already gates /dashboard/**; this is a defensive fallback.
+    redirect('/')
+  }
+
   const { data, error } = await supabase
     .from('tickets')
-    .select('id, category, location, severity, description, status, photo_url, created_at, tenants(id, name, phone)')
+    .select(
+      'id, category, location, severity, description, status, photo_url, assigned_to, created_at, unit_id, tenants(id, name, phone), units(id, unit_number, properties(id, name))',
+    )
+    .eq('client_id', manager.clientId)
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -20,17 +31,26 @@ export default async function MaintenancePage() {
   }
 
   const tickets = (data ?? []) as unknown as Ticket[]
-  const outstanding = tickets.filter((t) => t.status === 'open')
-  const completed = tickets.filter((t) => t.status === 'resolved' || t.status === 'closed')
 
   return (
     <div className="flex-1 overflow-y-auto px-8 py-7">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold text-[#344767]">Maintenance</h1>
-        <p className="mt-1 text-sm text-[#7b809a]">Track outstanding and completed maintenance requests.</p>
+      <header className="mb-5">
+        <h1 className="text-lg font-bold text-[#1e293b]">Maintenance</h1>
+        {/* Tabs — "Recurring" is an inactive placeholder for now. */}
+        <nav className="mt-3 flex items-center gap-6 border-b border-[rgba(52,71,103,0.10)]">
+          <span className="-mb-px border-b-2 border-[#1565c0] pb-2 text-sm font-semibold text-[#1565c0]">
+            Requests Board
+          </span>
+          <span
+            className="-mb-px cursor-not-allowed border-b-2 border-transparent pb-2 text-sm font-semibold text-[#b0b7c3]"
+            aria-disabled="true"
+          >
+            Recurring
+          </span>
+        </nav>
       </header>
 
-      <TicketList outstanding={outstanding} completed={completed} />
+      <TicketBoard tickets={tickets} />
     </div>
   )
 }

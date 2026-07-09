@@ -1,4 +1,5 @@
 import IconSidebar from '@/components/sidebar/IconSidebar'
+import TopHeader from '@/components/ui/TopHeader'
 import styles from './dashboard.module.css'
 
 export default function DashboardLayout({
@@ -9,9 +10,12 @@ export default function DashboardLayout({
   return (
     <div className={styles.shell}>
       <IconSidebar />
-      <main className={styles.main}>
-        {children}
-      </main>
+      <div className={styles.right}>
+        <TopHeader />
+        <main className={styles.main}>
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

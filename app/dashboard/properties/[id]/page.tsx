@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/integrations/supabase'
 import { notFound } from 'next/navigation'
-import PropertyEditor from '@/components/properties/PropertyEditor'
+import PropertyProfile from '@/components/properties/PropertyProfile'
 import type { Property } from '@/types'
 
 export default async function PropertyDetailPage({
@@ -12,7 +12,9 @@ export default async function PropertyDetailPage({
 
   const { data } = await supabase
     .from('properties')
-    .select('id, name, address, created_at, units(id, unit_number, tenants(id, name, phone))')
+    .select(
+      'id, name, address, photo_url, created_at, units(id, unit_number, tenants(id, name, phone), tickets(id, status))',
+    )
     .eq('id', id)
     .single()
 
@@ -20,5 +22,5 @@ export default async function PropertyDetailPage({
 
   const property = data as unknown as Property
 
-  return <PropertyEditor property={property} />
+  return <PropertyProfile property={property} />
 }

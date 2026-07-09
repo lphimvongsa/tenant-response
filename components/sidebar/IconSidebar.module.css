@@ -1,30 +1,42 @@
+/* Dark navigation chrome — self-contained dark surface.
+   Neutral dark values below are intentional one-offs (not part of the
+   light-theme token set); brand accents use the shared brand tokens. */
 .sidebar {
-  width: var(--icon-sidebar-width, 64px);
+  width: 68px;
   flex-shrink: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 0;
-  background-color: #1e293b;
+  gap: 0.25rem;
+  padding: 1rem 0 1.5rem;
+  background-color: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-sidebar-border);
 }
 
 .brand {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md, 14px);
-  margin-bottom: 0.5rem;
-  background: rgba(255, 255, 255, 0.06);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  background: var(--color-brand-gradient);
+  box-shadow: var(--shadow-button);
   flex-shrink: 0;
+  transition: box-shadow 0.15s;
+}
+
+.brand:hover {
+  box-shadow: var(--shadow-button-hover);
 }
 
 .brand img {
   border-radius: 8px;
   object-fit: contain;
+  width: 24px;
+  height: 24px;
 }
 
 .nav {
@@ -34,7 +46,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.25rem;
   width: 100%;
 }
 
@@ -43,26 +55,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md, 14px);
-  color: #94a3b8;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: var(--color-text-secondary);
   text-decoration: none;
   transition: color 0.15s, background-color 0.15s;
 }
 
 .item:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-sidebar-hover-text);
+  background-color: var(--color-sidebar-hover-bg);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-brand-light);
+  outline-offset: 2px;
 }
 
 .itemActive {
-  color: #ffffff;
-  background-color: var(--color-brand-dark, #1565c0);
+  color: var(--color-btn-text);
+  background-color: var(--color-brand-dark);
+  box-shadow: var(--shadow-button-hover);
 }
 
 .itemActive:hover {
-  background-color: var(--color-brand-dark, #1565c0);
+  background-color: var(--color-brand);
 }
 
 .icon {
@@ -71,22 +89,23 @@
   justify-content: center;
 }
 
-/* Hover tooltip showing the label */
+/* Hover tooltip — dark chrome */
 .tooltip {
   position: absolute;
-  left: calc(100% + 10px);
+  left: calc(100% + 12px);
   top: 50%;
   transform: translateY(-50%);
   white-space: nowrap;
-  background-color: #0f172a;
-  color: #ffffff;
-  font-size: 0.75rem;
+  background-color: var(--color-sidebar-tooltip-bg);
+  color: var(--color-sidebar-tooltip-text);
+  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 0.3rem 0.55rem;
-  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 7px;
+  box-shadow: var(--shadow-tooltip);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.12s;
+  transition: opacity 0.12s ease;
   z-index: 50;
 }
 

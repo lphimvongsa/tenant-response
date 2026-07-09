@@ -1,10 +1,19 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id: unit_id } = await params
 
   let body: { phone: string; name?: string }
@@ -24,11 +33,12 @@ export async function POST(
     })
   }
 
-  // Inherit client_id from the unit
+  // Confirm the unit belongs to the caller's client before inserting under it
   const { data: unit, error: unitError } = await supabase
     .from('units')
     .select('client_id')
     .eq('id', unit_id)
+    .eq('client_id', manager.clientId)
     .single()
 
   if (unitError || !unit) {
@@ -41,7 +51,7 @@ export async function POST(
   const { data, error } = await supabase
     .from('tenants')
     .insert({
-      client_id: unit.client_id,
+      client_id: manager.clientId,
       unit_id,
       phone: body.phone.trim(),
       name: body.name?.trim() || null,

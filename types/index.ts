@@ -34,12 +34,14 @@ export type PropertyUnit = {
   id: string
   unit_number: string
   tenants: PropertyTenant[]
+  tickets: { id: string; status: string }[]
 }
 
 export type Property = {
   id: string
   name: string
   address: string
+  photo_url: string | null
   created_at: string
   units: PropertyUnit[]
 }
@@ -47,4 +49,12 @@ export type Property = {
 export type PropertySummary = {
   id: string
   name: string
+}
+
+export type TenantDirectoryEntry = {
+  id: string
+  name: string | null
+  phone: string
+  unit_id: string | null
+  units: { unit_number: string; properties: { name: string } | null } | null
 }

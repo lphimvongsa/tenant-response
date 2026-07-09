@@ -73,7 +73,7 @@ export default function IconSidebar() {
                 title={item.label}
               >
                 <span className={styles.icon}>{item.icon}</span>
-                <span className={styles.tooltip}>{item.label}</span>
+                
               </Link>
             </li>
           )

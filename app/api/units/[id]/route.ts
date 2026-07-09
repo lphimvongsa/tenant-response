@@ -1,10 +1,19 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
   let body: { unit_number?: string }
@@ -28,6 +37,7 @@ export async function PATCH(
     .from('units')
     .update({ unit_number: body.unit_number.trim() })
     .eq('id', id)
+    .eq('client_id', manager.clientId)
     .select()
     .single()
 
@@ -48,9 +58,21 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { id } = await params
 
-  const { error } = await supabase.from('units').delete().eq('id', id)
+  const { error } = await supabase
+    .from('units')
+    .delete()
+    .eq('id', id)
+    .eq('client_id', manager.clientId)
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

@@ -13,6 +13,6 @@
 
 .button:hover {
   color: var(--color-brand);
-  border-color: rgba(25, 118, 210, 0.4);
+  border-color: var(--color-brand-border);
   background-color: var(--color-bg-elevated);
 }

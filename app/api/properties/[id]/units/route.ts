@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function POST(
@@ -6,6 +7,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: property_id } = await params
+
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   let body: { unit_number: string }
   try {
@@ -29,6 +38,7 @@ export async function POST(
     .from('properties')
     .select('client_id')
     .eq('id', property_id)
+    .eq('client_id', manager.clientId)
     .single()
 
   if (propError || !property) {

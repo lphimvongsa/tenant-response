@@ -1,10 +1,22 @@
 import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import type { NextRequest } from 'next/server'
 
 export async function GET() {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const { data, error } = await supabase
     .from('properties')
-    .select('id, name, address, created_at, units(id, unit_number, tenants(id, name, phone))')
+    .select(
+      'id, name, address, photo_url, created_at, units(id, unit_number, tenants(id, name, phone), tickets(id, status))',
+    )
+    .eq('client_id', manager.clientId)
     .order('name', { ascending: true })
 
   if (error) {
@@ -21,7 +33,15 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  let body: { client_id: string; name: string; address: string }
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  let body: { name: string; address: string }
   try {
     body = await request.json()
   } catch {
@@ -31,10 +51,10 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const { client_id, name, address } = body
+  const { name, address } = body
 
-  if (!client_id || !name?.trim() || !address?.trim()) {
-    return new Response(JSON.stringify({ error: 'client_id, name, and address are required' }), {
+  if (!name?.trim() || !address?.trim()) {
+    return new Response(JSON.stringify({ error: 'name and address are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     })
@@ -42,7 +62,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('properties')
-    .insert({ client_id, name: name.trim(), address: address.trim() })
+    .insert({ client_id: manager.clientId, name: name.trim(), address: address.trim() })
     .select()
     .single()
 
