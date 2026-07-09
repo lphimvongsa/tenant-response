@@ -99,20 +99,17 @@ function MaintenancePill({ openCount }: { openCount: number }) {
   return <span className={styles.pillClear}>All clear</span>
 }
 
-// ─── Profile card (photo, name/address, stats, photo controls, delete) ───────
+// ─── Location formatting ─────────────────────────────────────────────────────
+
+function formatCityStateZip(property: Property): string {
+  const cityState = [property.city, property.state].filter(Boolean).join(', ')
+  return [cityState, property.zip].filter(Boolean).join(' ')
+}
+
+// ─── Profile card (photo, name/address, stats, edit trigger) ────────────────
 
 function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: () => void }) {
-  const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const [editing, setEditing] = useState(false)
-  const [name, setName] = useState(property.name)
-  const [address, setAddress] = useState(property.address)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const [photoBusy, setPhotoBusy] = useState(false)
-  const [photoError, setPhotoError] = useState('')
 
   const units = property.units ?? []
   const unitCount = units.length
@@ -121,6 +118,90 @@ function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: (
     0,
   )
   const openCount = countOpenTickets(units)
+  const location = formatCityStateZip(property)
+
+  return (
+    <section className={styles.profileCard}>
+      <div className={styles.photoColumn}>
+        <div className={styles.photoFrame}>
+          {property.photo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={property.photo_url} alt={property.name} className={styles.photo} />
+          ) : (
+            <PropertyPhotoPlaceholder className={styles.photo} />
+          )}
+        </div>
+      </div>
+
+      <div className={styles.infoColumn}>
+        <div className={styles.infoTop}>
+          <div className={styles.infoText}>
+            <h1 className={styles.propName}>{property.name}</h1>
+            <p className={styles.proplocationinfo}>{property.address}</p>
+            {location && <p className={styles.proplocationinfo}>{location}</p>}
+            {property.country && <p className={styles.proplocationinfo}>{property.country}</p>}
+          </div>
+          <button className={styles.editBtn} onClick={() => setEditing(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
+            Edit
+          </button>
+        </div>
+
+        <div className={styles.stats}>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{unitCount}</span>
+            <span className={styles.statLabel}>Unit{unitCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{tenantCount}</span>
+            <span className={styles.statLabel}>Tenant{tenantCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div className={styles.stat}>
+            <MaintenancePill openCount={openCount} />
+            <span className={styles.statLabel}>Maintenance</span>
+          </div>
+        </div>
+      </div>
+
+      {editing && (
+        <EditPropertyModal
+          property={property}
+          onClose={() => setEditing(false)}
+          onRefresh={onRefresh}
+        />
+      )}
+    </section>
+  )
+}
+
+// ─── Edit property modal (photo, name/address, location, delete) ────────────
+
+function EditPropertyModal({
+  property,
+  onClose,
+  onRefresh,
+}: {
+  property: Property
+  onClose: () => void
+  onRefresh: () => void
+}) {
+  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [name, setName] = useState(property.name)
+  const [address, setAddress] = useState(property.address)
+  const [city, setCity] = useState(property.city ?? '')
+  const [state, setState] = useState(property.state ?? '')
+  const [country, setCountry] = useState(property.country ?? '')
+  const [zip, setZip] = useState(property.zip ?? '')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const [photoBusy, setPhotoBusy] = useState(false)
+  const [photoError, setPhotoError] = useState('')
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -129,7 +210,7 @@ function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: (
     const res = await fetch(`/api/properties/${property.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, address }),
+      body: JSON.stringify({ name, address, city, state, country, zip }),
     })
     setLoading(false)
     if (!res.ok) {
@@ -137,8 +218,8 @@ function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: (
       setError(d.error ?? 'Failed to save')
       return
     }
-    setEditing(false)
     onRefresh()
+    onClose()
   }
 
   async function handleDelete() {
@@ -191,19 +272,33 @@ function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: (
   }
 
   return (
-    <section className={styles.profileCard}>
-      <div className={styles.photoColumn}>
-        <div className={styles.photoFrame}>
-          {property.photo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={property.photo_url} alt={property.name} className={styles.photo} />
-          ) : (
-            <PropertyPhotoPlaceholder className={styles.photo} />
-          )}
+    <div
+      className={styles.overlay}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div className={styles.modal}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Edit Property</h2>
+          <button className={styles.modalCloseBtn} onClick={onClose} aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
-        {editing && (
-          <>
+        <form onSubmit={handleSave} className={styles.modalForm}>
+          <div className={styles.photoRow}>
+            <div className={styles.photoFrame}>
+              {property.photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={property.photo_url} alt={property.name} className={styles.photo} />
+              ) : (
+                <PropertyPhotoPlaceholder className={styles.photo} />
+              )}
+            </div>
             <input
               ref={fileInputRef}
               type="file"
@@ -231,79 +326,72 @@ function ProfileCard({ property, onRefresh }: { property: Property; onRefresh: (
                 </button>
               )}
             </div>
-            {photoError && <p className={styles.error}>{photoError}</p>}
-          </>
-        )}
-      </div>
+          </div>
+          {photoError && <p className={styles.error}>{photoError}</p>}
 
-      <div className={styles.infoColumn}>
-        {editing ? (
-          <form onSubmit={handleSave} className={styles.editForm}>
+          <input
+            className={styles.input}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Property name"
+            required
+            autoFocus
+          />
+          <input
+            className={styles.input}
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Address"
+            required
+          />
+          <div className={styles.locationRow}>
             <input
-              className={styles.input}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Property name"
+              className={`${styles.input} ${styles.cityInput}`}
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City"
               required
-              autoFocus
             />
             <input
-              className={styles.input}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Address"
+              className={`${styles.input} ${styles.stateInput}`}
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+              placeholder="State"
               required
             />
-            <div className={styles.editActions}>
-              <button type="button" className={styles.cancelBtn} onClick={() => setEditing(false)}>
+            <input
+              className={`${styles.input} ${styles.zipInput}`}
+              value={zip}
+              onChange={(e) => setZip(e.target.value)}
+              placeholder="ZIP"
+              required
+            />
+          </div>
+          <input
+            className={styles.input}
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="Country"
+            required
+          />
+
+          <div className={styles.modalActions}>
+            <button type="button" className={styles.deleteBtn} onClick={handleDelete}>
+              Delete Property
+            </button>
+            <div className={styles.modalActionsRight}>
+              <button type="button" className={styles.cancelBtn} onClick={onClose}>
                 Cancel
               </button>
               <button type="submit" className={styles.saveBtn} disabled={loading}>
                 {loading ? 'Saving…' : 'Save'}
               </button>
             </div>
-            {error && <p className={styles.error}>{error}</p>}
-          </form>
-        ) : (
-          <div className={styles.infoTop}>
-            <div className={styles.infoText}>
-              <h1 className={styles.propName}>{property.name}</h1>
-              <p className={styles.propAddress}>{property.address}</p>
-            </div>
-            <button className={styles.editBtn} onClick={() => setEditing(true)}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-              </svg>
-              Edit
-            </button>
           </div>
-        )}
-
-        <div className={styles.stats}>
-          <div className={styles.stat}>
-            <span className={styles.statValue}>{unitCount}</span>
-            <span className={styles.statLabel}>Unit{unitCount !== 1 ? 's' : ''}</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statValue}>{tenantCount}</span>
-            <span className={styles.statLabel}>Tenant{tenantCount !== 1 ? 's' : ''}</span>
-          </div>
-          <div className={styles.stat}>
-            <MaintenancePill openCount={openCount} />
-            <span className={styles.statLabel}>Maintenance</span>
-          </div>
-        </div>
-
-        {editing && (
-          <div className={styles.footerRow}>
-            <button className={styles.deleteBtn} onClick={handleDelete}>
-              Delete Property
-            </button>
-          </div>
-        )}
+          {error && <p className={styles.error}>{error}</p>}
+        </form>
       </div>
-    </section>
+    </div>
   )
 }
 

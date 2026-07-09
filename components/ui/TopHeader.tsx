@@ -12,14 +12,6 @@ const SettingsIcon = (
   </svg>
 )
 
-const SignOutIcon = (
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-    <path d="m16 17 5-5-5-5" />
-    <path d="M21 12H9" />
-  </svg>
-)
-
 function getGreeting(): string {
   const h = new Date().getHours()
   if (h < 12) return 'Good morning'
@@ -27,11 +19,18 @@ function getGreeting(): string {
   return 'Good evening'
 }
 
-import { signOut } from '@/app/login/actions'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import ProfileMenu from './ProfileMenu'
 import styles from './TopHeader.module.css'
 
-export default function TopHeader() {
+export default async function TopHeader() {
   const greeting = getGreeting()
+
+  // proxy.ts already gates /dashboard/**, so a manager should always exist
+  // here; fall back to empty strings defensively rather than crashing.
+  const manager = await getCurrentManager()
+  const name = manager?.name ?? ''
+  const email = manager?.email ?? ''
 
   return (
     <header className={styles.header}>
@@ -47,7 +46,7 @@ export default function TopHeader() {
         <button className={styles.iconBtn} aria-label="Settings" type="button">
           {SettingsIcon}
         </button>
-        <div className={styles.avatar} role="img" aria-label="User profile">LP</div>
+        <ProfileMenu name={name} email={email} />
       </div>
     </header>
   )

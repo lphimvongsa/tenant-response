@@ -16,7 +16,15 @@ export async function PATCH(
 
   const { id } = await params
 
-  let body: { name?: string; address?: string; photo_url?: string | null }
+  let body: {
+    name?: string
+    address?: string
+    city?: string | null
+    state?: string | null
+    country?: string | null
+    zip?: string | null
+    photo_url?: string | null
+  }
   try {
     body = await request.json()
   } catch {
@@ -29,6 +37,10 @@ export async function PATCH(
   const updates: Record<string, string | null> = {}
   if (body.name?.trim()) updates.name = body.name.trim()
   if (body.address?.trim()) updates.address = body.address.trim()
+  if ('city' in body) updates.city = body.city?.trim() || null
+  if ('state' in body) updates.state = body.state?.trim() || null
+  if ('country' in body) updates.country = body.country?.trim() || null
+  if ('zip' in body) updates.zip = body.zip?.trim() || null
   if ('photo_url' in body) updates.photo_url = body.photo_url ?? null
 
   if (Object.keys(updates).length === 0) {

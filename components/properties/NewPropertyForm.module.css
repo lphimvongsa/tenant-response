@@ -142,6 +142,26 @@
   box-shadow: var(--shadow-focus);
 }
 
+.locationRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cityInput {
+  flex: 2;
+  min-width: 0;
+}
+
+.stateInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.zipInput {
+  flex: 1;
+  min-width: 0;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;

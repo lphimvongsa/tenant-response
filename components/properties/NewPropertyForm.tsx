@@ -16,6 +16,10 @@ export default function NewPropertyForm({ clientId }: Props) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [country, setCountry] = useState('')
+  const [zip, setZip] = useState('')
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -24,6 +28,10 @@ export default function NewPropertyForm({ clientId }: Props) {
   function reset() {
     setName('')
     setAddress('')
+    setCity('')
+    setState('')
+    setCountry('')
+    setZip('')
     setPhotoFile(null)
     setPhotoPreview(null)
     setError('')
@@ -49,7 +57,7 @@ export default function NewPropertyForm({ clientId }: Props) {
     const res = await fetch('/api/properties', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_id: clientId, name, address }),
+      body: JSON.stringify({ client_id: clientId, name, address, city, state, country, zip }),
     })
 
     if (!res.ok) {
@@ -143,6 +151,36 @@ export default function NewPropertyForm({ clientId }: Props) {
                 placeholder="Address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+              <div className={styles.locationRow}>
+                <input
+                  className={`${styles.input} ${styles.cityInput}`}
+                  placeholder="City"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+                <input
+                  className={`${styles.input} ${styles.stateInput}`}
+                  placeholder="State"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  required
+                />
+                <input
+                  className={`${styles.input} ${styles.zipInput}`}
+                  placeholder="ZIP"
+                  value={zip}
+                  onChange={(e) => setZip(e.target.value)}
+                  required
+                />
+              </div>
+              <input
+                className={styles.input}
+                placeholder="Country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
                 required
               />
 

@@ -41,8 +41,11 @@ export async function createServerSupabaseClient() {
 // exactly the scope we want here.
 export async function getCurrentManager(): Promise<{
   userId: string
+  managerId: string
   clientId: string
   role: string
+  name: string
+  email: string
 } | null> {
   const supabase = await createServerSupabaseClient()
 
@@ -56,7 +59,7 @@ export async function getCurrentManager(): Promise<{
 
   const { data, error } = await supabase
     .from('managers')
-    .select('client_id, role')
+    .select('id, client_id, role')
     .eq('supabase_user_id', user.id)
     .single()
 
@@ -64,5 +67,12 @@ export async function getCurrentManager(): Promise<{
     return null
   }
 
-  return { userId: user.id, clientId: data.client_id, role: data.role }
+  return {
+    userId: user.id,
+    managerId: data.id,
+    clientId: data.client_id,
+    role: data.role,
+    name: (user.user_metadata?.name as string) || '',
+    email: user.email || '',
+  }
 }

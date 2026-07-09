@@ -41,7 +41,14 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  let body: { name: string; address: string }
+  let body: {
+    name: string
+    address: string
+    city: string
+    state: string
+    country: string
+    zip: string
+  }
   try {
     body = await request.json()
   } catch {
@@ -51,18 +58,33 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const { name, address } = body
+  const { name, address, city, state, country, zip } = body
 
-  if (!name?.trim() || !address?.trim()) {
-    return new Response(JSON.stringify({ error: 'name and address are required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
+  if (
+    !name?.trim() ||
+    !address?.trim() ||
+    !city?.trim() ||
+    !state?.trim() ||
+    !country?.trim() ||
+    !zip?.trim()
+  ) {
+    return new Response(
+      JSON.stringify({ error: 'name, address, city, state, country, and zip are required' }),
+      { status: 400, headers: { 'Content-Type': 'application/json' } },
+    )
   }
 
   const { data, error } = await supabase
     .from('properties')
-    .insert({ client_id: manager.clientId, name: name.trim(), address: address.trim() })
+    .insert({
+      client_id: manager.clientId,
+      name: name.trim(),
+      address: address.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      country: country.trim(),
+      zip: zip.trim(),
+    })
     .select()
     .single()
 

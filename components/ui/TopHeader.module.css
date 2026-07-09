@@ -37,12 +37,6 @@
   gap: 0.5rem;
 }
 
-/* Wrapper so the sign-out submit button participates in the actions flex
-   row directly (server-action forms must wrap the button). */
-.signOutForm {
-  display: contents;
-}
-
 .iconBtn {
   position: relative;
   display: flex;
@@ -79,21 +73,4 @@
   border-radius: 50%;
   background-color: var(--color-error);
   border: 2px solid var(--color-bg-surface);
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--color-brand-gradient);
-  color: var(--color-btn-text);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  box-shadow: var(--shadow-button);
-  flex-shrink: 0;
 }

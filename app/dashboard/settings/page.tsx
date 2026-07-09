@@ -1,0 +1,60 @@
+import { redirect } from 'next/navigation'
+import { supabase } from '@/lib/integrations/supabase'
+import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { getTeammates, getJoinCode } from '@/lib/integrations/team'
+import SettingsTabs from '@/components/settings/SettingsTabs'
+
+export default async function SettingsPage() {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    // proxy.ts already gates /dashboard/**; this is a defensive fallback.
+    redirect('/')
+  }
+
+  // One trip for the caller's own contact/notification fields (getCurrentManager
+  // doesn't return phone or notify prefs), the team list (everyone sees it), and
+  // the join code (admins only — no point fetching it otherwise). Service-role
+  // client bypasses RLS, so the managers query is scoped by hand.
+  const [profileResult, teammates, joinCode] = await Promise.all([
+    supabase
+      .from('managers')
+      .select('phone, notify_email, notify_sms')
+      .eq('id', manager.managerId)
+      .eq('client_id', manager.clientId)
+      .single(),
+    getTeammates(manager.clientId),
+    manager.role === 'admin' ? getJoinCode(manager.clientId) : Promise.resolve(null),
+  ])
+
+  if (profileResult.error) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-8">
+        <div className="max-w-md rounded-[var(--radius-md)] border p-6 text-center [background:var(--color-danger-bg)] [border-color:var(--color-danger)]">
+          <p className="text-sm font-semibold [color:var(--color-danger)]">
+            Unable to load your settings
+          </p>
+          <p className="mt-1 text-sm [color:var(--color-danger)]">{profileResult.error.message}</p>
+        </div>
+      </div>
+    )
+  }
+
+  const profile = profileResult.data
+
+  return (
+    <div className="flex-1 overflow-y-auto px-8 py-7">
+      <SettingsTabs
+        managerId={manager.managerId}
+        role={manager.role}
+        name={manager.name}
+        email={manager.email}
+        phone={profile.phone ?? ''}
+        // Opt-out model: absent/null preference defaults to "on".
+        notifyEmail={profile.notify_email ?? true}
+        notifySms={profile.notify_sms ?? true}
+        teammates={teammates}
+        joinCode={joinCode}
+      />
+    </div>
+  )
+}

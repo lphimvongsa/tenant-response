@@ -39,7 +39,7 @@ export default function Home() {
             fontSize: '2.5rem',
           }}
         >
-          🤖
+          <img src="/tenatimmy_solo.png" alt="logo" width={60} height={60}/>
         </div>
 
         <h1

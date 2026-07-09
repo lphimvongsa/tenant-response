@@ -55,6 +55,10 @@ export type Property = {
   id: string
   name: string
   address: string
+  city: string | null
+  state: string | null
+  country: string | null
+  zip: string | null
   photo_url: string | null
   created_at: string
   units: PropertyUnit[]

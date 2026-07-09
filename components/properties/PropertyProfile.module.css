@@ -143,21 +143,9 @@
   line-height: 1.2;
 }
 
-.propAddress {
+.proplocationinfo {
   font-size: 0.9375rem;
   color: var(--color-text-secondary);
-}
-
-.editForm {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.editActions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 /* ── Stats ── */
@@ -233,10 +221,106 @@
   color: var(--color-warning);
 }
 
-/* ── Footer (delete) ── */
-.footerRow {
-  margin-top: auto;
+/* ── Edit property modal ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--color-overlay);
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.modalTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.modalCloseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.modalCloseBtn:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-hover);
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+}
+
+.photoRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.locationRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cityInput {
+  flex: 2;
+  min-width: 0;
+}
+
+.stateInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.zipInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.modalActionsRight {
+  display: flex;
+  gap: 0.5rem;
 }
 
 /* ── Units section ── */

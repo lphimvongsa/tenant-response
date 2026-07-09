@@ -32,7 +32,9 @@ project (in addition to `lib/integrations/supabase.ts` service-role and
 - `getCurrentManager()` — calls `auth.getUser()` on that session client, then queries `managers`
   via the SAME session client (relying on the `manager_read_own_row` RLS policy), never the
   service-role client — the whole point is to prove RLS actually gates the query. Returns
-  `{ userId, clientId, role } | null`.
+  `{ userId, clientId, role } | null`. As of 013_manager_contact_prefs.sql it also returns
+  `managerId` (the `managers.id` PK, added to the same `.select()` — no extra query) — see
+  [[schema_managers]] for why this and `userId` are easy to confuse and must stay distinct.
 
 **Why session client for the managers lookup specifically:** using service-role here would silently
 bypass the only RLS policy this feature is meant to exercise, defeating the purpose of adding real

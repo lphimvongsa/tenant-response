@@ -3,3 +3,5 @@
 - [migration style pattern](pattern_migration_style.md) — numbering, section dividers, idempotency guards, RLS policy naming conventions
 - [auth + join codes decision](decision_auth_and_join_codes.md) — clients.join_code invite signup; session-client vs service-role split for getCurrentManager()
 - [tickets schema](schema_tickets.md) — tickets columns, category taxonomy CHECK (NOT VALID), title column, indexes
+- [managers schema](schema_managers.md) — managers columns incl. phone/notify_email/notify_sms (013), auth.users name/email split, no write RLS policies exist
+- [admin authorization boundary decision](decision_admin_authorization_boundary.md) — why teammate mgmt/join-code rotation are authorized in Server Actions (lib/integrations/team.ts) not RLS
