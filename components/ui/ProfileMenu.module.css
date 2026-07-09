@@ -34,11 +34,12 @@
   outline-offset: 2px;
 }
 
-/* Panel anchored below and to the right of the trigger. */
+/* Base panel shape — position is finished off by .panelAboveLeft/.panelAboveRight,
+   since both current triggers (icon sidebar, mobile tab bar) sit at the
+   bottom of their container and the panel needs to open upward from there. */
 .panel {
   position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
+  bottom: calc(100% + 0.5rem);
   width: 264px;
   padding: 0.375rem;
   background-color: var(--color-bg-surface);
@@ -46,19 +47,33 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card-hover);
   z-index: 50;
-  transform-origin: top right;
-  animation: fadeScaleIn 0.14s ease-out;
+  animation: fadeScaleInUp 0.14s ease-out;
 }
 
-@keyframes fadeScaleIn {
+@keyframes fadeScaleInUp {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(-4px);
+    transform: scale(0.96) translateY(4px);
   }
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+}
+
+/* Desktop icon sidebar — trigger is pinned to the bottom of a rail at the
+   far left edge of the screen, so the panel must grow rightward or it runs
+   off-screen. */
+.panelAboveLeft {
+  left: 0;
+  transform-origin: bottom left;
+}
+
+/* Mobile bottom tab bar — trigger is the rightmost of 5 tabs, so the panel
+   grows leftward to stay clear of the right edge. */
+.panelAboveRight {
+  right: 0;
+  transform-origin: bottom right;
 }
 
 .header {

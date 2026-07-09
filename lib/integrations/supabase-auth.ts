@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -39,14 +40,17 @@ export async function createServerSupabaseClient() {
 // client) so the managers lookup goes through the manager_read_own_row RLS
 // policy — a real session can only ever read its own manager row, which is
 // exactly the scope we want here.
-export async function getCurrentManager(): Promise<{
+// Wrapped in cache() because several places in a single request tree call
+// this independently (a page and its header, desktop and mobile chrome) —
+// cache() dedupes those into one Supabase round trip per request.
+export const getCurrentManager = cache(async (): Promise<{
   userId: string
   managerId: string
   clientId: string
   role: string
   name: string
   email: string
-} | null> {
+} | null> => {
   const supabase = await createServerSupabaseClient()
 
   const {
@@ -75,4 +79,4 @@ export async function getCurrentManager(): Promise<{
     name: (user.user_metadata?.name as string) || '',
     email: user.email || '',
   }
-}
+})

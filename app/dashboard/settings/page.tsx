@@ -42,7 +42,7 @@ export default async function SettingsPage() {
   const profile = profileResult.data
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-7">
+    <div className="flex-1 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] md:px-8 md:py-7 md:pb-7">
       <SettingsTabs
         managerId={manager.managerId}
         role={manager.role}

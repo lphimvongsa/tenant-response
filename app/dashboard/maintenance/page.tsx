@@ -33,7 +33,7 @@ export default async function MaintenancePage() {
   const tickets = (data ?? []) as unknown as Ticket[]
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-7">
+    <div className="flex-1 overflow-y-auto px-4 py-5 md:px-8 md:py-7">
       <header className="mb-5">
         <h1 className="text-lg font-bold text-[#1e293b]">Maintenance</h1>
         {/* Tabs — "Recurring" is an inactive placeholder for now. */}

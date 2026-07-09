@@ -7,6 +7,14 @@
   height: 100%;
 }
 
+@media (max-width: 767px) {
+  .page {
+    padding: 1rem;
+    padding-bottom: calc(var(--bottom-nav-height) + 1.5rem);
+    gap: 1rem;
+  }
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -25,6 +33,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1.25rem;
+}
+
+/* Reference "Properties" screen is a fixed 2-column grid, not auto-fill —
+   260px minmax would collapse to a single column on a 375px phone. */
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
 }
 
 /* ── Property card ── */
@@ -105,6 +122,30 @@
   font-size: 0.75rem;
   color: var(--color-text-muted);
   font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .cardBody {
+    padding: 0.625rem 0.75rem 0.875rem;
+  }
+
+  .cardName {
+    font-size: 0.8125rem;
+  }
+
+  .cardAddress {
+    font-size: 0.6875rem;
+  }
+
+  .cardMeta {
+    font-size: 0.6875rem;
+  }
+
+  .badgeClear,
+  .badgeAttention {
+    font-size: 0.5625rem;
+    padding: 0.2rem 0.5rem;
+  }
 }
 
 /* ── Empty / error state ── */

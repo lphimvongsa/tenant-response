@@ -14,6 +14,13 @@
   border-right: 1px solid var(--color-sidebar-border);
 }
 
+/* Desktop-only chrome — MobileTabBar takes over below this breakpoint. */
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -87,6 +94,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Pinned to the bottom of the rail via margin-top: auto, which consumes
+   the flex column's remaining space above it. */
+.profileSlot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.75rem;
 }
 
 /* Hover tooltip — dark chrome */

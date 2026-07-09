@@ -1,6 +1,7 @@
 .shell {
   display: flex;
   height: 100vh;
+  height: 100dvh; /* avoids the address-bar jump on mobile Safari */
   overflow: hidden;
   background: var(--color-bg-base);
 }

@@ -7,6 +7,13 @@
   padding: 1.75rem;
 }
 
+@media (max-width: 767px) {
+  .page {
+    padding: 1rem;
+    padding-bottom: calc(var(--bottom-nav-height) + 1.5rem);
+  }
+}
+
 .container {
   width: 100%;
   max-width: 940px;
@@ -44,7 +51,7 @@
   box-shadow: var(--shadow-card);
 }
 
-@media (max-width: 680px) {
+@media (max-width: 767px) {
   .profileCard {
     flex-direction: column;
   }
@@ -58,7 +65,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 767px) {
   .photoColumn {
     width: 100%;
   }
@@ -241,6 +248,20 @@
   background-color: var(--color-bg-surface);
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+}
+
+/* Full-width bottom sheet instead of a centered dialog on mobile. */
+@media (max-width: 767px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    max-width: none;
+    max-height: 92vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
 }
 
 .modalHeader {

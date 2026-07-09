@@ -329,7 +329,7 @@ export default async function OverviewPage() {
   const greeting = getGreeting()
 
   return (
-    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-8 py-7">
+    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] md:px-8 md:py-7 md:pb-7">
 
       {/* ── Header: heading + stat tiles ── */}
       <div className="flex flex-col gap-5">
@@ -374,78 +374,7 @@ export default async function OverviewPage() {
         <ConversationSummaryList conversations={conversationSummaries} />
       </div>
 
-      {/* ── Recent activity ── */}
-      <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#344767]">Recent Activity</h2>
-          <Link
-            href="/dashboard/conversations"
-            className="text-xs font-semibold text-[#1565c0] hover:underline"
-          >
-            View all
-          </Link>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl bg-white shadow-[0_2px_12px_rgba(52,71,103,0.08)]">
-          {recent.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-[#b0b7c3]">No conversations yet.</p>
-          ) : (
-            <ul className="divide-y divide-[rgba(52,71,103,0.05)]">
-              {recent.map((conv) => {
-                const tenant = conv.tenants
-                const displayName = tenant?.name ?? tenant?.phone ?? 'Unknown'
-                const phone = tenant?.name ? tenant.phone : null
-                const last = getLastMessage(conv.messages)
-                const preview = last
-                  ? (last.direction === 'outbound' ? 'You: ' : '') + last.body
-                  : 'No messages yet'
-                const timeLabel = last ? timeAgo(last.created_at) : timeAgo(conv.created_at)
-                const initials = displayName
-                  .split(' ')
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .map((w: string) => w[0].toUpperCase())
-                  .join('')
-
-                return (
-                  <li key={conv.id}>
-                    <Link
-                      href={`/dashboard/conversations/${conv.id}`}
-                      className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-[#f5f8ff]"
-                    >
-                      {/* Avatar circle */}
-                      <div
-                        className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#e8f0fe] text-[0.625rem] font-bold text-[#1565c0]"
-                        aria-hidden="true"
-                      >
-                        {initials || '?'}
-                      </div>
-
-                      {/* Name + preview */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="truncate text-sm font-semibold text-[#344767]">{displayName}</p>
-                          {phone && (
-                            <p className="hidden truncate text-xs text-[#b0b7c3] sm:block">{phone}</p>
-                          )}
-                          {conv.status === 'escalated' && (
-                            <span className="shrink-0 rounded-full bg-[#fce8e6] px-2 py-0.5 text-[10px] font-semibold text-[#d93025]">
-                              Escalated
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-0.5 truncate text-xs text-[#7b809a]">{preview}</p>
-                      </div>
-
-                      <span className="shrink-0 text-xs text-[#b0b7c3]">{timeLabel}</span>
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
-      </section>
+      
     </div>
   )
 }

@@ -79,7 +79,13 @@
   --color-highlight:          #fff176;  /* search-match highlight yellow */
 
   /* ── Layout ── */
-  --header-height:  64px;
+  --header-height:     64px;
+  --bottom-nav-height: 60px; /* mobile fixed tab bar, excludes safe-area inset */
+
+  /* ── Mobile z-index stack (documented here since it now spans several
+     components): 30 = MobileTabBar, 40 = full-screen mobile panels that
+     sit above it (e.g. Settings drill-down), 50 = true modals/dialogs
+     (ticket/property modals, edit-contact panel) that sit above those. ── */
 
   /* ── Radius ── */
   --radius-sm:     0.625rem;   /* 10px */

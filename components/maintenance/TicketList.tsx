@@ -7,6 +7,8 @@ import {
   maintenanceCategoryLabel,
   type MaintenanceCategory,
 } from '@/lib/maintenance-categories'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
+import MobileTicketList from './MobileTicketList'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,7 +31,7 @@ export type Ticket = {
 
 // ── Board column + status taxonomy ────────────────────────────────────────────
 
-const COLUMNS: { key: string; label: string; statuses: TicketStatus[] }[] = [
+export const COLUMNS: { key: string; label: string; statuses: TicketStatus[] }[] = [
   { key: 'new', label: 'New', statuses: ['open'] },
   { key: 'in_progress', label: 'In Progress', statuses: ['in_progress'] },
   { key: 'in_review', label: 'In Review', statuses: ['in_review'] },
@@ -61,7 +63,7 @@ const PRIORITY: Record<'mild' | 'moderate' | 'severe', { label: string; dot: str
   severe: { label: 'Severe', dot: '#ef5350', text: '#d93025' },
 }
 
-const SEVERITY_OPTIONS: { value: 'mild' | 'moderate' | 'severe'; label: string }[] = [
+export const SEVERITY_OPTIONS: { value: 'mild' | 'moderate' | 'severe'; label: string }[] = [
   { value: 'mild', label: 'Mild' },
   { value: 'moderate', label: 'Moderate' },
   { value: 'severe', label: 'Severe' },
@@ -222,7 +224,7 @@ function KebabMenu({
 
 // ── Ticket card ───────────────────────────────────────────────────────────────
 
-function TicketCard({
+export function TicketCard({
   ticket,
   onSelect,
   onMove,
@@ -395,13 +397,13 @@ function TicketModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 md:items-center md:p-4"
       style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)' }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.25)]">
+      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.25)] md:max-h-none md:rounded-2xl">
         {/* Header */}
         <div className="flex items-start justify-between border-b border-[rgba(52,71,103,0.08)] px-6 py-4">
           <div>
@@ -422,7 +424,7 @@ function TicketModal({
         </div>
 
         {/* Body */}
-        <div className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5">
+        <div className="max-h-[calc(92vh-160px)] space-y-4 overflow-y-auto px-6 py-5 md:max-h-[70vh]">
           {/* Badges row */}
           <div className="flex flex-wrap items-center gap-2">
             <PriorityBadge severity={ticket.severity} />
@@ -662,13 +664,13 @@ function NewTicketModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 md:items-center md:p-4"
       style={{ backgroundColor: 'rgba(15, 23, 42, 0.5)' }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.25)]">
+      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.25)] md:max-h-none md:rounded-2xl">
         <div className="flex items-center justify-between border-b border-[rgba(52,71,103,0.08)] px-6 py-4">
           <h2 className="text-base font-bold text-[#1e293b]">New Ticket</h2>
           <button
@@ -690,7 +692,7 @@ function NewTicketModal({
         ) : properties === null ? (
           <div className="px-6 py-10 text-center text-sm text-[#7b809a]">Loading properties…</div>
         ) : (
-          <form onSubmit={handleSubmit} className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5">
+          <form onSubmit={handleSubmit} className="max-h-[calc(92vh-72px)] space-y-4 overflow-y-auto px-6 py-5 md:max-h-[70vh]">
             {scopedProperty ? (
               <div className="block">
                 <span className="text-xs font-semibold uppercase tracking-wide text-[#7b809a]">Property</span>
@@ -860,6 +862,9 @@ export default function TicketBoard({
   scopeProperty?: ScopedProperty
 }) {
   const router = useRouter()
+  const isMobile = useIsMobile()
+  // Which pill is active in the mobile segmented control — unused on desktop.
+  const [activeStatus, setActiveStatus] = useState<string>('new')
   const [selected, setSelected] = useState<Ticket | null>(null)
   const [showNew, setShowNew] = useState(false)
   const [search, setSearch] = useState('')
@@ -955,6 +960,59 @@ export default function TicketBoard({
     } finally {
       setBusyId(null)
     }
+  }
+
+  if (isMobile) {
+    return (
+      <div ref={boardRef}>
+        <MobileTicketList
+          tickets={filtered}
+          activeStatus={activeStatus}
+          onChangeStatus={setActiveStatus}
+          search={search}
+          onSearchChange={setSearch}
+          propertyOptions={propertyOptions}
+          unitOptions={unitOptions}
+          propertyFilter={propertyFilter}
+          onPropertyFilterChange={setPropertyFilter}
+          unitFilter={unitFilter}
+          onUnitFilterChange={setUnitFilter}
+          severityFilter={severityFilter}
+          onSeverityFilterChange={setSeverityFilter}
+          categoryFilter={categoryFilter}
+          onCategoryFilterChange={setCategoryFilter}
+          filtersActive={filtersActive}
+          onClearFilters={clearFilters}
+          scopeProperty={scopeProperty}
+          onSelect={(t) => {
+            setOpenMenuId(null)
+            setSelected(t)
+          }}
+          onNewTicket={() => setShowNew(true)}
+          onMove={handleMove}
+          openMenuId={openMenuId}
+          onToggleMenu={setOpenMenuId}
+          busyId={busyId}
+          moveError={moveError}
+        />
+
+        {selected && (
+          <TicketModal
+            ticket={selected}
+            onClose={() => setSelected(null)}
+            onSaved={() => router.refresh()}
+          />
+        )}
+
+        {showNew && (
+          <NewTicketModal
+            onClose={() => setShowNew(false)}
+            onSaved={() => router.refresh()}
+            scopedProperty={scopeProperty}
+          />
+        )}
+      </div>
+    )
   }
 
   return (

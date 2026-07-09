@@ -368,3 +368,69 @@
   border-top: 1px solid var(--color-border-subtle);
   background: var(--color-bg-surface);
 }
+
+/* ── Mobile-only back link (this view is only ever mounted at
+   /dashboard/conversations/[id], so the target is hardcoded) ── */
+.backBtn {
+  display: none;
+}
+
+/* Call + Refresh are standalone header icons on desktop; on mobile they
+   fold into the kebab menu instead (see .mobileOnlyMenuItem) so the header
+   doesn't have to fit 5+ tap targets at once. */
+.desktopOnlyAction {
+  display: flex;
+  align-items: center;
+}
+
+.mobileOnlyMenuItem {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 0 1rem;
+    height: 64px;
+    gap: 0.5rem;
+  }
+
+  .headerLeft {
+    gap: 0.625rem;
+  }
+
+  .headerAvatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.75rem;
+  }
+
+  .backBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    color: var(--color-text-secondary);
+    transition: background-color 0.15s, color 0.15s;
+  }
+
+  .backBtn:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  .backBtn:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  .desktopOnlyAction {
+    display: none;
+  }
+
+  .mobileOnlyMenuItem {
+    display: flex;
+  }
+}

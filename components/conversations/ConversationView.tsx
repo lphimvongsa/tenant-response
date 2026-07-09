@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import RefreshButton from '@/components/ui/RefreshButton'
 import MessageThread from './MessageThread'
 import type { ThreadMessage } from './MessageThread'
@@ -68,6 +69,19 @@ const CheckIcon = (
 const ChevronIcon = (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="6 9 12 15 18 9" />
+  </svg>
+)
+
+const BackIcon = (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+  </svg>
+)
+
+const RefreshIcon = (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
   </svg>
 )
 
@@ -216,6 +230,13 @@ export default function ConversationView({
       {/* ── Header ── */}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
+          <Link
+            href="/dashboard/conversations"
+            className={styles.backBtn}
+            aria-label="Back to conversations"
+          >
+            {BackIcon}
+          </Link>
           <div className={styles.headerAvatar} aria-hidden="true">
             {showHeaderPhoto ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -305,10 +326,16 @@ export default function ConversationView({
           >
             {SearchIcon}
           </button>
-          <button className={styles.headerBtn} aria-label="Call tenant" type="button">
+          <button
+            className={`${styles.headerBtn} ${styles.desktopOnlyAction}`}
+            aria-label="Call tenant"
+            type="button"
+          >
             {PhoneIcon}
           </button>
-          <RefreshButton />
+          <span className={styles.desktopOnlyAction}>
+            <RefreshButton />
+          </span>
           <div className={styles.moreMenuWrap} ref={moreMenuWrapRef}>
             <button
               className={`${styles.headerBtn} ${moreMenuOpen ? styles.headerBtnActive : ''}`}
@@ -322,6 +349,31 @@ export default function ConversationView({
             </button>
             {moreMenuOpen && (
               <div className={styles.moreMenu} role="menu">
+                {/* Call/Refresh are standalone header icons on desktop (see
+                    .desktopOnlyAction above) — folded in here on mobile so
+                    a narrow header doesn't have to fit 4+ icon buttons. */}
+                <button
+                  className={`${styles.moreMenuItem} ${styles.mobileOnlyMenuItem}`}
+                  role="menuitem"
+                  type="button"
+                  aria-label="Call tenant"
+                  onClick={() => setMoreMenuOpen(false)}
+                >
+                  {PhoneIcon}
+                  Call tenant
+                </button>
+                <button
+                  className={`${styles.moreMenuItem} ${styles.mobileOnlyMenuItem}`}
+                  role="menuitem"
+                  type="button"
+                  onClick={() => {
+                    setMoreMenuOpen(false)
+                    router.refresh()
+                  }}
+                >
+                  {RefreshIcon}
+                  Refresh
+                </button>
                 <button
                   className={styles.moreMenuItem}
                   role="menuitem"

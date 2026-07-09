@@ -21,6 +21,15 @@
   padding: 0.875rem 1rem 0.875rem;
 }
 
+/* The mobile tab bar stays visible (fixed) below this view, so reserve
+   room for it here — its own height already accounts for the
+   home-indicator safe area (see MobileTabBar.module.css). */
+@media (max-width: 767px) {
+  .bar {
+    padding-bottom: calc(0.875rem + var(--bottom-nav-height));
+  }
+}
+
 /* ── Icon buttons (attach, mic) ── */
 .iconBtn {
   display: flex;

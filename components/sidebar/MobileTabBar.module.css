@@ -1,0 +1,53 @@
+/* Same dark chrome as the desktop icon sidebar (IconSidebar.module.css) —
+   this bar replaces that sidebar on mobile, so it uses the same surface. */
+.bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30; /* see the mobile z-index stack comment in app/globals.css */
+  display: none;
+  align-items: stretch;
+  justify-content: space-around;
+  height: var(--bottom-nav-height);
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: var(--color-sidebar-bg);
+  border-top: 1px solid var(--color-sidebar-border);
+}
+
+@media (max-width: 767px) {
+  .bar {
+    display: flex;
+  }
+}
+
+.item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.item:hover {
+  color: var(--color-sidebar-hover-text);
+  background-color: var(--color-sidebar-hover-bg);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-brand-light);
+  outline-offset: -2px;
+}
+
+.itemActive {
+  color: var(--color-brand-light);
+}
+
+.label {
+  font-size: 0.625rem;
+  font-weight: 600;
+}

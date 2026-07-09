@@ -22,6 +22,19 @@
   transform: translateX(0);
 }
 
+/* Full-bleed bottom sheet instead of a narrow right-edge drawer — matches
+   the sheet treatment used by the other modals in the app on mobile. */
+@media (max-width: 767px) {
+  .panel {
+    left: 0;
+    top: 12%;
+    width: auto;
+    border-left: none;
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+  }
+}
+
 .panelHeader {
   display: flex;
   align-items: center;

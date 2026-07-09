@@ -5,9 +5,12 @@ import type { Teammate } from '@/lib/integrations/team'
 import type { SettingsActionState } from '@/app/dashboard/settings/actions'
 import { updateProfileAction, updateNotificationPrefsAction } from '@/app/dashboard/settings/actions'
 import { computeInitials } from '@/lib/utils/initials'
+import { useIsMobile } from '@/lib/hooks/useIsMobile'
 import ProfilePanel from './ProfilePanel'
 import TeammatesPanel from './TeammatesPanel'
 import NotificationsPanel from './NotificationsPanel'
+import GroupedSettingsList from './GroupedSettingsList'
+import MobileSettingsPanel from './MobileSettingsPanel'
 
 type TabId = 'profile' | 'teammates' | 'notifications'
 
@@ -60,7 +63,9 @@ export default function SettingsTabs({
   teammates,
   joinCode,
 }: SettingsTabsProps) {
+  const isMobile = useIsMobile()
   const [activeTab, setActiveTab] = useState<TabId>('profile')
+  const [mobileDrilldownOpen, setMobileDrilldownOpen] = useState(false)
 
   const [profileState, profileAction, profilePending] = useActionState<SettingsActionState, FormData>(
     updateProfileAction,
@@ -90,6 +95,80 @@ export default function SettingsTabs({
         : null
 
   const activeLabel = tabs.find((t) => t.id === activeTab)?.label ?? 'Settings'
+
+  // Computed once, reused by the desktop tabpanel and the mobile drill-down
+  // so the three-way switch isn't written twice.
+  const activePanel =
+    activeTab === 'profile' ? (
+      <ProfilePanel
+        formId={PROFILE_FORM_ID}
+        name={name}
+        email={email}
+        phone={phone}
+        initials={initials}
+        state={profileState}
+        formAction={profileAction}
+      />
+    ) : activeTab === 'teammates' ? (
+      <TeammatesPanel
+        role={role}
+        managerId={managerId}
+        teammates={teammates}
+        joinCode={joinCode}
+      />
+    ) : (
+      <NotificationsPanel
+        formId={NOTIF_FORM_ID}
+        notifyEmail={notifyEmail}
+        notifySms={notifySms}
+        state={notifState}
+        formAction={notifAction}
+      />
+    )
+
+  if (isMobile) {
+    return (
+      <div>
+        <div>
+          <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Settings</h1>
+          <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
+            Manage your profile, team, and notifications
+          </p>
+        </div>
+
+        <GroupedSettingsList
+          groups={[
+            {
+              title: 'Account',
+              items: [
+                { id: 'profile', label: 'Profile', icon: UserIcon },
+                { id: 'notifications', label: 'Notification Preferences', icon: BellIcon },
+              ],
+            },
+            {
+              title: 'Team',
+              items: [{ id: 'teammates', label: 'Manage Teammates', icon: UsersIcon }],
+            },
+          ]}
+          onSelect={(id) => {
+            setActiveTab(id as TabId)
+            setMobileDrilldownOpen(true)
+          }}
+        />
+
+        {mobileDrilldownOpen && (
+          <MobileSettingsPanel
+            title={activeLabel}
+            onBack={() => setMobileDrilldownOpen(false)}
+            saveFormId={saveTarget?.formId}
+            savePending={saveTarget?.pending}
+          >
+            {activePanel}
+          </MobileSettingsPanel>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -148,36 +227,7 @@ export default function SettingsTabs({
         aria-label={activeLabel}
         className="mt-6 max-w-2xl rounded-2xl border p-6 shadow-[var(--shadow-card)] [background:var(--color-bg-surface)] [border-color:var(--color-border)]"
       >
-        {activeTab === 'profile' && (
-          <ProfilePanel
-            formId={PROFILE_FORM_ID}
-            name={name}
-            email={email}
-            phone={phone}
-            initials={initials}
-            state={profileState}
-            formAction={profileAction}
-          />
-        )}
-
-        {activeTab === 'teammates' && (
-          <TeammatesPanel
-            role={role}
-            managerId={managerId}
-            teammates={teammates}
-            joinCode={joinCode}
-          />
-        )}
-
-        {activeTab === 'notifications' && (
-          <NotificationsPanel
-            formId={NOTIF_FORM_ID}
-            notifyEmail={notifyEmail}
-            notifySms={notifySms}
-            state={notifState}
-            formAction={notifAction}
-          />
-        )}
+        {activePanel}
       </div>
     </div>
   )

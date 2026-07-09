@@ -36,9 +36,15 @@ const SignOutIcon = (
 interface ProfileMenuProps {
   name: string
   email: string
+  // Which corner of the trigger the panel grows from — pick based on where
+  // the trigger sits on screen so the fixed-width panel stays on-screen.
+  // 'above-left' is the desktop icon sidebar (trigger pinned to the bottom
+  // of a rail at the far left edge); 'above-right' is the mobile bottom tab
+  // bar (trigger is the rightmost tab).
+  placement?: 'above-left' | 'above-right'
 }
 
-export default function ProfileMenu({ name, email }: ProfileMenuProps) {
+export default function ProfileMenu({ name, email, placement = 'above-right' }: ProfileMenuProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -100,7 +106,11 @@ export default function ProfileMenu({ name, email }: ProfileMenuProps) {
       </button>
 
       {open && (
-        <div ref={panelRef} className={styles.panel} role="menu">
+        <div
+          ref={panelRef}
+          className={`${styles.panel} ${placement === 'above-left' ? styles.panelAboveLeft : styles.panelAboveRight}`}
+          role="menu"
+        >
           <div className={styles.header}>
             <div className={styles.headerAvatar} aria-hidden="true">
               {initials}

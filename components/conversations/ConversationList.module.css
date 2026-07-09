@@ -91,6 +91,14 @@
   padding: 2rem 1rem;
 }
 
+/* This list is shown full-screen (no detail pane) on mobile, with the fixed
+   bottom tab bar visible below it — give the last item room to clear it. */
+@media (max-width: 767px) {
+  .list {
+    padding-bottom: calc(var(--bottom-nav-height) + 0.75rem);
+  }
+}
+
 /* ── Item ── */
 .item {
   display: flex;
