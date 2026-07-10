@@ -34,17 +34,17 @@
 }
 
 .item:hover {
-  color: var(--color-sidebar-hover-text);
+  color: var(--color-on-ink);
   background-color: var(--color-sidebar-hover-bg);
 }
 
 .item:focus-visible {
-  outline: 2px solid var(--color-brand-light);
+  outline: 2px solid var(--color-on-ink);
   outline-offset: -2px;
 }
 
 .itemActive {
-  color: var(--color-brand-light);
+  color: var(--color-on-ink);
 }
 
 .label {

@@ -22,9 +22,9 @@ export default async function MaintenancePage() {
   if (error) {
     return (
       <div className="flex flex-1 items-center justify-center p-8">
-        <div className="max-w-md rounded-xl border border-[#fecaca] bg-[#fef2f2] p-6 text-center">
-          <p className="text-sm font-semibold text-[#b91c1c]">Unable to load maintenance tickets</p>
-          <p className="mt-1 text-sm text-[#7f1d1d]">{error.message}</p>
+        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:var(--color-danger)] [background:var(--color-danger-bg)] p-6 text-center">
+          <p className="text-sm font-semibold [color:var(--color-danger)]">Unable to load maintenance tickets</p>
+          <p className="mt-1 text-sm [color:var(--color-danger)]">{error.message}</p>
         </div>
       </div>
     )
@@ -35,14 +35,14 @@ export default async function MaintenancePage() {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-5 md:px-8 md:py-7">
       <header className="mb-5">
-        <h1 className="text-lg font-bold text-[#1e293b]">Maintenance</h1>
+        <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Maintenance</h1>
         {/* Tabs — "Recurring" is an inactive placeholder for now. */}
-        <nav className="mt-3 flex items-center gap-6 border-b border-[rgba(52,71,103,0.10)]">
-          <span className="-mb-px border-b-2 border-[#1565c0] pb-2 text-sm font-semibold text-[#1565c0]">
+        <nav className="mt-3 flex items-center gap-6 border-b [border-color:var(--color-border)]">
+          <span className="-mb-px border-b-2 [border-color:var(--color-ink)] pb-2 text-sm font-semibold [color:var(--color-ink)]">
             Requests Board
           </span>
           <span
-            className="-mb-px cursor-not-allowed border-b-2 border-transparent pb-2 text-sm font-semibold text-[#b0b7c3]"
+            className="-mb-px cursor-not-allowed border-b-2 border-transparent pb-2 text-sm font-semibold [color:var(--color-text-muted)]"
             aria-disabled="true"
           >
             Recurring

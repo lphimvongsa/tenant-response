@@ -9,7 +9,7 @@
 
 .error {
   font-size: 0.75rem;
-  color: var(--color-error);
+  color: var(--color-danger);
   padding: 0.375rem 1.25rem 0;
 }
 
@@ -47,8 +47,8 @@
 }
 
 .iconBtn:hover:not(:disabled) {
-  color: var(--color-brand-dark);
-  background-color: var(--color-bg-elevated);
+  color: var(--color-ink);
+  background-color: var(--color-bg-sunken);
 }
 
 .iconBtn:disabled {
@@ -117,7 +117,7 @@
 }
 
 .sendBtnActive {
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   cursor: pointer;
   box-shadow: var(--shadow-button);
@@ -137,7 +137,7 @@
   display: block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--color-border-on-brand);
+  border: 2px solid var(--color-border-on-ink);
   border-top-color: var(--color-btn-text);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;

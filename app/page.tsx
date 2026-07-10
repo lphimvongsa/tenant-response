@@ -8,17 +8,16 @@ export default function Home() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #e3f0ff 0%, #f0f4f8 60%, #e8f0fe 100%)',
-        fontFamily: 'var(--font-geist-sans), -apple-system, sans-serif',
+        background: 'var(--color-bg-base)',
       }}
     >
       <div
         style={{
           textAlign: 'center',
           padding: '3rem 2rem',
-          background: '#ffffff',
-          borderRadius: '1.5rem',
-          boxShadow: '0 8px 40px rgba(52, 71, 103, 0.12)',
+          background: 'var(--color-bg-surface)',
+          borderRadius: 'var(--radius-lg)',
+          boxShadow: 'var(--shadow-card-hover)',
           maxWidth: '420px',
           width: '100%',
           margin: '1rem',
@@ -30,12 +29,12 @@ export default function Home() {
             width: '88px',
             height: '88px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #42a5f5 0%, #1565c0 100%)',
+            background: 'var(--color-ink)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 1.5rem',
-            boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
+            boxShadow: 'var(--shadow-button-hover)',
             fontSize: '2.5rem',
           }}
         >
@@ -46,18 +45,18 @@ export default function Home() {
           style={{
             fontSize: '2rem',
             fontWeight: 700,
-            color: '#344767',
+            color: 'var(--color-text-primary)',
             margin: '0 0 0.375rem',
             letterSpacing: '-0.01em',
           }}
         >
-          Tena<span style={{ color: '#1976d2' }}>Timmy</span>
+          Tena<span style={{ color: 'var(--color-text-secondary)' }}>Timmy</span>
         </h1>
 
         <p
           style={{
             fontSize: '0.9375rem',
-            color: '#7b809a',
+            color: 'var(--color-text-secondary)',
             margin: '0 0 2rem',
             lineHeight: 1.6,
           }}

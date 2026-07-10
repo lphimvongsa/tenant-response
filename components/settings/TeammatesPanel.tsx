@@ -16,7 +16,7 @@ interface TeammatesPanelProps {
 }
 
 const secondaryBtn =
-  'rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-semibold transition-colors [background:var(--color-bg-surface)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] hover:[background:var(--color-bg-hover)] disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-semibold transition-colors [background:var(--color-bg-surface)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] hover:[background:var(--color-bg-sunken)] disabled:cursor-not-allowed disabled:opacity-50'
 
 function RoleBadge({ role }: { role: string }) {
   const isAdmin = role === 'admin'
@@ -24,7 +24,7 @@ function RoleBadge({ role }: { role: string }) {
     <span
       className={`shrink-0 rounded-[var(--radius-pill)] px-2 py-0.5 text-[11px] font-semibold capitalize ${
         isAdmin
-          ? '[background:var(--color-bg-elevated)] [color:var(--color-brand-dark)]'
+          ? '[background:var(--color-bg-sunken)] [color:var(--color-ink)]'
           : '[background:var(--color-input-bg)] [color:var(--color-text-secondary)]'
       }`}
     >
@@ -41,7 +41,7 @@ function RemoveButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold transition-colors [color:var(--color-error)] hover:[background:var(--color-error-bg-hover)] disabled:opacity-50"
+      className="rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold transition-colors [color:var(--color-danger)] hover:[background:var(--color-danger-bg)] disabled:opacity-50"
     >
       {pending ? 'Removing…' : 'Remove'}
     </button>
@@ -144,7 +144,7 @@ export default function TeammatesPanel({
               >
                 <div
                   aria-hidden="true"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white [background:var(--color-brand-gradient)]"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white [background:var(--color-ink)]"
                 >
                   {computeInitials(t.name, t.email)}
                 </div>

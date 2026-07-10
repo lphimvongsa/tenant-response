@@ -29,7 +29,7 @@
   height: 40px;
   border-radius: 12px;
   margin-bottom: 1rem;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   box-shadow: var(--shadow-button);
   flex-shrink: 0;
   transition: box-shadow 0.15s;
@@ -71,23 +71,23 @@
 }
 
 .item:hover {
-  color: var(--color-sidebar-hover-text);
+  color: var(--color-on-ink);
   background-color: var(--color-sidebar-hover-bg);
 }
 
 .item:focus-visible {
-  outline: 2px solid var(--color-brand-light);
+  outline: 2px solid var(--color-on-ink);
   outline-offset: 2px;
 }
 
 .itemActive {
   color: var(--color-btn-text);
-  background-color: var(--color-brand-dark);
+  background-color: var(--color-ink);
   box-shadow: var(--shadow-button-hover);
 }
 
 .itemActive:hover {
-  background-color: var(--color-brand);
+  background-color: var(--color-ink);
 }
 
 .icon {
@@ -113,13 +113,13 @@
   top: 50%;
   transform: translateY(-50%);
   white-space: nowrap;
-  background-color: var(--color-sidebar-tooltip-bg);
-  color: var(--color-sidebar-tooltip-text);
+  background-color: var(--color-ink);
+  color: var(--color-on-ink);
   font-size: 0.6875rem;
   font-weight: 600;
   padding: 0.3rem 0.6rem;
   border-radius: 7px;
-  box-shadow: var(--shadow-tooltip);
+  box-shadow: var(--shadow-card-hover);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease;

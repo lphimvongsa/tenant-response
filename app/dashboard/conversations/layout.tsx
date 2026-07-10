@@ -20,8 +20,8 @@ export default async function ConversationsLayout({
       list={
         error ? (
           <div style={{ padding: '1rem' }}>
-            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#b91c1c' }}>Failed to load</p>
-            <p style={{ fontSize: '0.75rem', color: '#7f1d1d', marginTop: '0.25rem' }}>{error.message}</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-danger)' }}>Failed to load</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-danger)', marginTop: '0.25rem' }}>{error.message}</p>
           </div>
         ) : (
           <ConversationList conversations={conversations} basePath="/dashboard/conversations" />

@@ -12,7 +12,7 @@
 }
 
 .button:hover {
-  color: var(--color-brand);
-  border-color: var(--color-brand-border);
-  background-color: var(--color-bg-elevated);
+  color: var(--color-ink);
+  border-color: var(--color-border-strong);
+  background-color: var(--color-bg-sunken);
 }

@@ -16,7 +16,7 @@ export default function PropertyPhotoPlaceholder({ className }: Props) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #e8f0fe 0%, #d7e5fb 100%)',
+        background: 'linear-gradient(135deg, var(--color-bg-sunken) 0%, var(--color-bg-sunken) 100%)',
       }}
     >
       <svg
@@ -24,7 +24,7 @@ export default function PropertyPhotoPlaceholder({ className }: Props) {
         height="44"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#7ba7dd"
+        stroke="var(--color-text-muted)"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

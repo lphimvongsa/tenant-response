@@ -41,11 +41,11 @@ export default function GroupedSettingsList({ groups, onSelect }: Props) {
                 key={item.id}
                 type="button"
                 onClick={() => onSelect(item.id)}
-                className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:[background:var(--color-bg-hover)] ${
+                className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:[background:var(--color-bg-sunken)] ${
                   i !== group.items.length - 1 ? 'border-b [border-color:var(--color-border-subtle)]' : ''
                 }`}
               >
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:var(--color-bg-elevated)] [color:var(--color-brand-dark)]">
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:var(--color-bg-sunken)] [color:var(--color-ink)]">
                   {item.icon}
                 </span>
                 <span className="flex-1 text-sm font-semibold [color:var(--color-text-primary)]">

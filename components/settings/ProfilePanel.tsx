@@ -51,7 +51,7 @@ export default function ProfilePanel({
       <div className="flex items-center gap-4 border-b pb-5 [border-color:var(--color-border)]">
         <div
           aria-hidden="true"
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-[var(--shadow-button)] [background:var(--color-brand-gradient)]"
+          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-[var(--shadow-button)] [background:var(--color-ink)]"
         >
           {initials}
         </div>

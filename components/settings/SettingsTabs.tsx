@@ -184,7 +184,7 @@ export default function SettingsTabs({
             type="submit"
             form={saveTarget.formId}
             disabled={saveTarget.pending}
-            className="shrink-0 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-brand-gradient)] hover:shadow-[var(--shadow-button-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="shrink-0 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-ink)] hover:shadow-[var(--shadow-button-hover)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saveTarget.pending ? 'Saving…' : 'Save Changes'}
           </button>
@@ -209,7 +209,7 @@ export default function SettingsTabs({
               onClick={() => setActiveTab(tab.id)}
               className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 pb-3 text-sm font-semibold transition-colors ${
                 active
-                  ? '[border-color:var(--color-brand-dark)] [color:var(--color-brand-dark)]'
+                  ? '[border-color:var(--color-ink)] [color:var(--color-ink)]'
                   : 'border-transparent [color:var(--color-text-secondary)] hover:[color:var(--color-text-primary)]'
               }`}
             >

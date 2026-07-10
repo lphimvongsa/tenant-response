@@ -12,13 +12,9 @@ export type ConversationSummaryItem = {
   escalated: boolean
 }
 
-const AVATAR_COLORS = [
-  'bg-[#e8f0fe] text-[#1565c0]',
-  'bg-[#e6f4ea] text-[#0f9d58]',
-  'bg-[#fef9c3] text-[#854d0e]',
-  'bg-[#f3e8fd] text-[#7c3aed]',
-  'bg-[#fce8e6] text-[#d93025]',
-]
+// Monochrome avatar chip — the near-monochrome direction drops the old
+// per-person hue rotation; initials carry the distinction, not colour.
+const AVATAR_STYLE = '[background:var(--color-bg-sunken)] [color:var(--color-text-primary)]'
 
 function initials(name: string): string {
   const parts = name.split(' ').filter(Boolean).slice(0, 2)
@@ -28,46 +24,46 @@ function initials(name: string): string {
 
 export default function ConversationSummaryList({ conversations }: { conversations: ConversationSummaryItem[] }) {
   return (
-    <div className="flex h-full flex-col rounded-2xl bg-white p-5 shadow-[0_2px_12px_rgba(52,71,103,0.08)]">
+    <div className="flex h-full flex-col rounded-[var(--radius-lg)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-[#344767]">Conversations</h2>
+        <h2 className="text-sm font-bold [color:var(--color-text-primary)]">Conversations</h2>
         <Link
           href="/dashboard/conversations"
-          className="text-xs font-semibold text-[#1565c0] hover:underline"
+          className="text-xs font-semibold [color:var(--color-ink)] hover:underline"
         >
           View all
         </Link>
       </div>
 
       {conversations.length === 0 ? (
-        <p className="flex-1 px-2 py-10 text-center text-sm text-[#b0b7c3]">No conversations yet.</p>
+        <p className="flex-1 px-2 py-10 text-center text-sm [color:var(--color-text-muted)]">No conversations yet.</p>
       ) : (
         <ul className="flex flex-1 flex-col gap-1">
-          {conversations.map((conv, i) => (
+          {conversations.map((conv) => (
             <li key={conv.id}>
               <Link
                 href={`/dashboard/conversations/${conv.id}`}
-                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-[#f5f8ff]"
+                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:[background:var(--color-bg-sunken)]"
               >
                 <span
-                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xs font-bold ${AVATAR_COLORS[i % AVATAR_COLORS.length]}`}
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xs font-bold ${AVATAR_STYLE}`}
                   aria-hidden="true"
                 >
                   {initials(conv.name)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-[#344767]">{conv.name}</p>
-                  <p className="truncate text-xs text-[#7b809a]">{conv.timeLabel}</p>
+                  <p className="truncate text-sm font-semibold [color:var(--color-text-primary)]">{conv.name}</p>
+                  <p className="truncate text-xs [color:var(--color-text-secondary)]">{conv.timeLabel}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
                   {conv.escalated && (
-                    <span className="rounded-full bg-[#fce8e6] px-2 py-1 text-[10px] font-semibold text-[#d93025]">
+                    <span className="rounded-full [background:var(--color-danger-bg)] px-2 py-1 text-[10px] font-semibold [color:var(--color-danger)]">
                       Escalated
                     </span>
                   )}
                   {conv.unreadCount > 0 && (
                     <span
-                      className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1565c0] px-1.5 text-[10px] font-bold text-white"
+                      className="flex h-5 min-w-[20px] items-center justify-center rounded-full [background:var(--color-ink)] px-1.5 text-[10px] font-bold text-white"
                       aria-label={`${conv.unreadCount} unread`}
                     >
                       {conv.unreadCount}

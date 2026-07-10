@@ -31,7 +31,7 @@
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   font-size: 0.875rem;
   font-weight: 700;
@@ -116,7 +116,7 @@
 }
 
 .headerBtn:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 

@@ -32,7 +32,7 @@
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   font-size: 0.875rem;
   font-weight: 700;
@@ -166,11 +166,11 @@
 }
 
 .statusMenuItem:hover {
-  background-color: var(--color-bg-hover);
+  background-color: var(--color-bg-sunken);
 }
 
 .statusMenuItem:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: -2px;
 }
 
@@ -203,7 +203,7 @@
 .statusCheck {
   display: inline-flex;
   align-items: center;
-  color: var(--color-brand-dark);
+  color: var(--color-ink);
   flex-shrink: 0;
 }
 
@@ -254,14 +254,14 @@
 }
 
 .headerBtn:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
 /* Active state for toggle buttons */
 .headerBtnActive {
-  background-color: var(--color-bg-elevated) !important;
-  color: var(--color-brand-dark) !important;
+  background-color: var(--color-bg-sunken) !important;
+  color: var(--color-ink) !important;
 }
 
 /* More menu */
@@ -299,7 +299,7 @@
 }
 
 .moreMenuItem:hover {
-  background-color: var(--color-bg-hover);
+  background-color: var(--color-bg-sunken);
 }
 
 /* Search bar */
@@ -349,7 +349,7 @@
 .searchClose {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-brand-dark);
+  color: var(--color-ink);
   border: none;
   background: transparent;
   cursor: pointer;
@@ -359,7 +359,7 @@
 }
 
 .searchClose:hover {
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-sunken);
 }
 
 /* ── Input area wrapper ── */
@@ -417,12 +417,12 @@
   }
 
   .backBtn:hover {
-    background-color: var(--color-bg-hover);
+    background-color: var(--color-bg-sunken);
     color: var(--color-text-primary);
   }
 
   .backBtn:focus-visible {
-    outline: 2px solid var(--color-brand);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
   }
 

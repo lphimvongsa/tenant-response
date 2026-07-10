@@ -28,7 +28,7 @@ function ToggleRow({
       </div>
       <label className="relative inline-flex shrink-0 cursor-pointer items-center">
         <input type="checkbox" name={name} defaultChecked={defaultChecked} className="peer sr-only" />
-        <div className="relative h-6 w-11 rounded-full transition-colors [background:var(--color-input-border)] after:absolute after:left-[3px] after:top-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:content-[''] peer-checked:[background:var(--color-brand)] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--color-brand)]" />
+        <div className="relative h-6 w-11 rounded-full transition-colors [background:var(--color-input-border)] after:absolute after:left-[3px] after:top-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:content-[''] peer-checked:[background:var(--color-ink)] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--color-ink)]" />
       </label>
     </div>
   )

@@ -11,7 +11,7 @@
   border-radius: 50%;
   border: none;
   padding: 0;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -30,7 +30,7 @@
 }
 
 .trigger:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
@@ -87,7 +87,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -156,23 +156,23 @@
 }
 
 .item:hover {
-  background-color: var(--color-bg-elevated);
-  color: var(--color-brand-dark);
+  background-color: var(--color-bg-sunken);
+  color: var(--color-ink);
 }
 
 .item:focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-ink);
   outline-offset: -2px;
 }
 
 /* Sign out is a destructive/exit action — tinted with the soft error color. */
 .signOut {
-  color: var(--color-error);
+  color: var(--color-danger);
 }
 
 .signOut:hover {
-  background-color: var(--color-error-bg-hover);
-  color: var(--color-error);
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
 }
 
 /* Let the server-action form's submit button participate in the panel's

@@ -27,7 +27,7 @@
 }
 
 .brandName span {
-  color: var(--color-brand);
+  color: var(--color-ink);
 }
 
 /* ── Tabs ── */
@@ -53,10 +53,10 @@
 
 .tab:hover {
   color: var(--color-text-secondary);
-  background-color: var(--color-bg-hover);
+  background-color: var(--color-bg-sunken);
 }
 
 .tabActive {
-  color: var(--color-brand);
-  background-color: var(--color-bg-elevated);
+  color: var(--color-ink);
+  background-color: var(--color-bg-sunken);
 }

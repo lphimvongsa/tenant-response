@@ -73,7 +73,7 @@
 
 /* Staff messages: blue gradient */
 .bubble.outbound {
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   border-radius: var(--radius-bubble) var(--radius-bubble) 0.25rem var(--radius-bubble);
   box-shadow: var(--shadow-button);

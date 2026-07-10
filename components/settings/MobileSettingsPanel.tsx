@@ -30,7 +30,7 @@ export default function MobileSettingsPanel({ title, onBack, saveFormId, savePen
           type="button"
           onClick={onBack}
           aria-label="Back to settings"
-          className="flex h-9 w-9 items-center justify-center rounded-lg [color:var(--color-text-secondary)] hover:[background:var(--color-bg-hover)]"
+          className="flex h-9 w-9 items-center justify-center rounded-lg [color:var(--color-text-secondary)] hover:[background:var(--color-bg-sunken)]"
         >
           {BackIcon}
         </button>
@@ -42,7 +42,7 @@ export default function MobileSettingsPanel({ title, onBack, saveFormId, savePen
             type="submit"
             form={saveFormId}
             disabled={savePending}
-            className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-brand-gradient)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {savePending ? 'Saving…' : 'Save'}
           </button>

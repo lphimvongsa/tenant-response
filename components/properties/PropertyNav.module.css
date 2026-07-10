@@ -13,8 +13,8 @@
   padding: 0.45rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-brand);
-  border: 1.5px dashed var(--color-brand-border);
+  color: var(--color-ink);
+  border: 1.5px dashed var(--color-border-strong);
   border-radius: var(--radius-sm);
   text-decoration: none;
   text-align: center;
@@ -22,8 +22,8 @@
 }
 
 .newBtn:hover {
-  background-color: var(--color-bg-elevated);
-  border-color: var(--color-brand);
+  background-color: var(--color-bg-sunken);
+  border-color: var(--color-ink);
 }
 
 .empty {
@@ -47,13 +47,13 @@
 }
 
 .item:hover {
-  background-color: var(--color-bg-hover);
+  background-color: var(--color-bg-sunken);
   color: var(--color-text-primary);
 }
 
 .itemActive {
-  background-color: var(--color-bg-elevated);
-  color: var(--color-brand);
+  background-color: var(--color-bg-sunken);
+  color: var(--color-ink);
   font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--color-brand);
+  box-shadow: inset 3px 0 0 var(--color-ink);
 }

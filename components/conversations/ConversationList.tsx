@@ -31,12 +31,11 @@ function truncate(text: string, max: number): string {
 
 // Deterministic avatar hue from a string
 const AVATAR_PALETTES = [
-  { bg: '#1565c0', text: '#fff' },
-  { bg: '#7c3aed', text: '#fff' },
-  { bg: '#0f9d58', text: '#fff' },
-  { bg: '#d97706', text: '#fff' },
-  { bg: '#dc2626', text: '#fff' },
-  { bg: '#0369a1', text: '#fff' },
+  { bg: 'var(--color-ink)', text: 'var(--color-on-ink)' },
+  { bg: 'var(--color-success)', text: 'var(--color-on-ink)' },
+  { bg: 'var(--color-warning)', text: 'var(--color-on-ink)' },
+  { bg: 'var(--color-danger)', text: 'var(--color-on-ink)' },
+  { bg: 'var(--color-text-secondary)', text: 'var(--color-on-ink)' },
 ]
 function avatarPalette(str: string) {
   const hash = str.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -111,7 +110,7 @@ export default function ConversationList({ conversations, basePath = '/dashboard
               {/* Avatar */}
               <div
                 className={styles.avatar}
-                style={{ background: active ? '#1565c0' : palette.bg, color: palette.text }}
+                style={{ background: active ? 'var(--color-ink)' : palette.bg, color: palette.text }}
                 aria-hidden="true"
               >
                 {initials}

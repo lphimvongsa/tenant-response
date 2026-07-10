@@ -111,7 +111,10 @@ function sumResponseTotals(
 }
 
 // ── Types ────────────────────────────────────────────────────────────────────
-type TileVariant = 'blue' | 'green' | 'white'
+// 'primary' = the dark ink hero tile; 'neutral' = a surface tile with a sunken
+// icon chip; 'alert' = same neutral shell but the icon keeps the danger hue so
+// escalation severity still reads at a glance.
+type TileVariant = 'primary' | 'neutral' | 'alert'
 
 type StatTile = {
   label: string
@@ -132,26 +135,26 @@ function getLastMessage(messages: Conversation['messages']): Conversation['messa
 }
 
 const TILE_STYLES: Record<TileVariant, { card: string; label: string; value: string; delta: string; iconWrap: string }> = {
-  blue: {
-    card: 'text-white shadow-[0_6px_20px_rgba(21,101,192,0.28)] [background:linear-gradient(135deg,#42a5f5_0%,#1565c0_100%)]',
+  primary: {
+    card: 'text-white shadow-[var(--shadow-card)] [background:var(--color-ink)]',
     label: 'text-white/80',
     value: 'text-white',
-    delta: 'text-white/75',
-    iconWrap: 'bg-white/20 text-white',
+    delta: 'text-white/70',
+    iconWrap: 'bg-white/15 text-white',
   },
-  green: {
-    card: 'text-white shadow-[0_6px_20px_rgba(15,157,88,0.26)] [background:linear-gradient(135deg,#66bb6a_0%,#0f9d58_100%)]',
-    label: 'text-white/80',
-    value: 'text-white',
-    delta: 'text-white/75',
-    iconWrap: 'bg-white/20 text-white',
+  neutral: {
+    card: 'shadow-[var(--shadow-card)] [background:var(--color-bg-surface)]',
+    label: '[color:var(--color-text-secondary)]',
+    value: '[color:var(--color-text-primary)]',
+    delta: '[color:var(--color-text-muted)]',
+    iconWrap: '[background:var(--color-bg-sunken)] [color:var(--color-text-secondary)]',
   },
-  white: {
-    card: 'bg-white text-[#344767] shadow-[0_2px_12px_rgba(52,71,103,0.08)]',
-    label: 'text-[#7b809a]',
-    value: 'text-[#d93025]',
-    delta: 'text-[#b0b7c3]',
-    iconWrap: 'bg-[#fce8e6] text-[#d93025]',
+  alert: {
+    card: 'shadow-[var(--shadow-card)] [background:var(--color-bg-surface)]',
+    label: '[color:var(--color-text-secondary)]',
+    value: '[color:var(--color-text-primary)]',
+    delta: '[color:var(--color-text-muted)]',
+    iconWrap: '[background:var(--color-bg-sunken)] [color:var(--color-danger)]',
   },
 }
 
@@ -233,9 +236,9 @@ export default async function OverviewPage() {
   if (loadError) {
     return (
       <div className="flex flex-1 items-center justify-center p-8">
-        <div className="max-w-md rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-6 text-center">
-          <p className="text-sm font-semibold text-[#b91c1c]">Unable to load overview</p>
-          <p className="mt-1 text-sm text-[#7f1d1d]">{loadError.message}</p>
+        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:var(--color-danger)] [background:var(--color-danger-bg)] p-6 text-center">
+          <p className="text-sm font-semibold [color:var(--color-danger)]">Unable to load overview</p>
+          <p className="mt-1 text-sm [color:var(--color-danger)]">{loadError.message}</p>
         </div>
       </div>
     )
@@ -270,7 +273,7 @@ export default async function OverviewPage() {
       value: openTicketsRes.count ?? 0,
       delta: ticketsTodayRes.count ?? 0,
       href: '/dashboard/maintenance',
-      variant: 'blue',
+      variant: 'primary',
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M14.7 6.3a4 4 0 0 0-5.3 5.3l-6 6a1.5 1.5 0 0 0 2.1 2.1l6-6a4 4 0 0 0 5.3-5.3l-2.4 2.4-2.1-2.1 2.4-2.4z" />
@@ -282,7 +285,7 @@ export default async function OverviewPage() {
       value: unreadMessagesRes.count ?? 0,
       delta: inboundToday,
       href: '/dashboard/conversations',
-      variant: 'green',
+      variant: 'neutral',
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
@@ -294,7 +297,7 @@ export default async function OverviewPage() {
       value: escalatedRes.count ?? 0,
       delta: escalatedTodayRes.count ?? 0,
       href: '/dashboard/conversations',
-      variant: 'white',
+      variant: 'alert',
       icon: (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 9v4" />
@@ -334,8 +337,8 @@ export default async function OverviewPage() {
       {/* ── Header: heading + stat tiles ── */}
       <div className="flex flex-col gap-5">
         <div>
-          <h1 className="text-2xl font-bold text-[#344767]">{greeting}</h1>
-          <p className="mt-1 text-sm text-[#7b809a]">
+          <h1 className="text-2xl font-bold [color:var(--color-text-primary)]">{greeting}</h1>
+          <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
             Here&apos;s whats going on in your properties
           </p>
         </div>
@@ -348,7 +351,7 @@ export default async function OverviewPage() {
               <Link
                 key={tile.label}
                 href={tile.href}
-                className={`group flex h-32 flex-col justify-between rounded-2xl px-5 py-4 transition-transform hover:-translate-y-0.5 ${s.card}`}
+                className={`group flex h-32 flex-col justify-between rounded-[var(--radius-lg)] px-5 py-4 transition-transform hover:-translate-y-0.5 ${s.card}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className={`text-xs font-semibold leading-tight ${s.label}`}>{tile.label}</p>

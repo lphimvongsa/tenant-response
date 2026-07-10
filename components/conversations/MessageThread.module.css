@@ -36,7 +36,7 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -47,9 +47,8 @@
   align-self: flex-end;
 }
 
-/* Staff (outbound) avatar: dark slate gradient — one-off treatment */
 .avatarOutbound {
-  background: linear-gradient(135deg, var(--color-avatar-staff-start) 0%, var(--color-text-primary) 100%);
+  background: var(--color-ink);
 }
 
 /* ── Message column (label + bubble + meta) ── */
@@ -69,7 +68,7 @@
 }
 
 .senderLabelInbound {
-  color: var(--color-brand-dark);
+  color: var(--color-ink);
   text-align: left;
 }
 
@@ -96,7 +95,7 @@
 }
 
 .bubbleOutbound {
-  background: var(--color-brand-gradient);
+  background: var(--color-ink);
   color: var(--color-btn-text);
   border-radius: 18px 4px 18px 18px;
   box-shadow: var(--shadow-button);
@@ -107,9 +106,8 @@
   white-space: pre-wrap;
 }
 
-/* Search-match highlight — one-off accent yellow */
 .highlight {
-  background: var(--color-highlight);
+  background: var(--color-warning-bg);
   color: var(--color-text-primary);
   border-radius: 2px;
   padding: 0 1px;
@@ -141,7 +139,7 @@
 }
 
 .readCheckRead {
-  color: var(--color-brand-dark);
+  color: var(--color-ink);
 }
 
 /* Mark read/unread toggle button */
@@ -164,5 +162,5 @@
 }
 
 .readToggle:hover {
-  color: var(--color-brand-dark);
+  color: var(--color-ink);
 }
