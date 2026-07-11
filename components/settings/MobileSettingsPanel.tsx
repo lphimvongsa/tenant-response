@@ -34,7 +34,7 @@ export default function MobileSettingsPanel({ title, onBack, saveFormId, savePen
         >
           {BackIcon}
         </button>
-        <h2 className="flex-1 truncate text-center text-sm font-bold [color:var(--color-text-primary)]">
+        <h2 className="flex-1 truncate text-center text-base font-bold [color:var(--color-text-primary)]">
           {title}
         </h2>
         {saveFormId ? (

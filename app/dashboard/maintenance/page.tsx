@@ -36,18 +36,6 @@ export default async function MaintenancePage() {
     <div className="flex-1 overflow-y-auto px-4 py-5 md:px-8 md:py-7">
       <header className="mb-5">
         <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Maintenance</h1>
-        {/* Tabs — "Recurring" is an inactive placeholder for now. */}
-        <nav className="mt-3 flex items-center gap-6 border-b [border-color:var(--color-border)]">
-          <span className="-mb-px border-b-2 [border-color:var(--color-ink)] pb-2 text-sm font-semibold [color:var(--color-ink)]">
-            Requests Board
-          </span>
-          <span
-            className="-mb-px cursor-not-allowed border-b-2 border-transparent pb-2 text-sm font-semibold [color:var(--color-text-muted)]"
-            aria-disabled="true"
-          >
-            Recurring
-          </span>
-        </nav>
       </header>
 
       <TicketBoard tickets={tickets} />

@@ -158,7 +158,7 @@ export default function MobileTicketList({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search tenants"
-            className="w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-sm [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+            className="w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-base [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
           />
         </div>
         <button
@@ -226,7 +226,7 @@ export default function MobileTicketList({
                   <select
                     value={propertyFilter}
                     onChange={(e) => onPropertyFilterChange(e.target.value)}
-                    className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                    className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                   >
                     <option value="">All properties</option>
                     {propertyOptions.map((p) => (
@@ -241,7 +241,7 @@ export default function MobileTicketList({
                 <select
                   value={unitFilter}
                   onChange={(e) => onUnitFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="">All units</option>
                   {unitOptions.map((u) => (
@@ -257,7 +257,7 @@ export default function MobileTicketList({
                 <select
                   value={severityFilter}
                   onChange={(e) => onSeverityFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="">All severities</option>
                   {SEVERITY_OPTIONS.map((s) => (
@@ -271,7 +271,7 @@ export default function MobileTicketList({
                 <select
                   value={categoryFilter}
                   onChange={(e) => onCategoryFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="">All categories</option>
                   {MAINTENANCE_CATEGORIES.map((c) => (

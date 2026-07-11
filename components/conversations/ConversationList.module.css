@@ -57,7 +57,7 @@
   border: 1.5px solid var(--color-border);
   background: var(--color-input-bg);
   padding: 0 0.875rem 0 2.25rem;
-  font-size: 0.8125rem;
+  font-size: 1rem;
   color: var(--color-text-primary);
   font-family: inherit;
   outline: none;

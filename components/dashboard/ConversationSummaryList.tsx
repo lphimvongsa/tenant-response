@@ -26,7 +26,7 @@ export default function ConversationSummaryList({ conversations }: { conversatio
   return (
     <div className="flex h-full flex-col rounded-[var(--radius-lg)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-bold [color:var(--color-text-primary)]">Conversations</h2>
+        <h2 className="text-base font-bold [color:var(--color-text-primary)]">Conversations</h2>
         <Link
           href="/dashboard/conversations"
           className="text-xs font-semibold [color:var(--color-ink)] hover:underline"

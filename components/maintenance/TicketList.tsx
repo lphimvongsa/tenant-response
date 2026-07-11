@@ -488,7 +488,7 @@ function TicketModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Short summary"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
               />
             </label>
             <div className="grid grid-cols-2 gap-4">
@@ -497,7 +497,7 @@ function TicketModal({
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="">—</option>
                   {MAINTENANCE_CATEGORIES.map((c) => (
@@ -512,7 +512,7 @@ function TicketModal({
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as TicketStatus)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -529,7 +529,7 @@ function TicketModal({
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
                 placeholder="Unassigned"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
               />
             </label>
           </div>
@@ -707,7 +707,7 @@ function NewTicketModal({
                     setPropertyId(e.target.value)
                     setUnitId('')
                   }}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="">Select a property…</option>
                   {properties.map((p) => (
@@ -725,7 +725,7 @@ function NewTicketModal({
                 value={unitId}
                 onChange={(e) => setUnitId(e.target.value)}
                 disabled={!selectedProperty}
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none disabled:[background:var(--color-bg-sunken)] disabled:[color:var(--color-text-muted)]"
+                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none disabled:[background:var(--color-bg-sunken)] disabled:[color:var(--color-text-muted)]"
               >
                 <option value="">{selectedProperty ? 'Select a unit…' : 'Select a property first'}</option>
                 {units.map((u) => (
@@ -746,7 +746,7 @@ function NewTicketModal({
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 placeholder="e.g. Leaking faucet"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
               />
             </label>
 
@@ -755,7 +755,7 @@ function NewTicketModal({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as MaintenanceCategory | '')}
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
               >
                 <option value="">Select a category…</option>
                 {MAINTENANCE_CATEGORIES.map((c) => (
@@ -776,7 +776,7 @@ function NewTicketModal({
                 required
                 rows={3}
                 placeholder="Describe the issue…"
-                className="mt-1 w-full resize-none rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className="mt-1 w-full resize-none rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
               />
             </label>
 
@@ -786,7 +786,7 @@ function NewTicketModal({
                 <select
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value as 'mild' | 'moderate' | 'severe')}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 >
                   <option value="mild">Low</option>
                   <option value="moderate">Normal</option>
@@ -800,7 +800,7 @@ function NewTicketModal({
                   value={assignedTo}
                   onChange={(e) => setAssignedTo(e.target.value)}
                   placeholder="Optional"
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-sm [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
                 />
               </label>
             </div>
@@ -1037,7 +1037,7 @@ export default function TicketBoard({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tenants"
-              className="w-56 rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-sm [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+              className="w-56 rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-base [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
             />
           </div>
           <button
@@ -1056,7 +1056,7 @@ export default function TicketBoard({
           <select
             value={propertyFilter}
             onChange={(e) => setPropertyFilter(e.target.value)}
-            className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-xs font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+            className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
           >
             <option value="">All properties</option>
             {propertyOptions.map((p) => (
@@ -1069,7 +1069,7 @@ export default function TicketBoard({
         <select
           value={unitFilter}
           onChange={(e) => setUnitFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-xs font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
         >
           <option value="">All units</option>
           {unitOptions.map((u) => (
@@ -1081,7 +1081,7 @@ export default function TicketBoard({
         <select
           value={severityFilter}
           onChange={(e) => setSeverityFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-xs font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
         >
           <option value="">All severities</option>
           {SEVERITY_OPTIONS.map((s) => (
@@ -1093,7 +1093,7 @@ export default function TicketBoard({
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-xs font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
         >
           <option value="">All categories</option>
           {MAINTENANCE_CATEGORIES.map((c) => (

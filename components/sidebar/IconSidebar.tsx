@@ -40,10 +40,9 @@ export default function IconSidebar({ name, email }: Props) {
         })}
       </ul>
 
-      {/* Pinned to the bottom via .profileSlot's margin-top: auto — opens
-          upward since it sits near the bottom of the viewport. */}
+      {/* Pinned to the bottom via .profileSlot's margin-top: auto. */}
       <div className={styles.profileSlot}>
-        <ProfileMenu name={name} email={email} placement="above-left" />
+        <ProfileMenu name={name} email={email} />
       </div>
     </nav>
   )

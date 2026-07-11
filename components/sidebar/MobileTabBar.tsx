@@ -11,10 +11,10 @@ type Props = {
   email: string
 }
 
-// There is no separate header bar on any breakpoint — the profile menu
-// (account settings / help / sign out) lives here instead, as the tab
-// bar's 5th item (the desktop icon sidebar has its own copy, pinned to
-// the bottom of the rail).
+// There is no separate header bar on any breakpoint — the profile link
+// into account settings lives here instead, as the tab bar's 5th item
+// (the desktop icon sidebar has its own copy, pinned to the bottom of
+// the rail).
 //
 // Stays mounted on every dashboard route, including individual conversation
 // threads — MessageInput reserves space above it (see its mobile
@@ -31,7 +31,7 @@ export default function MobileTabBar({ name, email }: Props) {
         if (item.profile) {
           return (
             <div key={item.href} className={className}>
-              <ProfileMenu name={name} email={email} placement="above-right" />
+              <ProfileMenu name={name} email={email} />
               <span className={styles.label}>{item.label}</span>
             </div>
           )

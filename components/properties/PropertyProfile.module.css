@@ -143,7 +143,7 @@
 }
 
 .propName {
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.02em;
@@ -364,7 +364,7 @@
 
 .sectionTitle {
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
@@ -580,7 +580,7 @@
 /* ── Shared inputs & buttons ── */
 .input {
   padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-text-primary);
   background-color: var(--color-input-bg);
   border: 1.5px solid var(--color-input-border);

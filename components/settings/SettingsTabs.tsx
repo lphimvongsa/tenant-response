@@ -4,6 +4,7 @@ import { useActionState, useState, type ReactNode } from 'react'
 import type { Teammate } from '@/lib/integrations/team'
 import type { SettingsActionState } from '@/app/dashboard/settings/actions'
 import { updateProfileAction, updateNotificationPrefsAction } from '@/app/dashboard/settings/actions'
+import { signOut } from '@/app/login/actions'
 import { computeInitials } from '@/lib/utils/initials'
 import { useIsMobile } from '@/lib/hooks/useIsMobile'
 import ProfilePanel from './ProfilePanel'
@@ -37,6 +38,14 @@ const BellIcon = (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
     <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+)
+
+const SignOutIcon = (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <path d="m16 17 5-5-5-5" />
+    <path d="M21 12H9" />
   </svg>
 )
 
@@ -156,6 +165,18 @@ export default function SettingsTabs({
           }}
         />
 
+        <form action={signOut} className="mt-6">
+          <button
+            type="submit"
+            className="flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-[var(--shadow-card)] transition-colors [border-color:var(--color-border)] [background:var(--color-bg-surface)] hover:[background:var(--color-danger-bg)]"
+          >
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:var(--color-danger-bg)] [color:var(--color-danger)]">
+              {SignOutIcon}
+            </span>
+            <span className="flex-1 text-sm font-semibold [color:var(--color-danger)]">Sign out</span>
+          </button>
+        </form>
+
         {mobileDrilldownOpen && (
           <MobileSettingsPanel
             title={activeLabel}
@@ -229,6 +250,16 @@ export default function SettingsTabs({
       >
         {activePanel}
       </div>
+
+      <form action={signOut} className="mt-6">
+        <button
+          type="submit"
+          className="flex items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-sm font-semibold transition-colors [color:var(--color-danger)] hover:[background:var(--color-danger-bg)]"
+        >
+          {SignOutIcon}
+          Sign out
+        </button>
+      </form>
     </div>
   )
 }

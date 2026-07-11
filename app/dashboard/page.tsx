@@ -143,14 +143,14 @@ const TILE_STYLES: Record<TileVariant, { card: string; label: string; value: str
     iconWrap: 'bg-white/15 text-white',
   },
   neutral: {
-    card: 'shadow-[var(--shadow-card)] [background:var(--color-bg-surface)]',
+    card: 'shadow-[var(--shadow-card)] [background:var(--color-lavender-200)]',
     label: '[color:var(--color-text-secondary)]',
     value: '[color:var(--color-text-primary)]',
     delta: '[color:var(--color-text-muted)]',
     iconWrap: '[background:var(--color-bg-sunken)] [color:var(--color-text-secondary)]',
   },
   alert: {
-    card: 'shadow-[var(--shadow-card)] [background:var(--color-bg-surface)]',
+    card: 'shadow-[var(--shadow-card)] [background:var(--color-lavender-100)]',
     label: '[color:var(--color-text-secondary)]',
     value: '[color:var(--color-text-primary)]',
     delta: '[color:var(--color-text-muted)]',
@@ -337,7 +337,7 @@ export default async function OverviewPage() {
       {/* ── Header: heading + stat tiles ── */}
       <div className="flex flex-col gap-5">
         <div>
-          <h1 className="text-2xl font-bold [color:var(--color-text-primary)]">{greeting}</h1>
+          <h1 className="text-lg font-bold [color:var(--color-text-primary)]">{greeting}</h1>
           <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
             Here&apos;s whats going on in your properties
           </p>

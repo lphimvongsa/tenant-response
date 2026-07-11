@@ -13,7 +13,7 @@ interface ProfilePanelProps {
 }
 
 const inputClass =
-  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-sm outline-none transition [background:var(--color-input-bg)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:shadow-[var(--shadow-focus)]'
+  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-base outline-none transition [background:var(--color-input-bg)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:shadow-[var(--shadow-focus)]'
 
 function FieldRow({
   label,
