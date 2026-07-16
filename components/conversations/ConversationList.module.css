@@ -32,6 +32,34 @@
   line-height: 1.6;
 }
 
+/* ── Mass-text trigger ── */
+.massTextBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-btn-text);
+  background: var(--color-ink);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+.massTextBtn:hover {
+  background: var(--color-ink-hover);
+}
+
+.massTextBtn:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
 /* ── Search ── */
 .searchWrap {
   position: relative;

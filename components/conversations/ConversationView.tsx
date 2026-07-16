@@ -23,6 +23,7 @@ type Property = { id: string; name: string; units: Unit[] }
 type ConversationViewProps = {
   conversationId: string
   initialMessages: ThreadMessage[]
+  initialHasMore: boolean
   tenant: TenantInfo | null
   isEscalated: boolean
   properties: Property[]
@@ -99,6 +100,7 @@ function computeInitials(name: string): string {
 export default function ConversationView({
   conversationId,
   initialMessages,
+  initialHasMore,
   tenant,
   isEscalated,
   properties,
@@ -424,6 +426,7 @@ export default function ConversationView({
       <MessageThread
         conversationId={conversationId}
         initialMessages={initialMessages}
+        initialHasMore={initialHasMore}
         tenantName={tenantName}
         tenantInitials={tenantInitials}
         searchQuery={searchOpen ? searchQuery : ''}

@@ -76,3 +76,22 @@ export type TenantDirectoryEntry = {
   unit_id: string | null
   units: { unit_number: string; properties: { name: string } | null } | null
 }
+
+// Mass texting
+
+export type MassTextResult = {
+  tenantId: string
+  tenantName: string | null
+  phone: string
+  status: 'sent' | 'failed'
+  conversationId?: string
+  messageId?: string
+  error?: string
+}
+
+export type MassTextResponse = {
+  total: number
+  sent: number
+  failed: number
+  results: MassTextResult[]
+}

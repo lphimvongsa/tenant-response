@@ -1,6 +1,9 @@
 .list {
   flex: 1;
   overflow-y: auto;
+  /* Keep scroll-up-to-load from triggering the browser's native
+     pull-to-refresh / overscroll chaining on mobile. */
+  overscroll-behavior: contain;
   padding: 1.5rem 1.5rem 0.75rem;
   display: flex;
   flex-direction: column;
@@ -12,6 +15,30 @@
   font-size: 0.875rem;
   text-align: center;
   margin-top: 3rem;
+}
+
+/* ── Older-message pagination ── */
+.sentinel {
+  height: 1px;
+  flex-shrink: 0;
+}
+
+.loadingOlder {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  padding: 0.5rem 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.loadOlderError {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-danger);
+  padding: 0.5rem 0;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 /* ── Message group (avatar + col) ── */

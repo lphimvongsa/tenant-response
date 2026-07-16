@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { supabaseBrowser } from '@/lib/integrations/supabase-browser'
 import styles from './MessageThread.module.css'
@@ -13,9 +13,17 @@ export type ThreadMessage = {
   is_read: boolean
 }
 
+// Cross-file contract for the keyset-paginated "load older messages" endpoint.
+// Colocated here (not types/index.ts) since it's feature-specific, not a DB row.
+export type MessagesPageResponse = {
+  messages: ThreadMessage[]
+  hasMore: boolean
+}
+
 type Props = {
   conversationId: string
   initialMessages: ThreadMessage[]
+  initialHasMore: boolean
   tenantName: string
   tenantInitials: string
   searchQuery?: string
@@ -42,9 +50,20 @@ const CheckIcon = (
   </svg>
 )
 
-export default function MessageThread({ conversationId, initialMessages, tenantName, tenantInitials, searchQuery }: Props) {
+export default function MessageThread({ conversationId, initialMessages, initialHasMore, tenantName, tenantInitials, searchQuery }: Props) {
   const [messages, setMessages] = useState<ThreadMessage[]>(initialMessages)
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  // ── Older-message pagination (scroll-up to load more) ──
+  const [hasMore, setHasMore] = useState(initialHasMore)
+  const [loadingOlder, setLoadingOlder] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  // One-shot scroll anchor: set right before a prepend, consumed by the layout
+  // effect below, then cleared. Null at all other times so a Realtime append
+  // (which also mutates `messages`) leaves the scroll position untouched.
+  const pendingScrollAdjustRef = useRef<{ prevScrollTop: number; prevScrollHeight: number } | null>(null)
 
   const filtered = useMemo(() => {
     const q = searchQuery?.trim().toLowerCase() ?? ''
@@ -69,6 +88,81 @@ export default function MessageThread({ conversationId, initialMessages, tenantN
       prev.map((m) => (m.direction === 'inbound' ? { ...m, is_read: true } : m))
     )
   }, [conversationId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch the next older page (keyset by the oldest currently-loaded message).
+  const loadOlder = useCallback(async () => {
+    if (loadingOlder || !hasMore || messages.length === 0) return
+
+    const list = listRef.current
+    if (list) {
+      pendingScrollAdjustRef.current = {
+        prevScrollTop: list.scrollTop,
+        prevScrollHeight: list.scrollHeight,
+      }
+    }
+    setLoadingOlder(true)
+    setLoadError(null)
+
+    const cursor = messages[0].created_at
+    try {
+      const res = await fetch(
+        `/api/conversations/${conversationId}/messages?cursor=${encodeURIComponent(cursor)}`,
+      )
+      if (!res.ok) throw new Error('Failed to load earlier messages')
+      const data = (await res.json()) as MessagesPageResponse
+      setMessages((prev) => {
+        const existingIds = new Set(prev.map((m) => m.id))
+        const fresh = data.messages.filter((m) => !existingIds.has(m.id))
+        return [...fresh, ...prev]
+      })
+      setHasMore(data.hasMore)
+    } catch {
+      // No prepend happened — drop the pending anchor so a later Realtime
+      // append doesn't apply a stale scroll correction. Leave `hasMore` as-is
+      // so scrolling up again retries.
+      pendingScrollAdjustRef.current = null
+      setLoadError('Failed to load earlier messages')
+    } finally {
+      setLoadingOlder(false)
+    }
+  }, [conversationId, hasMore, loadingOlder, messages])
+
+  // Keep a stable ref to the latest loadOlder so the observer effect can be
+  // scoped to conversationId only (like the Realtime effect) without
+  // re-subscribing on every message change.
+  const loadOlderRef = useRef(loadOlder)
+  useEffect(() => {
+    loadOlderRef.current = loadOlder
+  })
+
+  // Watch a sentinel above the list; load older messages as it approaches view.
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    const root = listRef.current
+    if (!sentinel || !root) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadOlderRef.current()
+      },
+      { root, rootMargin: '200px 0px 0px 0px' },
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [conversationId])
+
+  // Preserve scroll position after prepending older messages: anchor the
+  // viewport to the same content by offsetting scrollTop by the height gained.
+  // useLayoutEffect so the correction lands before paint (no visible jump).
+  useLayoutEffect(() => {
+    const adjust = pendingScrollAdjustRef.current
+    if (!adjust) return
+    const list = listRef.current
+    if (list) {
+      const newScrollHeight = list.scrollHeight
+      list.scrollTop = adjust.prevScrollTop + (newScrollHeight - adjust.prevScrollHeight)
+    }
+    pendingScrollAdjustRef.current = null
+  }, [messages])
 
   // Realtime subscription
   useEffect(() => {
@@ -111,7 +205,17 @@ export default function MessageThread({ conversationId, initialMessages, tenantN
   }, [])
 
   return (
-    <div className={styles.list}>
+    <div className={styles.list} ref={listRef}>
+      {/* Sentinel for scroll-up pagination — must stay the first child of .list */}
+      <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />
+
+      {loadingOlder && (
+        <p className={styles.loadingOlder}>Loading earlier messages…</p>
+      )}
+      {loadError && (
+        <p className={styles.loadOlderError} role="alert">{loadError}</p>
+      )}
+
       {messages.length === 0 && (
         <p className={styles.empty}>No messages yet.</p>
       )}

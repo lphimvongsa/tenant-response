@@ -125,3 +125,65 @@ export async function POST(
     headers: { 'Content-Type': 'application/json' },
   })
 }
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const { id } = await params
+  const cursor = new URL(request.url).searchParams.get('cursor')
+
+  // Scoped to the caller's client so a guessed/enumerated conversation id
+  // from another tenant can't be read.
+  const { data: conversation } = await supabase
+    .from('conversations')
+    .select('id')
+    .eq('id', id)
+    .eq('client_id', manager.clientId)
+    .single()
+
+  if (!conversation) {
+    return new Response(JSON.stringify({ error: 'Conversation not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Over-fetch by one row to detect hasMore without a second round trip.
+  let query = supabase
+    .from('messages')
+    .select('id, direction, body, created_at, is_read')
+    .eq('conversation_id', id)
+    .order('created_at', { ascending: false })
+    .limit(11)
+
+  if (cursor) {
+    query = query.lt('created_at', cursor)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Failed to fetch messages:', error)
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const hasMore = (data?.length ?? 0) === 11
+  const messages = (data ?? []).slice(0, 10).reverse()
+
+  return new Response(JSON.stringify({ messages, hasMore }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  })
+}
