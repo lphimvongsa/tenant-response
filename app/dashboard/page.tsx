@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import { timeAgo } from '@/lib/utils/time'
+import { TICKETS_TAG, CONVERSATIONS_TAG } from '@/lib/cache-tags'
 import type { Conversation } from '@/types'
 import { type TrendPoint } from '@/components/dashboard/TrendChart'
 import { type ResponseTotals } from '@/components/dashboard/ResponseChart'
@@ -15,11 +17,18 @@ const WEEK_DAYS = 7
 // all three bucketings computed below.
 const TREND_FETCH_DAYS = 366
 
+// Rounds "now" down to the minute so repeated calls within the same minute
+// produce the exact same ISO string. That value is passed as a cache-key
+// argument to getCachedOverviewData below — without rounding, every call
+// would carry a unique millisecond timestamp and never hit the cache.
+const CACHE_BUCKET_MS = 60_000
+
 // ── Module-level date helpers ────────────────────────────────────────────────
 // The react-hooks/purity lint rule errors on `Date.now()` / `new Date()` called
 // directly in a render body, but permits calls made through a named helper.
 function daysAgoISO(days: number): string {
-  return new Date(Date.now() - days * 86_400_000).toISOString()
+  const bucketed = Math.floor(Date.now() / CACHE_BUCKET_MS) * CACHE_BUCKET_MS
+  return new Date(bucketed - days * 86_400_000).toISOString()
 }
 
 function pad2(n: number): string {
@@ -127,6 +136,83 @@ type StatTile = {
 
 type TrendMessage = { direction: string; created_at: string; ai_generated: boolean }
 
+const getCachedOverviewData = unstable_cache(
+  async (clientId: string, oneDayAgo: string, trendSince: string) => {
+    const [
+      openTicketsRes,
+      unreadMessagesRes,
+      escalatedRes,
+      ticketsTodayRes,
+      escalatedTodayRes,
+      recentConversationsRes,
+      trendMessagesRes,
+    ] = await Promise.all([
+      supabase
+        .from('tickets')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', clientId)
+        .in('status', ['open', 'in_progress', 'in_review']),
+      supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', clientId)
+        .eq('direction', 'inbound')
+        .eq('is_read', false),
+      supabase
+        .from('conversations')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', clientId)
+        .eq('status', 'escalated'),
+      supabase
+        .from('tickets')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', clientId)
+        .gte('created_at', oneDayAgo),
+      supabase
+        .from('conversations')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', clientId)
+        .eq('status', 'escalated')
+        .gte('last_message_at', oneDayAgo),
+      supabase
+        .from('conversations')
+        .select('id, status, created_at, last_message_at, tenants(id, phone, name), messages(body, direction, created_at, is_read)')
+        .eq('client_id', clientId)
+        .order('last_message_at', { ascending: false, nullsFirst: false })
+        .limit(5),
+      supabase
+        .from('messages')
+        .select('direction, created_at, ai_generated')
+        .eq('client_id', clientId)
+        .gte('created_at', trendSince),
+    ])
+
+    const loadError =
+      openTicketsRes.error ||
+      unreadMessagesRes.error ||
+      escalatedRes.error ||
+      ticketsTodayRes.error ||
+      escalatedTodayRes.error ||
+      recentConversationsRes.error ||
+      trendMessagesRes.error
+
+    // Same shape whether or not there's an error, so callers never have to
+    // deal with a discriminated union — just check `error` first.
+    return {
+      error: loadError?.message ?? null,
+      openTickets: openTicketsRes.count ?? 0,
+      unreadMessages: unreadMessagesRes.count ?? 0,
+      escalated: escalatedRes.count ?? 0,
+      ticketsToday: ticketsTodayRes.count ?? 0,
+      escalatedToday: escalatedTodayRes.count ?? 0,
+      recentConversations: (recentConversationsRes.data ?? []) as unknown as Conversation[],
+      trendMessages: (trendMessagesRes.data ?? []) as TrendMessage[],
+    }
+  },
+  ['dashboard-overview'],
+  { revalidate: 30, tags: [TICKETS_TAG, CONVERSATIONS_TAG] },
+)
+
 function getLastMessage(messages: Conversation['messages']): Conversation['messages'][number] | null {
   if (!messages || messages.length === 0) return null
   return [...messages].sort(
@@ -175,77 +261,21 @@ export default async function OverviewPage() {
   const clientId = manager.clientId
   const oneDayAgo = daysAgoISO(1)
 
-  const [
-    openTicketsRes,
-    unreadMessagesRes,
-    escalatedRes,
-    ticketsTodayRes,
-    escalatedTodayRes,
-    recentConversationsRes,
-    trendMessagesRes,
-  ] = await Promise.all([
-    supabase
-      .from('tickets')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_id', clientId)
-      .in('status', ['open', 'in_progress', 'in_review']),
-    supabase
-      .from('messages')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_id', clientId)
-      .eq('direction', 'inbound')
-      .eq('is_read', false),
-    supabase
-      .from('conversations')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_id', clientId)
-      .eq('status', 'escalated'),
-    supabase
-      .from('tickets')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_id', clientId)
-      .gte('created_at', oneDayAgo),
-    supabase
-      .from('conversations')
-      .select('id', { count: 'exact', head: true })
-      .eq('client_id', clientId)
-      .eq('status', 'escalated')
-      .gte('last_message_at', oneDayAgo),
-    supabase
-      .from('conversations')
-      .select('id, status, created_at, last_message_at, tenants(id, phone, name), messages(body, direction, created_at, is_read)')
-      .eq('client_id', clientId)
-      .order('last_message_at', { ascending: false, nullsFirst: false })
-      .limit(5),
-    supabase
-      .from('messages')
-      .select('direction, created_at, ai_generated')
-      .eq('client_id', clientId)
-      .gte('created_at', daysAgoISO(TREND_FETCH_DAYS)),
-  ])
+  const overview = await getCachedOverviewData(clientId, oneDayAgo, daysAgoISO(TREND_FETCH_DAYS))
 
-  const loadError =
-    openTicketsRes.error ||
-    unreadMessagesRes.error ||
-    escalatedRes.error ||
-    ticketsTodayRes.error ||
-    escalatedTodayRes.error ||
-    recentConversationsRes.error ||
-    trendMessagesRes.error
-
-  if (loadError) {
+  if (overview.error) {
     return (
       <div className="flex flex-1 items-center justify-center p-8">
         <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:var(--color-danger)] [background:var(--color-danger-bg)] p-6 text-center">
           <p className="text-sm font-semibold [color:var(--color-danger)]">Unable to load overview</p>
-          <p className="mt-1 text-sm [color:var(--color-danger)]">{loadError.message}</p>
+          <p className="mt-1 text-sm [color:var(--color-danger)]">{overview.error}</p>
         </div>
       </div>
     )
   }
 
   // ── Trend chart: bucket message volume by day/month, split inbound / outbound ──
-  const trendMessages = (trendMessagesRes.data ?? []) as TrendMessage[]
+  const trendMessages = overview.trendMessages
 
   const weekBuckets = buildDayBuckets(WEEK_DAYS)
   const monthBuckets = buildMonthDayBuckets()
@@ -270,8 +300,8 @@ export default async function OverviewPage() {
   const tiles: StatTile[] = [
     {
       label: 'Open maintenance tickets',
-      value: openTicketsRes.count ?? 0,
-      delta: ticketsTodayRes.count ?? 0,
+      value: overview.openTickets,
+      delta: overview.ticketsToday,
       href: '/dashboard/maintenance',
       variant: 'primary',
       icon: (
@@ -282,7 +312,7 @@ export default async function OverviewPage() {
     },
     {
       label: 'Unread tenant messages',
-      value: unreadMessagesRes.count ?? 0,
+      value: overview.unreadMessages,
       delta: inboundToday,
       href: '/dashboard/conversations',
       variant: 'neutral',
@@ -294,8 +324,8 @@ export default async function OverviewPage() {
     },
     {
       label: 'Escalated threads',
-      value: escalatedRes.count ?? 0,
-      delta: escalatedTodayRes.count ?? 0,
+      value: overview.escalated,
+      delta: overview.escalatedToday,
       href: '/dashboard/conversations',
       variant: 'alert',
       icon: (
@@ -308,7 +338,7 @@ export default async function OverviewPage() {
     },
   ]
 
-  const recent = (recentConversationsRes.data ?? []) as unknown as Conversation[]
+  const recent = overview.recentConversations
 
   // ── Conversations side-panel: unread + escalated at a glance ─────────────────
   const conversationSummaries: ConversationSummaryItem[] = recent.map((conv) => {

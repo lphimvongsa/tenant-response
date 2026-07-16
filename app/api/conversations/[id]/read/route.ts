@@ -1,5 +1,7 @@
+import { revalidateTag } from 'next/cache'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { CONVERSATIONS_TAG } from '@/lib/cache-tags'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
@@ -30,6 +32,8 @@ export async function PATCH(
       headers: { 'Content-Type': 'application/json' },
     })
   }
+
+  revalidateTag(CONVERSATIONS_TAG, { expire: 0 })
 
   return new Response(null, { status: 204 })
 }

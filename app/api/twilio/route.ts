@@ -1,10 +1,12 @@
 import twilio from 'twilio'
 import { NextRequest } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { twilioClient } from '@/lib/integrations/twilio'
 import { supabase } from '@/lib/integrations/supabase'
 import { isAfterHours } from '@/lib/utils/time'
 import { runAiRouter } from '@/lib/ai/router'
 import { executeFlow } from '@/lib/execute-flow'
+import { CONVERSATIONS_TAG, TICKETS_TAG, PROPERTIES_TAG } from '@/lib/cache-tags'
 import type { BusinessHours } from '@/lib/utils/time'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -101,6 +103,7 @@ async function sendAndStore(opts: {
       ai_generated: senderType === 'ai',
       status: 'sent',
     })
+    revalidateTag(CONVERSATIONS_TAG, { expire: 0 })
   } catch (err) {
     console.error(`[${clientId}] Failed to send/store outbound message:`, err)
   }
@@ -217,6 +220,10 @@ export async function POST(request: NextRequest) {
     return emptyTwiML
   }
 
+  // New inbound message — the cached conversations list (last message
+  // preview, unread count, ordering) is now stale for this client.
+  revalidateTag(CONVERSATIONS_TAG, { expire: 0 })
+
   // ── STAGE 2A: Guard — manager has taken over this conversation ─────────────
 
   if (!aiEnabled) {
@@ -289,6 +296,14 @@ export async function POST(request: NextRequest) {
     routerOutput,
     uploadedPhotoUrl,
   })
+
+  // executeFlow may have created/updated a maintenance ticket (surfaced on
+  // both the maintenance board and the property detail page) or escalated
+  // the conversation on an emergency intent — invalidate all three so staff
+  // see it immediately rather than after the fallback revalidate window.
+  revalidateTag(TICKETS_TAG, { expire: 0 })
+  revalidateTag(PROPERTIES_TAG, { expire: 0 })
+  revalidateTag(CONVERSATIONS_TAG, { expire: 0 })
 
   // ── STAGE 5: Send outbound response and store it ───────────────────────────
   // After-hours only suppresses "general" chit-chat — maintenance, emergency,

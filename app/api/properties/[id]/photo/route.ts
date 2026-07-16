@@ -1,5 +1,7 @@
+import { revalidateTag } from 'next/cache'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { PROPERTIES_TAG } from '@/lib/cache-tags'
 import { randomUUID } from 'crypto'
 import type { NextRequest } from 'next/server'
 
@@ -87,6 +89,8 @@ export async function POST(
       headers: { 'Content-Type': 'application/json' },
     })
   }
+
+  revalidateTag(PROPERTIES_TAG, { expire: 0 })
 
   return new Response(JSON.stringify(data), {
     status: 200,

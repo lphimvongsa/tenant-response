@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
+import { unstable_cache } from 'next/cache'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { PROPERTIES_TAG } from '@/lib/cache-tags'
 import NewPropertyForm from '@/components/properties/NewPropertyForm'
 import PropertyPhotoPlaceholder from '@/components/properties/PropertyPhotoPlaceholder'
 import Link from 'next/link'
@@ -22,6 +24,19 @@ type ListProperty = {
 
 const OUTSTANDING_STATUSES = ['open', 'in_progress', 'in_review']
 
+const getCachedProperties = unstable_cache(
+  async (clientId: string) => {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('id, name, address, photo_url, units(id, tenants(id), tickets(id, status))')
+      .eq('client_id', clientId)
+      .order('name', { ascending: true })
+    return { data, error: error ? error.message : null }
+  },
+  ['properties-list'],
+  { revalidate: 30, tags: [PROPERTIES_TAG] },
+)
+
 function countOpenTickets(units: ListUnit[]): number {
   return units.reduce(
     (sum, u) =>
@@ -42,17 +57,13 @@ export default async function PropertiesPage() {
 
   const clientId = manager.clientId
 
-  const { data: properties, error } = await supabase
-    .from('properties')
-    .select('id, name, address, photo_url, units(id, tenants(id), tickets(id, status))')
-    .eq('client_id', clientId)
-    .order('name', { ascending: true })
+  const { data: properties, error } = await getCachedProperties(clientId)
 
   if (error) {
     return (
       <div className={styles.empty}>
         <h2 className={styles.emptyTitle}>Couldn&rsquo;t load properties</h2>
-        <p className={styles.emptyDesc}>{error.message}</p>
+        <p className={styles.emptyDesc}>{error}</p>
       </div>
     )
   }
