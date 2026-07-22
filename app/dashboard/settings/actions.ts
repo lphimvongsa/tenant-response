@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getCurrentManager, createServerSupabaseClient } from '@/lib/integrations/supabase-auth'
 import { updateOwnContactInfo, removeTeammate, regenerateJoinCode } from '@/lib/integrations/team'
+import { updateBusinessHours, updateEscalationConfig } from '@/lib/integrations/client-settings'
+import { NOTIFICATION_EVENTS, type NotificationPrefs } from '@/lib/notification-events'
 
 // Shared result shape for every Settings server action. `emailConfirmation`
 // is only set by updateProfileAction when the email change kicks off
@@ -85,8 +87,11 @@ export async function updateProfileAction(
   return { status: 'success', message: 'Profile saved.' }
 }
 
-// Persists the two notification toggles. Unchecked checkboxes are omitted
-// from FormData entirely, so presence in the payload means "on".
+// Persists the email toggle plus the per-event-type x per-channel push/SMS
+// matrix. Unchecked checkboxes are omitted from FormData entirely, so
+// presence in the payload means "on" — checkbox names are `${event}-push`
+// / `${event}-sms` for each of NOTIFICATION_EVENTS (see
+// components/settings/NotificationsPanel.tsx).
 export async function updateNotificationPrefsAction(
   _prev: SettingsActionState,
   formData: FormData,
@@ -97,11 +102,20 @@ export async function updateNotificationPrefsAction(
   }
 
   const notifyEmail = formData.get('notifyEmail') !== null
-  const notifySms = formData.get('notifySms') !== null
+
+  const notificationPrefs = Object.fromEntries(
+    NOTIFICATION_EVENTS.map((event) => [
+      event,
+      {
+        push: formData.get(`${event}-push`) !== null,
+        sms: formData.get(`${event}-sms`) !== null,
+      },
+    ]),
+  ) as NotificationPrefs
 
   const { error } = await updateOwnContactInfo(manager.managerId, {
     notifyEmail,
-    notifySms,
+    notificationPrefs,
   })
   if (error) {
     return { status: 'error', message: error }
@@ -109,6 +123,60 @@ export async function updateNotificationPrefsAction(
 
   revalidatePath(SETTINGS_PATH)
   return { status: 'success', message: 'Notification preferences saved.' }
+}
+
+// Persists the org-level business hours + escalation contact (Business
+// Settings tab). Admin-only — same defense-in-depth re-check as
+// removeTeammateAction/regenerateJoinCodeAction, since the UI already hides
+// the editable form for non-admins.
+export async function updateBusinessSettingsAction(
+  _prev: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  const manager = await getCurrentManager()
+  if (!manager) {
+    redirect('/')
+  }
+
+  if (manager.role !== 'admin') {
+    return { status: 'error', message: 'Only admins can edit business settings.' }
+  }
+
+  const timezone = String(formData.get('timezone') ?? '').trim()
+  const start = String(formData.get('start') ?? '').trim()
+  const end = String(formData.get('end') ?? '').trim()
+  const days = formData
+    .getAll('days')
+    .map((d) => parseInt(String(d), 10))
+    .filter((d) => !Number.isNaN(d))
+
+  const escalationEmail = String(formData.get('escalationEmail') ?? '').trim()
+  const escalationSms = String(formData.get('escalationSms') ?? '').trim()
+
+  if (!timezone || !start || !end || days.length === 0) {
+    return { status: 'error', message: 'Timezone, business days, and hours are all required.' }
+  }
+
+  const businessHoursResult = await updateBusinessHours(manager.clientId, {
+    timezone,
+    days,
+    start,
+    end,
+  })
+  if (businessHoursResult.error) {
+    return { status: 'error', message: businessHoursResult.error }
+  }
+
+  const escalationResult = await updateEscalationConfig(manager.clientId, {
+    email: escalationEmail || undefined,
+    sms: escalationSms || undefined,
+  })
+  if (escalationResult.error) {
+    return { status: 'error', message: escalationResult.error }
+  }
+
+  revalidatePath(SETTINGS_PATH)
+  return { status: 'success', message: 'Business settings saved.' }
 }
 
 // Removes a teammate. Admin-only. We re-check the role here rather than

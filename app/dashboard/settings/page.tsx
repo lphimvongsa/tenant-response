@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import { getTeammates, getJoinCode } from '@/lib/integrations/team'
+import { getClientSettings } from '@/lib/integrations/client-settings'
 import SettingsTabs from '@/components/settings/SettingsTabs'
 
 export default async function SettingsPage() {
@@ -11,19 +12,22 @@ export default async function SettingsPage() {
     redirect('/')
   }
 
-  // One trip for the caller's own contact/notification fields (getCurrentManager
-  // doesn't return phone or notify prefs), the team list (everyone sees it), and
-  // the join code (admins only — no point fetching it otherwise). Service-role
-  // client bypasses RLS, so the managers query is scoped by hand.
-  const [profileResult, teammates, joinCode] = await Promise.all([
+  // One trip each for: the caller's own contact/notification fields
+  // (getCurrentManager doesn't return phone or notify prefs), the team list
+  // (everyone sees it), the join code (admins only — no point fetching it
+  // otherwise), and the org-level business hours/escalation contact
+  // (everyone can view it, only admins can edit — see BusinessSettingsPanel).
+  // Service-role client bypasses RLS, so the managers query is scoped by hand.
+  const [profileResult, teammates, joinCode, clientSettings] = await Promise.all([
     supabase
       .from('managers')
-      .select('phone, notify_email, notify_sms')
+      .select('phone, notify_email, notification_prefs')
       .eq('id', manager.managerId)
       .eq('client_id', manager.clientId)
       .single(),
     getTeammates(manager.clientId),
     manager.role === 'admin' ? getJoinCode(manager.clientId) : Promise.resolve(null),
+    getClientSettings(manager.clientId),
   ])
 
   if (profileResult.error) {
@@ -51,7 +55,10 @@ export default async function SettingsPage() {
         phone={profile.phone ?? ''}
         // Opt-out model: absent/null preference defaults to "on".
         notifyEmail={profile.notify_email ?? true}
-        notifySms={profile.notify_sms ?? true}
+        notificationPrefs={profile.notification_prefs ?? {}}
+        businessHours={clientSettings?.businessHours ?? null}
+        escalationEmail={clientSettings?.escalationConfig.email ?? ''}
+        escalationSms={clientSettings?.escalationConfig.sms ?? ''}
         teammates={teammates}
         joinCode={joinCode}
       />

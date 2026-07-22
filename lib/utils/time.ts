@@ -5,32 +5,45 @@ export type BusinessHours = {
   end: string        // "HH:MM" 24-hour, e.g. "17:00"
 }
 
-// Returns true when the current moment falls outside the configured business hours.
-// If business_hours is not configured on the client, always returns false (in-hours).
-export function isAfterHours(businessHours: BusinessHours | undefined | null): boolean {
-  if (!businessHours?.timezone || !businessHours.days?.length) return false
+const DAY_MAP: Record<string, number> = {
+  Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+}
 
-  const { timezone, days, start, end } = businessHours
-
-  // Use formatToParts so we get each piece by type — no string parsing, no locale variance
-  const now = new Date()
+// Resolves "now" in a given IANA timezone to a weekday index, minutes since
+// midnight, and a YYYY-MM-DD date key — shared by isAfterHours below and by
+// the EOD digest cron route, which both need to reason about a client's
+// local time without string-parsing or locale variance.
+export function getLocalParts(
+  timezone: string,
+  now: Date = new Date(),
+): { day: number; minutes: number; dateKey: string } {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
     hour12: false,
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   }).formatToParts(now)
 
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? ''
 
-  const dayMap: Record<string, number> = {
-    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+  return {
+    day: DAY_MAP[get('weekday')] ?? -1,
+    minutes: parseInt(get('hour'), 10) * 60 + parseInt(get('minute'), 10),
+    dateKey: `${get('year')}-${get('month')}-${get('day')}`,
   }
-  const currentDay = dayMap[get('weekday')] ?? -1
-  const currentHour = parseInt(get('hour'), 10)
-  const currentMinute = parseInt(get('minute'), 10)
-  const currentMinutes = currentHour * 60 + currentMinute
+}
+
+// Returns true when the current moment falls outside the configured business hours.
+// If business_hours is not configured on the client, always returns false (in-hours).
+export function isAfterHours(businessHours: BusinessHours | undefined | null): boolean {
+  if (!businessHours?.timezone || !businessHours.days?.length) return false
+
+  const { timezone, days, start, end } = businessHours
+  const { day: currentDay, minutes: currentMinutes } = getLocalParts(timezone)
 
   const [startHour, startMinute] = start.split(':').map(Number)
   const [endHour, endMinute] = end.split(':').map(Number)

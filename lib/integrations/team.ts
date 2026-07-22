@@ -1,5 +1,6 @@
 import { randomBytes } from 'crypto'
 import { supabase as supabaseAdmin } from '@/lib/integrations/supabase'
+import type { NotificationPrefs } from '@/lib/notification-events'
 
 // Data-access layer for the Settings page's "Manage Teammates" tab.
 //
@@ -138,20 +139,25 @@ export async function removeTeammate(
 }
 
 // Updates the caller's own contact info / notification preferences. Only
-// ever writes phone/notify_email/notify_sms — this function must NEVER
-// accept or write `role` or `client_id`, since those are the
+// ever writes phone/notify_email/notification_prefs — this function must
+// NEVER accept or write `role` or `client_id`, since those are the
 // privilege-escalation boundary (a manager updating their own role to
 // 'admin', or reassigning themselves to a different client, would bypass
 // the authorization model entirely). Keep this signature narrow even if a
 // future caller asks for more fields.
+//
+// notificationPrefs replaces the old flat notifySms toggle with the
+// per-event-type x per-channel matrix consumed by lib/notifications.ts.
+// notifyEmail is unrelated (no email-sending system exists) and stays as a
+// simple flat boolean.
 export async function updateOwnContactInfo(
   managerId: string,
-  fields: { phone?: string | null; notifyEmail?: boolean; notifySms?: boolean },
+  fields: { phone?: string | null; notifyEmail?: boolean; notificationPrefs?: NotificationPrefs },
 ): Promise<{ error?: string }> {
-  const update: Record<string, string | boolean | null> = {}
+  const update: Record<string, string | boolean | null | NotificationPrefs> = {}
   if ('phone' in fields) update.phone = fields.phone ?? null
   if ('notifyEmail' in fields) update.notify_email = fields.notifyEmail as boolean
-  if ('notifySms' in fields) update.notify_sms = fields.notifySms as boolean
+  if ('notificationPrefs' in fields) update.notification_prefs = fields.notificationPrefs as NotificationPrefs
 
   if (Object.keys(update).length === 0) {
     return {}

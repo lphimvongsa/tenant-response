@@ -1,5 +1,6 @@
 import IconSidebar from '@/components/sidebar/IconSidebar'
 import MobileTabBar from '@/components/sidebar/MobileTabBar'
+import PushRegistration from '@/components/notifications/PushRegistration'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
 import styles from './dashboard.module.css'
 
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
     <div className={styles.shell}>
       <IconSidebar name={name} email={email} />
       <div className={styles.right}>
+        <PushRegistration />
         <main className={styles.main}>
           {children}
         </main>

@@ -6,7 +6,9 @@ import { supabase } from '@/lib/integrations/supabase'
 import { isAfterHours } from '@/lib/utils/time'
 import { runAiRouter } from '@/lib/ai/router'
 import { executeFlow } from '@/lib/execute-flow'
+import { notifyManagers } from '@/lib/notifications'
 import { CONVERSATIONS_TAG, TICKETS_TAG, PROPERTIES_TAG } from '@/lib/cache-tags'
+import { truncate } from '@/lib/utils/text'
 import type { BusinessHours } from '@/lib/utils/time'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -151,7 +153,7 @@ export async function POST(request: NextRequest) {
   const { data: tenant, error: tenantError } = await supabase
     .from('tenants')
     .upsert({ client_id: client.id, phone: From }, { onConflict: 'phone,client_id' })
-    .select('id')
+    .select('id, name')
     .single()
 
   if (tenantError || !tenant) {
@@ -331,6 +333,20 @@ export async function POST(request: NextRequest) {
     clientId: client.id,
     conversationId,
     senderType: 'ai',
+  })
+
+  // Not suppressed (see the after-hours branch above, which returns early) —
+  // the AI always sent a real reply in this branch, so surface both in one
+  // notification rather than buzzing staff twice for one exchange.
+  const tenantLabel = tenant.name?.trim() || From
+  await notifyManagers({
+    clientId: client.id,
+    event: 'message',
+    payload: {
+      title: `New message from ${tenantLabel}`,
+      body: `"${truncate(Body, 100)}" — AI replied: "${truncate(routerOutput.responseText, 100)}"`,
+      url: `/dashboard/conversations/${conversationId}`,
+    },
   })
 
   return emptyTwiML

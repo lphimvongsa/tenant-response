@@ -2,30 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { Property, TenantDirectoryEntry } from '@/types'
+import type { MassTextResponse, Property, TenantDirectoryEntry } from '@/types'
 import MassTextRecipientPicker from './MassTextRecipientPicker'
 import type { Recipient, RecipientGroup } from './MassTextRecipientPicker'
 import styles from './MassTextModal.module.css'
-
-// TODO: switch to `import type { MassTextResponse } from '@/types'` once the
-// mass-text API route lands and exports it. Defined locally for now so this
-// compiles independently — shape matches the agreed server contract exactly.
-type MassTextResult = {
-  tenantId: string
-  tenantName: string | null
-  phone: string
-  status: 'sent' | 'failed'
-  conversationId?: string
-  messageId?: string
-  error?: string
-}
-
-type MassTextResponse = {
-  total: number
-  sent: number
-  failed: number
-  results: MassTextResult[]
-}
 
 type MassTextModalProps = {
   onClose: () => void

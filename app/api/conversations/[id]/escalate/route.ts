@@ -1,6 +1,7 @@
 import { revalidateTag } from 'next/cache'
 import { supabase } from '@/lib/integrations/supabase'
 import { getCurrentManager } from '@/lib/integrations/supabase-auth'
+import { notifyManagers } from '@/lib/notifications'
 import { CONVERSATIONS_TAG } from '@/lib/cache-tags'
 import type { NextRequest } from 'next/server'
 
@@ -50,6 +51,18 @@ export async function POST(
   }
 
   revalidateTag(CONVERSATIONS_TAG, { expire: 0 })
+
+  // Exclude the acting manager — they already know, they just did it.
+  await notifyManagers({
+    clientId: manager.clientId,
+    event: 'escalation',
+    payload: {
+      title: 'Conversation escalated',
+      body: 'A teammate escalated a conversation. Check the dashboard.',
+      url: `/dashboard/conversations/${id}`,
+    },
+    excludeManagerId: manager.managerId,
+  })
 
   return new Response(JSON.stringify(updated), {
     status: 200,

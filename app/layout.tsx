@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 
@@ -10,6 +10,18 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "TenaTimmy",
   description: "AI-powered tenant communication management",
+  // Required for iOS to treat a home-screen install as a standalone app —
+  // Web Push notifications only fire in that standalone context, not in a
+  // regular Safari tab (see components/notifications/PushRegistration.tsx).
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TenaTimmy",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2a225c",
 };
 
 export default function RootLayout({

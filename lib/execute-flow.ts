@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { RouterOutput } from './ai/router'
 import { isMaintenanceCategory } from './maintenance-categories'
+import { notifyManagers } from './notifications'
+import { truncate } from './utils/text'
 
 type FlowContext = {
   supabase: SupabaseClient
@@ -89,6 +91,15 @@ async function handleMaintenance(ctx: FlowContext): Promise<void> {
     console.error(`[${clientId}] Failed to create maintenance ticket:`, error)
   } else {
     console.log(`[${clientId}] Maintenance ticket created for conversation ${conversationId}`)
+    await notifyManagers({
+      clientId,
+      event: 'ticket_created',
+      payload: {
+        title: `New maintenance ticket: ${category}`,
+        body: `${severity} severity — ${location}. ${truncate(description, 100)}`,
+        url: '/dashboard/maintenance',
+      },
+    })
   }
 }
 
@@ -195,6 +206,19 @@ async function handleEmergency(ctx: FlowContext): Promise<void> {
       console.error(`[${clientId}] Failed to send emergency SMS alert:`, err)
     }
   }
+
+  // Per-manager alert (push/SMS per their own notification_prefs) — separate
+  // from the escalation_config.sms alert above, which targets a single
+  // designated on-call contact that isn't necessarily a manager account.
+  await notifyManagers({
+    clientId,
+    event: 'escalation',
+    payload: {
+      title: 'Emergency escalation',
+      body: 'A tenant reported an emergency. Check the dashboard immediately.',
+      url: `/dashboard/conversations/${conversationId}`,
+    },
+  })
 
   // Log to actions_log for audit trail
   await supabase.from('actions_log').insert({
