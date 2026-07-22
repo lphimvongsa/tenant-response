@@ -14,7 +14,8 @@ export type ConversationSummaryItem = {
 
 // Monochrome avatar chip — the near-monochrome direction drops the old
 // per-person hue rotation; initials carry the distinction, not colour.
-const AVATAR_STYLE = '[background:var(--color-bg-sunken)] [color:var(--color-text-primary)]'
+// On the glass theme this is a translucent-white chip.
+const AVATAR_STYLE = 'glass-chip [color:var(--color-on-glass)]'
 
 function initials(name: string): string {
   const parts = name.split(' ').filter(Boolean).slice(0, 2)
@@ -24,26 +25,26 @@ function initials(name: string): string {
 
 export default function ConversationSummaryList({ conversations }: { conversations: ConversationSummaryItem[] }) {
   return (
-    <div className="flex h-full flex-col rounded-[var(--radius-lg)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-card)]">
+    <div className="glass-panel flex h-full flex-col p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-base font-bold [color:var(--color-text-primary)]">Conversations</h2>
+        <h2 className="text-base font-bold [color:var(--color-on-glass)]">Conversations</h2>
         <Link
           href="/dashboard/conversations"
-          className="text-xs font-semibold [color:var(--color-ink)] hover:underline"
+          className="text-xs font-semibold [color:var(--chart-line-secondary)] hover:underline"
         >
           View all
         </Link>
       </div>
 
       {conversations.length === 0 ? (
-        <p className="flex-1 px-2 py-10 text-center text-sm [color:var(--color-text-muted)]">No conversations yet.</p>
+        <p className="flex-1 px-2 py-10 text-center text-sm [color:var(--color-on-glass-subtle)]">No conversations yet.</p>
       ) : (
         <ul className="flex flex-1 flex-col gap-1">
           {conversations.map((conv) => (
             <li key={conv.id}>
               <Link
                 href={`/dashboard/conversations/${conv.id}`}
-                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:[background:var(--color-bg-sunken)]"
+                className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-white/10"
               >
                 <span
                   className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-xs font-bold ${AVATAR_STYLE}`}
@@ -52,18 +53,19 @@ export default function ConversationSummaryList({ conversations }: { conversatio
                   {initials(conv.name)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold [color:var(--color-text-primary)]">{conv.name}</p>
-                  <p className="truncate text-xs [color:var(--color-text-secondary)]">{conv.timeLabel}</p>
+                  <p className="truncate text-sm font-semibold [color:var(--color-on-glass)]">{conv.name}</p>
+                  <p className="truncate text-xs [color:var(--color-on-glass-muted)]">{conv.timeLabel}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
                   {conv.escalated && (
-                    <span className="rounded-full [background:var(--color-danger-bg)] px-2 py-1 text-[10px] font-semibold [color:var(--color-danger)]">
+                    <span className="glass-chip inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold [color:#ffb4b4]">
+                      <span className="h-1.5 w-1.5 rounded-full [background:var(--color-danger)]" />
                       Escalated
                     </span>
                   )}
                   {conv.unreadCount > 0 && (
                     <span
-                      className="flex h-5 min-w-[20px] items-center justify-center rounded-full [background:var(--color-ink)] px-1.5 text-[10px] font-bold text-white"
+                      className="flex h-5 min-w-[20px] items-center justify-center rounded-full [background:var(--color-lavender-300)] px-1.5 text-[10px] font-bold [color:var(--color-ink)]"
                       aria-label={`${conv.unreadCount} unread`}
                     >
                       {conv.unreadCount}

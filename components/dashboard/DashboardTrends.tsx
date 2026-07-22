@@ -40,8 +40,8 @@ export default function DashboardTrends({ data }: { data: Record<Period, PeriodD
     <div className="flex flex-col gap-4">
       {/* Shared period toggle — controls both charts below */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-base font-bold [color:var(--color-text-primary)]">Messaging trends</h2>
-        <div className="flex items-center gap-0.5 rounded-full [background:var(--color-bg-sunken)] p-1">
+        <h2 className="text-base font-bold [color:var(--color-on-glass)]">Messaging trends</h2>
+        <div className="glass-chip flex items-center gap-0.5 rounded-full p-1">
           {PERIODS.map((p) => (
             <button
               key={p}
@@ -50,8 +50,8 @@ export default function DashboardTrends({ data }: { data: Record<Period, PeriodD
               aria-pressed={period === p}
               className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                 period === p
-                  ? '[background:var(--color-bg-surface)] [color:var(--color-text-primary)] shadow-[var(--shadow-card)]'
-                  : '[color:var(--color-text-muted)] hover:[color:var(--color-text-secondary)]'
+                  ? 'bg-white/25 [color:var(--color-on-glass)]'
+                  : 'text-white/60 hover:text-white/90'
               }`}
             >
               {PERIOD_LABELS[p]}
@@ -62,26 +62,26 @@ export default function DashboardTrends({ data }: { data: Record<Period, PeriodD
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {/* Message volume chart */}
-        <div className="rounded-[var(--radius-lg)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-card)]">
+        <div className="glass-panel p-5">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold [color:var(--color-text-secondary)]">Message volume</p>
-              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-text-primary)]">
+              <p className="text-sm font-semibold text-white/70">Message volume</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-on-glass)]">
                 {totalVolume.toLocaleString()}
-                <span className="ml-1 text-sm font-medium [color:var(--color-text-muted)]">{PERIOD_SUFFIX[period]}</span>
+                <span className="ml-1 text-sm font-medium text-white/50">{PERIOD_SUFFIX[period]}</span>
               </p>
             </div>
             <div className="flex flex-col items-end gap-1">
-              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-ink)]">
-                <span className="h-2.5 w-2.5 rounded-full [background:var(--color-ink)]" />
+              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-on-glass)]">
+                <span className="h-2.5 w-2.5 rounded-full [background:var(--chart-line-primary)]" />
                 Total
               </span>
-              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-text-secondary)]">
-                <span className="h-2.5 w-2.5 rounded-full [background:var(--color-text-secondary)]" />
+              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--chart-line-secondary)]">
+                <span className="h-2.5 w-2.5 rounded-full [background:var(--chart-line-secondary)]" />
                 Inbound
               </span>
-              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-text-muted)]">
-                <span className="h-2.5 w-2.5 rounded-full [background:var(--color-text-muted)]" />
+              <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-on-glass-subtle)]">
+                <span className="h-2.5 w-2.5 rounded-full [background:var(--chart-line-muted)]" />
                 Outbound
               </span>
             </div>
@@ -90,25 +90,25 @@ export default function DashboardTrends({ data }: { data: Record<Period, PeriodD
         </div>
 
         {/* AI vs. manual response comparison */}
-        <div className="rounded-[var(--radius-lg)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-card)]">
-          <p className="mb-4 text-sm font-semibold [color:var(--color-text-secondary)]">AI vs. manual responses</p>
+        <div className="glass-panel p-5">
+          <p className="mb-4 text-sm font-semibold text-white/70">AI vs. manual responses</p>
           {/* Totals are laid out in the same two-column split as the bars/labels
               below (px-6 + flex-1 matches ResponseChart's PAD_L/PAD_R), so each
               total sits directly above its bar. */}
           <div className="mb-2 flex px-6">
             <div className="flex-1 text-center">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold [color:var(--color-ink)]">
-                <span className="h-2.5 w-2.5 rounded-full [background:var(--color-ink)]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold [color:var(--color-on-glass)]">
+                <span className="h-2.5 w-2.5 rounded-full [background:var(--chart-line-primary)]" />
                 LLM response
               </span>
-              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-text-primary)]">{responses.ai.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-on-glass)]">{responses.ai.toLocaleString()}</p>
             </div>
             <div className="flex-1 text-center">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold [color:var(--color-text-secondary)]">
-                <span className="h-2.5 w-2.5 rounded-full [background:var(--color-text-secondary)]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold [color:var(--chart-line-secondary)]">
+                <span className="h-2.5 w-2.5 rounded-full [background:var(--chart-line-secondary)]" />
                 Manual response
               </span>
-              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-text-primary)]">{responses.manual.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums [color:var(--color-on-glass)]">{responses.manual.toLocaleString()}</p>
             </div>
           </div>
           <ResponseChart data={responses} />

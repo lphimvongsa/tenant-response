@@ -21,13 +21,13 @@ export default function PushStatusRow() {
             : 'Push notifications are not yet enabled on this device.'
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[var(--radius-sm)] px-3 py-2.5 [background:var(--color-bg-sunken)]">
-      <p className="text-sm [color:var(--color-text-secondary)]">{label}</p>
+    <div className="glass-chip flex items-center justify-between gap-4 rounded-[var(--radius-sm)] px-3 py-2.5">
+      <p className="text-sm [color:var(--color-on-glass-muted)]">{label}</p>
       {status === 'prompt' && (
         <button
           type="button"
           onClick={enable}
-          className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-semibold text-white [background:var(--color-ink)]"
+          className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-sm font-semibold transition-colors [background:var(--color-lavender-300)] [color:var(--color-ink)] hover:[background:var(--color-lavender-200)]"
         >
           Enable
         </button>

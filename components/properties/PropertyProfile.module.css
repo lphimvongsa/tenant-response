@@ -3,7 +3,10 @@
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  background: var(--color-bg-base);
+  /* Reveals the dark-purple app gradient on the property detail route (mirrors
+     the Overview page). Painted on the scroll container so it stays fixed while
+     content scrolls, covering .main's light base beneath. */
+  background: var(--gradient-app-bg);
   padding: 1.75rem;
 }
 
@@ -31,24 +34,26 @@
   align-self: flex-start;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   text-decoration: none;
   transition: color 0.15s;
 }
 
 .backLink:hover {
-  color: var(--color-ink);
+  color: var(--color-on-glass);
 }
 
-/* ── Profile card ── */
+/* ── Profile card (glass panel) ── */
 .profileCard {
   display: flex;
   gap: 1.5rem;
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 @media (max-width: 767px) {
@@ -76,8 +81,8 @@
   aspect-ratio: 4 / 3;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
 }
 
 .photo {
@@ -101,17 +106,17 @@
   padding: 0.45rem 0.875rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-ink);
-  background: none;
-  border: 1.5px solid var(--color-border-strong);
+  color: var(--color-on-glass);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s;
 }
 
 .photoBtn:hover:not(:disabled) {
-  background-color: var(--color-bg-sunken);
-  border-color: var(--color-ink);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 .photoBtn:disabled {
@@ -145,17 +150,17 @@
 .propName {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .proplocationinfo {
   font-size: 0.9375rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
 }
 
-/* ── Stats ── */
+/* ── Stats (chips sitting on the glass panel — no backdrop blur) ── */
 .stats {
   display: flex;
   gap: 0.75rem;
@@ -167,8 +172,8 @@
   flex-direction: column;
   gap: 0.35rem;
   padding: 0.75rem 1rem;
-  background-color: var(--color-bg-sunken);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   min-width: 96px;
 }
@@ -178,8 +183,8 @@
   flex-direction: column;
   gap: 0.35rem;
   padding: 0.75rem 1rem;
-  background-color: var(--color-bg-sunken);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   min-width: 96px;
   text-decoration: none;
@@ -187,14 +192,14 @@
 }
 
 .statLink:hover {
-  border-color: var(--color-border-strong);
-  background-color: var(--color-bg-sunken);
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-strong);
 }
 
 .statValue {
   font-size: 1.375rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   line-height: 1;
 }
 
@@ -203,32 +208,44 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
-/* ── Maintenance pills ── */
+/* ── Maintenance pills (glass chip + leading dot, color via currentColor) ── */
 .pillClear,
 .pillAttention {
   display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   align-self: flex-start;
   padding: 0.25rem 0.625rem;
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: var(--radius-pill);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   white-space: nowrap;
 }
 
+.pillClear::before,
+.pillAttention::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
 .pillClear {
-  background-color: var(--color-success-bg);
-  color: var(--color-success);
+  color: #6ee7b7;
 }
 
 .pillAttention {
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning);
+  color: #f5c97a;
 }
 
-/* ── Edit property modal ── */
+/* ── Edit property modal (glass panel over a dark scrim) ── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -245,9 +262,12 @@
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
-  background-color: var(--color-bg-surface);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-modal);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* Full-width bottom sheet instead of a centered dialog on mobile. */
@@ -269,13 +289,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .modalTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .modalCloseBtn {
@@ -285,7 +305,7 @@
   width: 2rem;
   height: 2rem;
   flex-shrink: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   background: none;
   border: none;
   border-radius: var(--radius-sm);
@@ -294,8 +314,8 @@
 }
 
 .modalCloseBtn:hover {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-sunken);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
 }
 
 .modalForm {
@@ -344,16 +364,18 @@
   gap: 0.5rem;
 }
 
-/* ── Units section ── */
+/* ── Units section (glass panel) ── */
 .section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .sectionHeader {
@@ -367,7 +389,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .addUnitForm {
@@ -379,7 +401,7 @@
 
 .noUnits {
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .unitList {
@@ -388,10 +410,10 @@
   gap: 0.875rem;
 }
 
-/* ── Unit card ── */
+/* ── Unit card (chip on the section panel) ── */
 .unitCard {
-  background-color: var(--color-bg-sunken);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 1rem 1.125rem;
   display: flex;
@@ -414,7 +436,7 @@
 .unitNumber {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .unitTicketBadge {
@@ -423,11 +445,12 @@
   font-size: 0.6875rem;
   font-weight: 600;
   border-radius: var(--radius-pill);
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: #f5c97a;
 }
 
-/* ── Tenant rows ── */
+/* ── Tenant rows (nested inside the unit card — lighter fill to recede) ── */
 .tenantList {
   display: flex;
   flex-direction: column;
@@ -436,7 +459,7 @@
 
 .noTenants {
   font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .tenantRow {
@@ -444,9 +467,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 0.75rem;
-  background-color: var(--color-bg-surface);
+  background: var(--glass-bg);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--glass-border);
 }
 
 .tenantInfo {
@@ -458,12 +481,12 @@
 .tenantName {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .tenantPhone {
   font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
 }
 
 .addTenantForm {
@@ -497,19 +520,19 @@
 }
 
 .tenantModeTab {
-  color: var(--color-text-secondary);
-  background: var(--color-bg-surface);
-  border-color: var(--color-border);
+  color: var(--color-on-glass-muted);
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
 }
 
 .tenantModeTab:hover {
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .tenantModeTabActive {
-  color: var(--color-ink);
-  background: var(--color-bg-sunken);
-  border-color: var(--color-border-strong);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 /* ── Existing tenant picker ── */
@@ -529,7 +552,7 @@
 
 .tenantOptionEmpty {
   font-size: 0.8125rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   padding: 0.375rem 0.125rem;
 }
 
@@ -539,8 +562,8 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   text-align: left;
@@ -548,8 +571,8 @@
 }
 
 .tenantOption:hover:not(:disabled) {
-  border-color: var(--color-border-strong);
-  background-color: var(--color-bg-sunken);
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-strong);
 }
 
 .tenantOption:disabled {
@@ -567,7 +590,7 @@
 .tenantOptionMeta {
   flex-shrink: 0;
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   white-space: nowrap;
 }
 
@@ -581,9 +604,9 @@
 .input {
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
-  color: var(--color-text-primary);
-  background-color: var(--color-input-bg);
-  border: 1.5px solid var(--color-input-border);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-sm);
   outline: none;
   flex: 1;
@@ -591,27 +614,34 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.input::placeholder {
+  color: var(--color-on-glass-subtle);
+}
+
 .input:focus {
-  border-color: var(--color-input-border-focus);
+  border-color: var(--color-lavender-300);
   box-shadow: var(--shadow-focus);
 }
 
+/* Primary CTA on glass: bright lavender pill + ink text (a --color-ink fill
+   would blend into the gradient's dark corner). Matches the Settings-pass
+   form-control convention. */
 .saveBtn {
   padding: 0.45rem 1rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-btn-text);
-  background: var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-lavender-300);
   border: none;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  box-shadow: var(--shadow-button);
+  box-shadow: var(--glass-shadow);
   white-space: nowrap;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: background-color 0.15s, transform 0.15s;
 }
 
 .saveBtn:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--color-lavender-200);
   transform: translateY(-1px);
 }
 
@@ -625,26 +655,26 @@
   padding: 0.35rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   background: none;
-  border: 1.5px dashed var(--color-border-strong);
+  border: 1.5px dashed var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s;
 }
 
 .addBtn:hover {
-  background-color: var(--color-bg-sunken);
-  border-color: var(--color-ink);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 .viewBoardLink {
   padding: 0.35rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   background: none;
-  border: 1.5px dashed var(--color-border-strong);
+  border: 1.5px dashed var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   text-decoration: none;
@@ -652,8 +682,8 @@
 }
 
 .viewBoardLink:hover {
-  background-color: var(--color-bg-sunken);
-  border-color: var(--color-ink);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 /* ── Maintenance ticket rows ── */
@@ -669,16 +699,16 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.625rem 0.875rem;
-  background-color: var(--color-bg-sunken);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   text-decoration: none;
   transition: border-color 0.15s, background-color 0.15s;
 }
 
 .ticketRow:hover {
-  border-color: var(--color-border-strong);
-  background-color: var(--color-bg-sunken);
+  border-color: var(--glass-border-strong);
+  background: var(--glass-bg-strong);
 }
 
 .ticketInfo {
@@ -691,7 +721,7 @@
 .ticketTitleText {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -699,7 +729,7 @@
 
 .ticketMeta {
   font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
 }
 
 .ticketStatusBadge {
@@ -707,8 +737,9 @@
   padding: 0.2rem 0.625rem;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--color-ink);
-  background-color: var(--color-bg-sunken);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
   white-space: nowrap;
 }
@@ -717,16 +748,16 @@
   align-self: flex-start;
   padding: 0.25rem 0.625rem;
   font-size: 0.75rem;
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   background: none;
-  border: 1.5px dashed var(--color-border-strong);
+  border: 1.5px dashed var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.15s;
 }
 
 .addTenantBtn:hover {
-  background-color: var(--color-bg-sunken);
+  background: var(--glass-bg-strong);
 }
 
 .editBtn {
@@ -737,58 +768,60 @@
   padding: 0.4rem 0.875rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
-  background: none;
-  border: 1.5px solid var(--color-border);
+  color: var(--color-on-glass-muted);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
 }
 
 .editBtn:hover {
-  color: var(--color-ink);
-  border-color: var(--color-border-strong);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 .cancelBtn {
   padding: 0.45rem 0.875rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
-  background: none;
-  border: 1.5px solid var(--color-border);
+  color: var(--color-on-glass-muted);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.15s;
+  transition: color 0.15s, background-color 0.15s;
 }
 
 .cancelBtn:hover {
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
 }
 
 .deleteBtn {
   padding: 0.35rem 0.875rem;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--color-danger);
+  color: #ffb4b4;
   background: none;
   border: 1.5px solid transparent;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  opacity: 0.7;
+  opacity: 0.85;
   transition: opacity 0.15s, background-color 0.15s;
 }
 
 .deleteBtn:hover {
   opacity: 1;
-  background-color: var(--color-danger-bg);
+  background: rgba(214, 69, 69, 0.24);
 }
 
 .removeBtn {
   padding: 0.2rem 0.5rem;
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   background: none;
   border: none;
   cursor: pointer;
@@ -797,8 +830,8 @@
 }
 
 .removeBtn:hover:not(:disabled) {
-  color: var(--color-danger);
-  background-color: var(--color-danger-bg);
+  color: #ffb4b4;
+  background: rgba(214, 69, 69, 0.24);
 }
 
 .removeBtn:disabled {
@@ -808,5 +841,5 @@
 
 .error {
   font-size: 0.75rem;
-  color: var(--color-danger);
+  color: #ffb4b4;
 }

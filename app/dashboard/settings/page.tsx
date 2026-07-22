@@ -32,12 +32,10 @@ export default async function SettingsPage() {
 
   if (profileResult.error) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="max-w-md rounded-[var(--radius-md)] border p-6 text-center [background:var(--color-danger-bg)] [border-color:var(--color-danger)]">
-          <p className="text-sm font-semibold [color:var(--color-danger)]">
-            Unable to load your settings
-          </p>
-          <p className="mt-1 text-sm [color:var(--color-danger)]">{profileResult.error.message}</p>
+      <div className="flex flex-1 items-center justify-center p-8 [background:var(--gradient-app-bg)]">
+        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:rgba(255,180,180,0.4)] [background:rgba(214,69,69,0.14)] p-6 text-center shadow-[var(--glass-shadow)] backdrop-blur-xl">
+          <p className="text-sm font-semibold [color:#ffb4b4]">Unable to load your settings</p>
+          <p className="mt-1 text-sm text-white/80">{profileResult.error.message}</p>
         </div>
       </div>
     )
@@ -46,7 +44,7 @@ export default async function SettingsPage() {
   const profile = profileResult.data
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] md:px-8 md:py-7 md:pb-7">
+    <div className="flex-1 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] [background:var(--gradient-app-bg)] md:px-8 md:py-7 md:pb-7">
       <SettingsTabs
         managerId={manager.managerId}
         role={manager.role}

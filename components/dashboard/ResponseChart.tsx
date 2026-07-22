@@ -43,14 +43,14 @@ export default function ResponseChart({ data }: { data: ResponseTotals }) {
         role="img"
         aria-label="LLM response total versus manual response total"
       >
-        <line x1={PAD_L} y1={baselineY} x2={W - PAD_R} y2={baselineY} style={{ stroke: 'var(--color-border)' }} strokeWidth="1" vectorEffect="non-scaling-stroke" />
+        <line x1={PAD_L} y1={baselineY} x2={W - PAD_R} y2={baselineY} style={{ stroke: 'var(--chart-grid)' }} strokeWidth="1" vectorEffect="non-scaling-stroke" />
 
-        {aiH > 0 && <rect x={aiX} y={aiY} width={barW} height={aiH} rx="6" style={{ fill: 'var(--color-ink)' }} fillOpacity="0.9" />}
-        {manualH > 0 && <rect x={manualX} y={manualY} width={barW} height={manualH} rx="6" style={{ fill: 'var(--color-text-secondary)' }} fillOpacity="0.85" />}
+        {aiH > 0 && <rect x={aiX} y={aiY} width={barW} height={aiH} rx="6" style={{ fill: 'var(--chart-line-primary)' }} fillOpacity="0.9" />}
+        {manualH > 0 && <rect x={manualX} y={manualY} width={barW} height={manualH} rx="6" style={{ fill: 'var(--chart-line-secondary)' }} fillOpacity="0.9" />}
       </svg>
 
       {/* X-axis category labels */}
-      <div className="mt-1 flex px-6 text-[11px] font-medium [color:var(--color-text-secondary)]">
+      <div className="mt-1 flex px-6 text-[11px] font-medium [color:var(--color-on-glass-muted)]">
         <span className="flex-1 text-center">LLM response</span>
         <span className="flex-1 text-center">Manual response</span>
       </div>

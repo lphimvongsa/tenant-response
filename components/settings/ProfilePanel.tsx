@@ -13,7 +13,7 @@ interface ProfilePanelProps {
 }
 
 const inputClass =
-  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-base outline-none transition [background:var(--color-input-bg)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:shadow-[var(--shadow-focus)]'
+  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-base outline-none transition [background:var(--glass-bg-strong)] [border-color:var(--glass-border-strong)] [color:var(--color-on-glass)] placeholder:[color:var(--color-on-glass-subtle)] focus:[border-color:var(--color-lavender-300)] focus:shadow-[var(--shadow-focus)]'
 
 function FieldRow({
   label,
@@ -28,7 +28,7 @@ function FieldRow({
     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
       <label
         htmlFor={htmlFor}
-        className="text-sm font-medium [color:var(--color-text-secondary)] sm:w-28 sm:shrink-0 sm:pt-2"
+        className="text-sm font-medium [color:var(--color-on-glass-muted)] sm:w-28 sm:shrink-0 sm:pt-2"
       >
         {label}
       </label>
@@ -48,18 +48,18 @@ export default function ProfilePanel({
 }: ProfilePanelProps) {
   return (
     <div>
-      <div className="flex items-center gap-4 border-b pb-5 [border-color:var(--color-border)]">
+      <div className="flex items-center gap-4 border-b pb-5 [border-color:var(--glass-border)]">
         <div
           aria-hidden="true"
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-[var(--shadow-button)] [background:var(--color-ink)]"
+          className="glass-chip flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-lg font-bold [color:var(--color-on-glass)]"
         >
           {initials}
         </div>
         <div className="min-w-0">
-          <p className="truncate text-base font-bold [color:var(--color-text-primary)]">
+          <p className="truncate text-base font-bold [color:var(--color-on-glass)]">
             {name || 'Your account'}
           </p>
-          <p className="truncate text-sm [color:var(--color-text-secondary)]">{email || '—'}</p>
+          <p className="truncate text-sm [color:var(--color-on-glass-muted)]">{email || '—'}</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export default function ProfilePanel({
             placeholder="you@company.com"
             className={inputClass}
           />
-          <p className="mt-1.5 text-xs [color:var(--color-text-muted)]">
+          <p className="mt-1.5 text-xs [color:var(--color-on-glass-subtle)]">
             Changing your email sends a confirmation link to the new address before it takes effect.
           </p>
         </FieldRow>

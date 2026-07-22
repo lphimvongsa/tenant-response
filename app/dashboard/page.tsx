@@ -220,27 +220,33 @@ function getLastMessage(messages: Conversation['messages']): Conversation['messa
   )[0]
 }
 
+// Glass redesign: every tile is the same frosted glass surface (via the shared
+// .glass-panel / .glass-interactive utilities). Status is conveyed by the icon
+// chip's hue, not the card fill — 'primary' gets a lavender-accent chip, 'alert'
+// keeps the danger hue (brightened so it reads on the dark gradient), 'neutral'
+// a plain translucent-white chip. All text is white/lavender-tinted since it now
+// sits on glass over the dark gradient.
 const TILE_STYLES: Record<TileVariant, { card: string; label: string; value: string; delta: string; iconWrap: string }> = {
   primary: {
-    card: 'text-white shadow-[var(--shadow-card)] [background:var(--color-ink)]',
-    label: 'text-white/80',
+    card: 'glass-panel glass-interactive',
+    label: 'text-white/70',
     value: 'text-white',
-    delta: 'text-white/70',
-    iconWrap: 'bg-white/15 text-white',
+    delta: 'text-white/55',
+    iconWrap: '[background:rgba(183,166,255,0.22)] [color:#d8ccff]',
   },
   neutral: {
-    card: 'shadow-[var(--shadow-card)] [background:var(--color-lavender-200)]',
-    label: '[color:var(--color-text-secondary)]',
-    value: '[color:var(--color-text-primary)]',
-    delta: '[color:var(--color-text-muted)]',
-    iconWrap: '[background:var(--color-bg-sunken)] [color:var(--color-text-secondary)]',
+    card: 'glass-panel glass-interactive',
+    label: 'text-white/70',
+    value: 'text-white',
+    delta: 'text-white/55',
+    iconWrap: 'bg-white/10 text-white',
   },
   alert: {
-    card: 'shadow-[var(--shadow-card)] [background:var(--color-lavender-100)]',
-    label: '[color:var(--color-text-secondary)]',
-    value: '[color:var(--color-text-primary)]',
-    delta: '[color:var(--color-text-muted)]',
-    iconWrap: '[background:var(--color-bg-sunken)] [color:var(--color-danger)]',
+    card: 'glass-panel glass-interactive',
+    label: 'text-white/70',
+    value: 'text-white',
+    delta: 'text-white/55',
+    iconWrap: '[background:rgba(214,69,69,0.24)] [color:#ffb4b4]',
   },
 }
 
@@ -265,10 +271,10 @@ export default async function OverviewPage() {
 
   if (overview.error) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:var(--color-danger)] [background:var(--color-danger-bg)] p-6 text-center">
-          <p className="text-sm font-semibold [color:var(--color-danger)]">Unable to load overview</p>
-          <p className="mt-1 text-sm [color:var(--color-danger)]">{overview.error}</p>
+      <div className="flex flex-1 items-center justify-center p-8 [background:var(--gradient-app-bg)]">
+        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:rgba(255,180,180,0.4)] [background:rgba(214,69,69,0.14)] p-6 text-center shadow-[var(--glass-shadow)] backdrop-blur-xl">
+          <p className="text-sm font-semibold [color:#ffb4b4]">Unable to load overview</p>
+          <p className="mt-1 text-sm text-white/80">{overview.error}</p>
         </div>
       </div>
     )
@@ -362,13 +368,16 @@ export default async function OverviewPage() {
   const greeting = getGreeting()
 
   return (
-    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] md:px-8 md:py-7 md:pb-7">
+    // Paints the dark-purple gradient over .main's light base to reveal the
+    // glass theme on this route only. Background sits on the scroll container
+    // (default background-attachment) so it stays fixed while content scrolls.
+    <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 pb-[calc(var(--bottom-nav-height)+1.5rem)] [background:var(--gradient-app-bg)] md:px-8 md:py-7 md:pb-7">
 
       {/* ── Header: heading + stat tiles ── */}
       <div className="flex flex-col gap-5">
         <div>
-          <h1 className="text-lg font-bold [color:var(--color-text-primary)]">{greeting}</h1>
-          <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
+          <h1 className="text-lg font-bold [color:var(--color-on-glass)]">{greeting}</h1>
+          <p className="mt-1 text-sm [color:var(--color-on-glass-muted)]">
             Here&apos;s whats going on in your properties
           </p>
         </div>
@@ -381,7 +390,7 @@ export default async function OverviewPage() {
               <Link
                 key={tile.label}
                 href={tile.href}
-                className={`group flex h-32 flex-col justify-between rounded-[var(--radius-lg)] px-5 py-4 transition-transform hover:-translate-y-0.5 ${s.card}`}
+                className={`group flex h-32 flex-col justify-between px-5 py-4 hover:-translate-y-0.5 ${s.card}`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className={`text-xs font-semibold leading-tight ${s.label}`}>{tile.label}</p>

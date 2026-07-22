@@ -1,97 +1,179 @@
-.page {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: var(--color-bg-base);
+@import "tailwindcss";
+
+:root {
+  /* Palette */
+  --color-lavender-50: #f5efff;
+  --color-lavender-100: #e5d9f2;
+  --color-lavender-200: #cdc1ff;
+  --color-lavender-300: #a594f9;
+  --color-lavender-400: #7371fc;
+
+  /* Core UI */
+  --color-ink: #2a225c;
+  --color-ink-hover: #3b3180;
+  --color-on-ink: var(--color-lavender-50);
+  --color-accent: var(--color-lavender-400);
+
+  /* Backgrounds */
+  --color-bg-base: var(--color-lavender-50);
+  --color-bg-surface: var(--color-lavender-50);
+  --color-bg-sunken: var(--color-lavender-100);
+
+  /* Overlays */
+  --color-overlay: rgba(42, 34, 92, 0.5);
+  --color-overlay-subtle: rgba(42, 34, 92, 0.3);
+
+  /* Borders */
+  --color-border: rgba(42, 34, 92, 0.1);
+  --color-border-subtle: rgba(42, 34, 92, 0.06);
+  --color-border-strong: rgba(42, 34, 92, 0.28);
+  --color-border-on-ink: rgba(245, 239, 255, 0.45);
+
+  /* Text */
+  --color-text-primary: var(--color-ink);
+  --color-text-secondary: #5c5294;
+  --color-text-muted: #8277b6;
+
+  /* Message bubbles */
+  --color-bubble-inbound-bg: var(--color-lavender-100);
+  --color-bubble-inbound-text: var(--color-ink);
+  --color-bubble-outbound-bg: var(--color-lavender-400);
+  --color-bubble-outbound-text: var(--color-lavender-50);
+
+  /* Controls */
+  --color-btn-bg: var(--color-lavender-400);
+  --color-btn-bg-hover: var(--color-ink-hover);
+  --color-btn-text: var(--color-lavender-50);
+  --color-input-bg: var(--color-lavender-50);
+  --color-input-border: rgba(42, 34, 92, 0.18);
+  --color-input-border-focus: var(--color-lavender-400);
+
+  /* Semantic */
+  --color-danger: #d64545;
+  --color-danger-bg: #fceaea;
+  --color-success: #1e9e6c;
+  --color-success-bg: #e6f6ef;
+  --color-warning: #b7791f;
+  --color-warning-bg: #fdf3e0;
+
+  /* Shadows */
+  --shadow-hairline: 0 1px 0 rgba(42, 34, 92, 0.06);
+  --shadow-card: 0 1px 3px rgba(42, 34, 92, 0.08);
+  --shadow-card-hover: 0 8px 24px rgba(42, 34, 92, 0.12);
+  --shadow-drawer: -8px 0 32px rgba(42, 34, 92, 0.14);
+  --shadow-modal: 0 20px 60px rgba(42, 34, 92, 0.26);
+  --shadow-button: 0 2px 8px rgba(42, 34, 92, 0.16);
+  --shadow-button-hover: 0 4px 14px rgba(42, 34, 92, 0.22);
+  --shadow-focus: 0 0 0 3px rgba(165, 148, 249, 0.4);
+
+  /* Sidebar */
+  --color-sidebar-bg: var(--color-ink);
+  --color-sidebar-border: rgba(245, 239, 255, 0.08);
+  --color-sidebar-hover-bg: rgba(245, 239, 255, 0.1);
+
+  /* Layout */
+  --header-height: 64px;
+  --bottom-nav-height: 72px;
+
+  /* Radius */
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-bubble: 1.125rem;
+  --radius-pill: 9999px;
+
+  /* ── Glassmorphism / dark-gradient theme ────────────────────────────────
+     Uses the attached file's lavender-to-indigo gradient and translucent
+     lavender glass tones while keeping the fuller pasted token structure. */
+
+  /* Full-bleed app background */
+  --gradient-app-bg: linear-gradient(
+    160deg,
+    var(--color-lavender-400) 0%,
+    #4b3fa0 48%,
+    var(--color-ink) 100%
+  );
+  --gradient-hero: var(--gradient-app-bg);
+  --color-page-bg: var(--gradient-app-bg);
+
+  /* Glass surfaces */
+  --glass-bg: rgba(245, 239, 255, 0.12);
+  --glass-bg-strong: rgba(245, 239, 255, 0.18);
+  --glass-bg-hover: var(--glass-bg-strong);
+  --glass-border: rgba(245, 239, 255, 0.22);
+  --glass-border-strong: rgba(245, 239, 255, 0.32);
+  --glass-blur: 20px;
+  --glass-shadow: 0 8px 32px rgba(42, 34, 92, 0.28);
+
+  /* Text on glass / gradient */
+  --color-on-gradient: var(--color-lavender-50);
+  --color-on-gradient-muted: rgba(245, 239, 255, 0.72);
+  --color-on-glass: var(--color-lavender-50);
+  --color-on-glass-muted: rgba(245, 239, 255, 0.72);
+  --color-on-glass-subtle: rgba(245, 239, 255, 0.52);
+
+  /* Charts on glass */
+  --chart-line-primary: var(--color-lavender-50);
+  --chart-line-secondary: var(--color-lavender-200);
+  --chart-line-muted: rgba(245, 239, 255, 0.5);
+  --chart-grid: rgba(245, 239, 255, 0.12);
+  --chart-axis-text: rgba(245, 239, 255, 0.6);
 }
 
-/* ── Header ── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.25rem;
-  background-color: var(--color-bg-surface);
-  flex-shrink: 0;
-  height: var(--header-height);
-  box-shadow: var(--shadow-card);
-  z-index: 5;
-}
-
-.headerName {
-  font-size: 0.9375rem;
-  font-weight: 600;
+body {
+  background: var(--color-page-bg);
   color: var(--color-text-primary);
+  font-family: var(--font-nunito), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Message list ── */
-.messageList {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+/* Headline moments only — page greetings, hero copy, and major headings. */
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
 }
 
-.emptyState {
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  text-align: center;
-  margin-top: 3rem;
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-/* ── Bubbles ── */
-.messageRow {
-  display: flex;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.messageRow.inbound {
-  justify-content: flex-start;
+::-webkit-scrollbar-thumb {
+  background: rgba(42, 34, 92, 0.18);
+  border-radius: 4px;
 }
 
-.messageRow.outbound {
-  justify-content: flex-end;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(42, 34, 92, 0.32);
 }
 
-.bubble {
-  max-width: 22rem;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  line-height: 1.55;
-  border-radius: var(--radius-bubble);
+/* ── Glass surface utilities ───────────────────────────────────────────── */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
-/* Tenant messages: light gray */
-.bubble.inbound {
-  background-color: var(--color-bg-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-bubble) var(--radius-bubble) var(--radius-bubble) 0.25rem;
-  box-shadow: var(--shadow-card);
+.glass-chip {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
 }
 
-/* Staff messages: blue gradient */
-.bubble.outbound {
-  background: var(--color-ink);
-  color: var(--color-btn-text);
-  border-radius: var(--radius-bubble) var(--radius-bubble) 0.25rem var(--radius-bubble);
-  box-shadow: var(--shadow-button);
+.glass-interactive {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
-.bubbleTime {
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
-  margin-top: 0.25rem;
-}
-
-.messageRow.outbound .bubbleTime {
-  text-align: right;
-}
-
-/* ── Input area ── */
-.inputArea {
-  flex-shrink: 0;
-  border-top: 1px solid var(--color-border-subtle);
-  background-color: var(--color-bg-surface);
+.glass-interactive:hover {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }

@@ -1,6 +1,7 @@
 /* Shared by MassTextModal + MassTextRecipientPicker.
    Modal chrome mirrors the maintenance TicketModal pattern (overlay,
-   bottom-sheet on mobile / centered card on desktop) using design tokens. */
+   bottom-sheet on mobile / centered card on desktop). Glass redesign: the
+   panel is a frosted-glass surface floating on the dark gradient. */
 
 /* ── Modal chrome ── */
 .overlay {
@@ -22,9 +23,12 @@
   max-width: 32rem;
   max-height: 92vh;
   overflow: hidden;
-  background: var(--color-bg-surface);
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  box-shadow: var(--shadow-modal);
+  box-shadow: var(--glass-shadow);
 }
 
 @media (min-width: 768px) {
@@ -45,14 +49,14 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
 }
 
 .title {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   margin: 0;
 }
 
@@ -66,18 +70,18 @@
   border: none;
   background: transparent;
   border-radius: 10px;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
 }
 
 .closeBtn:hover {
-  background: var(--color-bg-sunken);
-  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--color-on-glass);
 }
 
 .closeBtn:focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid var(--color-on-glass);
   outline-offset: 2px;
 }
 
@@ -100,7 +104,7 @@
   justify-content: flex-end;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--glass-border);
   flex-shrink: 0;
 }
 
@@ -108,7 +112,7 @@
   margin-right: auto;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
 }
 
 /* ── Buttons ── */
@@ -119,14 +123,15 @@
   font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
-  background: var(--color-ink);
-  color: var(--color-btn-text);
+  background: var(--color-lavender-400);
+  color: var(--color-lavender-50);
   cursor: pointer;
   transition: background-color 0.15s, opacity 0.15s;
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: var(--color-ink-hover);
+  background: var(--color-lavender-300);
+  color: var(--color-ink);
 }
 
 .btnPrimary:disabled {
@@ -142,13 +147,13 @@
   font-weight: 600;
   font-family: inherit;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   cursor: pointer;
   transition: background-color 0.15s, opacity 0.15s;
 }
 
 .btnSecondary:hover:not(:disabled) {
-  background: var(--color-bg-sunken);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .btnSecondary:disabled {
@@ -160,13 +165,13 @@
 .loading {
   text-align: center;
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   padding: 2.5rem 1rem;
 }
 
 .errorBox {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
+  background: rgba(214, 69, 69, 0.18);
+  color: #ffb4b4;
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
@@ -183,12 +188,12 @@
 .pickerEmpty {
   text-align: center;
   font-size: 0.875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-muted);
   padding: 2rem 1rem;
 }
 
 .group {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -198,7 +203,7 @@
   align-items: center;
   gap: 0.625rem;
   padding: 0.5rem 0.75rem;
-  background: var(--color-bg-sunken);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .groupToggle {
@@ -220,7 +225,7 @@
   min-width: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -230,8 +235,9 @@
   flex-shrink: 0;
   font-size: 0.6875rem;
   font-weight: 700;
-  color: var(--color-ink);
-  background: var(--color-bg-surface);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
   padding: 0.1rem 0.5rem;
   line-height: 1.6;
@@ -244,7 +250,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   transition: transform 0.15s;
 }
 
@@ -256,7 +262,7 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  accent-color: var(--color-ink);
+  accent-color: var(--color-lavender-300);
   cursor: pointer;
 }
 
@@ -276,7 +282,7 @@
 }
 
 .tenantRow:hover {
-  background: var(--color-bg-sunken);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tenantInfo {
@@ -290,7 +296,7 @@
 .tenantName {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -298,12 +304,12 @@
 
 .tenantPhone {
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .groupEmpty {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   padding: 0.5rem 0.75rem;
   margin: 0;
 }
@@ -311,12 +317,12 @@
 /* ── Compose step ── */
 .composeInfo {
   font-size: 0.8125rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   margin: 0 0 0.75rem;
 }
 
 .composeInfo strong {
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   font-weight: 700;
 }
 
@@ -325,38 +331,38 @@
   min-height: 140px;
   resize: vertical;
   box-sizing: border-box;
-  border: 1.5px solid var(--color-input-border);
-  background: var(--color-input-bg);
+  border: 1.5px solid var(--glass-border);
+  background: var(--glass-bg);
   border-radius: var(--radius-sm);
   padding: 0.75rem;
   font-size: 1rem;
   line-height: 1.5;
   font-family: inherit;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   outline: none;
   transition: border-color 0.15s, background 0.15s;
 }
 
 .textarea:focus {
-  border-color: var(--color-input-border-focus);
-  background: var(--color-bg-surface);
+  border-color: var(--color-lavender-300);
+  background: var(--glass-bg-strong);
 }
 
 .textarea:disabled {
-  background: var(--color-bg-sunken);
-  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-on-glass-subtle);
   cursor: default;
 }
 
 .segmentInfo {
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   margin: 0.5rem 0 0;
 }
 
 .sendingNote {
   font-size: 0.8125rem;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   margin: 0.75rem 0 0;
 }
 
@@ -370,18 +376,18 @@
 }
 
 .resultBannerSuccess {
-  background: var(--color-success-bg);
-  color: var(--color-success);
+  background: rgba(30, 158, 108, 0.2);
+  color: #7ee0b8;
 }
 
 .resultBannerWarning {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
+  background: rgba(183, 121, 31, 0.22);
+  color: #f0c987;
 }
 
 .resultBannerDanger {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
+  background: rgba(214, 69, 69, 0.2);
+  color: #ffb4b4;
 }
 
 .resultStats {
@@ -392,7 +398,8 @@
 
 .stat {
   flex: 1;
-  background: var(--color-bg-sunken);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   padding: 0.75rem;
   text-align: center;
@@ -402,16 +409,16 @@
   display: block;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   line-height: 1.2;
 }
 
 .statNumSent {
-  color: var(--color-success);
+  color: #7ee0b8;
 }
 
 .statNumFailed {
-  color: var(--color-danger);
+  color: #ffb4b4;
 }
 
 .statLabel {
@@ -419,7 +426,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .failHeading {
@@ -427,7 +434,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   margin: 0 0 0.5rem;
 }
 
@@ -438,7 +445,7 @@
 }
 
 .failItem {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.75rem;
 }
@@ -452,16 +459,16 @@
 .failName {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .failPhone {
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .failError {
   font-size: 0.75rem;
-  color: var(--color-danger);
+  color: #ffb4b4;
   margin: 0.125rem 0 0;
 }

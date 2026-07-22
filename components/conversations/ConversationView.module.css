@@ -2,7 +2,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--color-bg-base);
+  /* Transparent — the split view's .container paints the gradient behind this
+     detail pane; the header and input are the glass bars that float on it. */
+  background: transparent;
   overflow: hidden;
   position: relative;
 }
@@ -15,8 +17,10 @@
   padding: 0 1.5rem;
   height: 72px;
   flex-shrink: 0;
-  background: var(--color-bg-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
   gap: 1rem;
 }
 
@@ -32,8 +36,9 @@
   width: 42px;
   height: 42px;
   border-radius: 13px;
-  background: var(--color-ink);
-  color: var(--color-btn-text);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: var(--color-on-glass);
   font-size: 0.875rem;
   font-weight: 700;
   display: flex;
@@ -65,7 +70,7 @@
 .headerName {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -78,6 +83,8 @@
   flex-shrink: 0;
 }
 
+/* Glass chip pill: translucent fill + hairline border, a colored dot + tinted
+   label carrying the status hue (per the glass-redesign status-chip pattern). */
 .statusTrigger {
   display: inline-flex;
   align-items: center;
@@ -85,22 +92,21 @@
   font-size: 0.625rem;
   font-weight: 700;
   font-family: inherit;
-  border: 1px solid transparent;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
   padding: 0.15rem 0.5rem;
   line-height: 1.6;
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
+  background: var(--glass-bg-strong);
 }
 
 .statusTriggerEscalated {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
+  color: #ffb4b4;
 }
 
 .statusTriggerActive {
-  background: var(--color-success-bg);
-  color: var(--color-success);
+  color: #7ee0b8;
 }
 
 .statusTrigger:hover:not(:disabled) {
@@ -136,15 +142,17 @@
   opacity: 0.75;
 }
 
-/* Status dropdown menu */
+/* Status dropdown menu — frosted popover floating on the gradient. */
 .statusMenu {
   position: absolute;
   left: 0;
   top: calc(100% + 6px);
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 0.375rem;
   min-width: 220px;
   z-index: 200;
@@ -159,27 +167,27 @@
   border: none;
   background: transparent;
   border-radius: 8px;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   cursor: pointer;
   text-align: left;
   transition: background-color 0.15s;
 }
 
 .statusMenuItem:hover {
-  background-color: var(--color-bg-sunken);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .statusMenuItem:focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid var(--color-on-glass);
   outline-offset: -2px;
 }
 
 .statusDotDanger {
-  background: var(--color-danger);
+  background: #ffb4b4;
 }
 
 .statusDotActive {
-  background: var(--color-success);
+  background: #7ee0b8;
 }
 
 .statusMenuItemBody {
@@ -197,25 +205,25 @@
 
 .statusMenuItemHint {
   font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .statusCheck {
   display: inline-flex;
   align-items: center;
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   flex-shrink: 0;
 }
 
 .resolveError {
   font-size: 0.6875rem;
-  color: var(--color-danger);
+  color: #ffb4b4;
   margin: 0.125rem 0 0;
 }
 
 .headerSub {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-muted);
   margin: 0;
   display: flex;
   align-items: center;
@@ -243,25 +251,25 @@
   border-radius: 10px;
   border: none;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
 }
 
 .headerBtn:hover {
-  background-color: var(--color-border);
-  color: var(--color-text-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-on-glass);
 }
 
 .headerBtn:focus-visible {
-  outline: 2px solid var(--color-ink);
+  outline: 2px solid var(--color-on-glass);
   outline-offset: 2px;
 }
 
 /* Active state for toggle buttons */
 .headerBtnActive {
-  background-color: var(--color-bg-sunken) !important;
-  color: var(--color-ink) !important;
+  background-color: var(--glass-bg-strong) !important;
+  color: var(--color-on-glass) !important;
 }
 
 /* More menu */
@@ -273,10 +281,12 @@
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: 0.375rem;
   min-width: 180px;
   z-index: 200;
@@ -292,14 +302,14 @@
   background: transparent;
   border-radius: 8px;
   font-size: 0.875rem;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   cursor: pointer;
   text-align: left;
   transition: background-color 0.15s;
 }
 
 .moreMenuItem:hover {
-  background-color: var(--color-bg-sunken);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Search bar */
@@ -308,10 +318,12 @@
   align-items: center;
   gap: 0.625rem;
   padding: 0.625rem 1.25rem;
-  background: var(--color-input-bg);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-muted);
 }
 
 .searchInput {
@@ -319,13 +331,13 @@
   border: none;
   background: transparent;
   font-size: 1rem;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
   outline: none;
   font-family: inherit;
 }
 
 .searchInput::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
 .searchClear {
@@ -335,21 +347,21 @@
   width: 20px;
   height: 20px;
   border: none;
-  background: var(--color-border);
+  background: rgba(255, 255, 255, 0.14);
   border-radius: 50%;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .searchClear:hover {
-  background: var(--color-input-border);
+  background: rgba(255, 255, 255, 0.24);
 }
 
 .searchClose {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   border: none;
   background: transparent;
   cursor: pointer;
@@ -359,14 +371,14 @@
 }
 
 .searchClose:hover {
-  background: var(--color-bg-sunken);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ── Input area wrapper ── */
 .inputArea {
   flex-shrink: 0;
-  border-top: 1px solid var(--color-border-subtle);
-  background: var(--color-bg-surface);
+  border-top: 1px solid var(--glass-border);
+  background: transparent;
 }
 
 /* ── Mobile-only back link (this view is only ever mounted at
@@ -412,17 +424,17 @@
     height: 32px;
     flex-shrink: 0;
     border-radius: 10px;
-    color: var(--color-text-secondary);
+    color: var(--color-on-glass-muted);
     transition: background-color 0.15s, color 0.15s;
   }
 
   .backBtn:hover {
-    background-color: var(--color-bg-sunken);
-    color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-on-glass);
   }
 
   .backBtn:focus-visible {
-    outline: 2px solid var(--color-ink);
+    outline: 2px solid var(--color-on-glass);
     outline-offset: 2px;
   }
 

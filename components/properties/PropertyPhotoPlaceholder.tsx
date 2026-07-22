@@ -16,15 +16,17 @@ export default function PropertyPhotoPlaceholder({ className }: Props) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, var(--color-bg-sunken) 0%, var(--color-bg-sunken) 100%)',
+        background: 'var(--glass-bg)',
       }}
     >
+      {/* var() tokens don't resolve in SVG presentation attributes, so the
+          stroke color is set via CSS style instead (project SVG convention). */}
       <svg
         width="44"
         height="44"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="var(--color-text-muted)"
+        style={{ stroke: 'var(--color-on-glass-subtle)' }}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"

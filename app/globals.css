@@ -82,6 +82,38 @@
   --radius-xl: 2rem;
   --radius-bubble: 1.125rem;
   --radius-pill: 9999px;
+
+  /* ── Glassmorphism / dark-gradient theme ─────────────────────────────────
+     Additive: these power the redesigned dashboard pages (Overview first).
+     The existing lavender/ink tokens above are untouched — light pages that
+     have not yet been migrated still depend on them. */
+
+  /* Full-bleed app background: deep indigo/violet (upper-left, near --color-ink)
+     fading to a lighter blue-purple (lower-right). White text clears 6.7:1 even
+     on the lightest stop. */
+  --gradient-app-bg: linear-gradient(160deg, var(--color-lavender-400) 0%, #4b3fa0 48%, var(--color-ink) 100%);
+
+  /* Glass surfaces: semi-transparent white fill + hairline white border, meant
+     to float on --gradient-app-bg. */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.14);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-border-strong: rgba(255, 255, 255, 0.26);
+  --glass-blur: 20px;
+  --glass-shadow: 0 8px 32px rgba(15, 10, 40, 0.36);
+
+  /* Text that sits directly on glass / the gradient. */
+  --color-on-glass: #ffffff;
+  --color-on-glass-muted: rgba(233, 228, 255, 0.72);
+  --color-on-glass-subtle: rgba(233, 228, 255, 0.52);
+
+  /* Chart strokes/fills tuned to read on glass (used via inline SVG style —
+     var() does not resolve in SVG presentation attributes). */
+  --chart-line-primary: #ffffff;
+  --chart-line-secondary: #b7a6ff;
+  --chart-line-muted: rgba(233, 228, 255, 0.5);
+  --chart-grid: rgba(255, 255, 255, 0.12);
+  --chart-axis-text: rgba(233, 228, 255, 0.6);
 }
 
 body {
@@ -107,4 +139,37 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(42, 34, 92, 0.32);
+}
+
+/* ── Glass surface utilities ───────────────────────────────────────────────
+   Reusable primitives for the dark-gradient theme so pages don't repeat the
+   same arbitrary-value Tailwind everywhere. */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Slightly more opaque translucent fill for chips/pills/counters that sit on
+   top of a .glass-panel. No backdrop-filter — it would frost the panel it sits
+   on rather than the page. Callers set radius/padding via utilities. */
+.glass-chip {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+}
+
+/* Add to a clickable .glass-panel for hover feedback. Defined unlayered and
+   after .glass-panel so its :hover (specificity 0,2,0) wins over the base
+   .glass-panel background — a Tailwind hover:bg-* utility could not, since
+   Tailwind's @layer utilities loses to unlayered rules. */
+.glass-interactive {
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.glass-interactive:hover {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }

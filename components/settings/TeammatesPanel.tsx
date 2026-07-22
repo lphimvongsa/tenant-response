@@ -16,7 +16,7 @@ interface TeammatesPanelProps {
 }
 
 const secondaryBtn =
-  'rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-semibold transition-colors [background:var(--color-bg-surface)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] hover:[background:var(--color-bg-sunken)] disabled:cursor-not-allowed disabled:opacity-50'
+  'rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-semibold transition-colors [background:var(--glass-bg)] [border-color:var(--glass-border-strong)] [color:var(--color-on-glass)] hover:[background:var(--glass-bg-strong)] disabled:cursor-not-allowed disabled:opacity-50'
 
 function RoleBadge({ role }: { role: string }) {
   const isAdmin = role === 'admin'
@@ -24,8 +24,8 @@ function RoleBadge({ role }: { role: string }) {
     <span
       className={`shrink-0 rounded-[var(--radius-pill)] px-2 py-0.5 text-[11px] font-semibold capitalize ${
         isAdmin
-          ? '[background:var(--color-bg-sunken)] [color:var(--color-ink)]'
-          : '[background:var(--color-input-bg)] [color:var(--color-text-secondary)]'
+          ? '[background:var(--color-lavender-300)] [color:var(--color-ink)]'
+          : 'glass-chip [color:var(--color-on-glass-muted)]'
       }`}
     >
       {role || 'member'}
@@ -41,7 +41,7 @@ function RemoveButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold transition-colors [color:var(--color-danger)] hover:[background:var(--color-danger-bg)] disabled:opacity-50"
+      className="rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold transition-colors [color:#ffb4b4] hover:bg-white/10 disabled:opacity-50"
     >
       {pending ? 'Removing…' : 'Remove'}
     </button>
@@ -85,14 +85,14 @@ export default function TeammatesPanel({
   return (
     <div>
       {isAdmin && (
-        <div className="border-b pb-6 [border-color:var(--color-border)]">
-          <p className="text-sm font-semibold [color:var(--color-text-primary)]">Team join code</p>
-          <p className="mt-0.5 text-sm [color:var(--color-text-secondary)]">
+        <div className="border-b pb-6 [border-color:var(--glass-border)]">
+          <p className="text-sm font-semibold [color:var(--color-on-glass)]">Team join code</p>
+          <p className="mt-0.5 text-sm [color:var(--color-on-glass-muted)]">
             Share this code with teammates so they can create an account.
           </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <code className="rounded-[var(--radius-sm)] border px-3 py-2 font-mono text-sm font-semibold tracking-widest [background:var(--color-input-bg)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)]">
+            <code className="glass-chip rounded-[var(--radius-sm)] px-3 py-2 font-mono text-sm font-semibold tracking-widest [color:var(--color-on-glass)]">
               {joinCode ?? 'Unavailable'}
             </code>
             <button type="button" onClick={handleCopy} disabled={!joinCode} className={secondaryBtn}>
@@ -125,7 +125,7 @@ export default function TeammatesPanel({
       )}
 
       <div className={isAdmin ? 'mt-6' : ''}>
-        <p className="text-sm font-semibold [color:var(--color-text-primary)]">Teammates</p>
+        <p className="text-sm font-semibold [color:var(--color-on-glass)]">Teammates</p>
 
         {removeState && (
           <div className="mt-3">
@@ -134,37 +134,37 @@ export default function TeammatesPanel({
         )}
 
         {teammates.length === 0 ? (
-          <p className="mt-3 text-sm [color:var(--color-text-secondary)]">No teammates yet.</p>
+          <p className="mt-3 text-sm [color:var(--color-on-glass-muted)]">No teammates yet.</p>
         ) : (
           <ul className="mt-2">
             {teammates.map((t) => (
               <li
                 key={t.id}
-                className="flex items-center gap-3 border-b py-3 last:border-b-0 [border-color:var(--color-border-subtle)]"
+                className="flex items-center gap-3 border-b py-3 last:border-b-0 [border-color:var(--glass-border)]"
               >
                 <div
                   aria-hidden="true"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white [background:var(--color-ink)]"
+                  className="glass-chip flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold [color:var(--color-on-glass)]"
                 >
                   {computeInitials(t.name, t.email)}
                 </div>
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-semibold [color:var(--color-text-primary)]">
+                    <p className="truncate text-sm font-semibold [color:var(--color-on-glass)]">
                       {t.name || t.email || 'Unknown'}
                     </p>
                     <RoleBadge role={t.role} />
                     {t.id === managerId && (
-                      <span className="text-xs [color:var(--color-text-muted)]">You</span>
+                      <span className="text-xs [color:var(--color-on-glass-subtle)]">You</span>
                     )}
                   </div>
-                  <p className="truncate text-xs [color:var(--color-text-secondary)]">
+                  <p className="truncate text-xs [color:var(--color-on-glass-muted)]">
                     {t.email || '—'}
                   </p>
                 </div>
 
-                <div className="hidden shrink-0 text-xs [color:var(--color-text-secondary)] sm:block">
+                <div className="hidden shrink-0 text-xs [color:var(--color-on-glass-muted)] sm:block">
                   {t.phone || '—'}
                 </div>
 

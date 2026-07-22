@@ -32,10 +32,10 @@ export default async function MaintenancePage() {
 
   if (error) {
     return (
-      <div className="flex flex-1 items-center justify-center p-8">
-        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:var(--color-danger)] [background:var(--color-danger-bg)] p-6 text-center">
-          <p className="text-sm font-semibold [color:var(--color-danger)]">Unable to load maintenance tickets</p>
-          <p className="mt-1 text-sm [color:var(--color-danger)]">{error}</p>
+      <div className="flex flex-1 items-center justify-center p-8 [background:var(--gradient-app-bg)]">
+        <div className="max-w-md rounded-[var(--radius-lg)] border [border-color:rgba(255,180,180,0.4)] [background:rgba(214,69,69,0.14)] p-6 text-center shadow-[var(--glass-shadow)] backdrop-blur-xl">
+          <p className="text-sm font-semibold [color:#ffb4b4]">Unable to load maintenance tickets</p>
+          <p className="mt-1 text-sm text-white/80">{error}</p>
         </div>
       </div>
     )
@@ -44,9 +44,9 @@ export default async function MaintenancePage() {
   const tickets = (data ?? []) as unknown as Ticket[]
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-5 md:px-8 md:py-7">
+    <div className="flex-1 overflow-y-auto px-4 py-5 [background:var(--gradient-app-bg)] md:px-8 md:py-7">
       <header className="mb-5">
-        <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Maintenance</h1>
+        <h1 className="text-lg font-bold [color:var(--color-on-glass)]">Maintenance</h1>
       </header>
 
       <TicketBoard tickets={tickets} />

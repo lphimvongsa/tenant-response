@@ -24,17 +24,17 @@ type Props = {
 // z-index stack comment in app/globals.css.
 export default function MobileSettingsPanel({ title, onBack, saveFormId, savePending, children }: Props) {
   return (
-    <div className="fixed inset-0 z-40 flex flex-col [background:var(--color-bg-base)]">
-      <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b px-4 py-3 [border-color:var(--color-border)] [background:var(--color-bg-surface)]">
+    <div className="fixed inset-0 z-40 flex flex-col [background:var(--gradient-app-bg)]">
+      <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b px-4 py-3 [border-color:var(--glass-border)] [background:var(--glass-bg)] backdrop-blur-[var(--glass-blur)]">
         <button
           type="button"
           onClick={onBack}
           aria-label="Back to settings"
-          className="flex h-9 w-9 items-center justify-center rounded-lg [color:var(--color-text-secondary)] hover:[background:var(--color-bg-sunken)]"
+          className="flex h-9 w-9 items-center justify-center rounded-lg [color:var(--color-on-glass-muted)] hover:bg-white/10"
         >
           {BackIcon}
         </button>
-        <h2 className="flex-1 truncate text-center text-base font-bold [color:var(--color-text-primary)]">
+        <h2 className="flex-1 truncate text-center text-base font-bold [color:var(--color-on-glass)]">
           {title}
         </h2>
         {saveFormId ? (
@@ -42,7 +42,7 @@ export default function MobileSettingsPanel({ title, onBack, saveFormId, savePen
             type="submit"
             form={saveFormId}
             disabled={savePending}
-            className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="shrink-0 rounded-[var(--radius-sm)] px-3 py-1.5 text-xs font-semibold shadow-[var(--glass-shadow)] transition-colors [background:var(--color-lavender-300)] [color:var(--color-ink)] hover:[background:var(--color-lavender-200)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {savePending ? 'Saving…' : 'Save'}
           </button>

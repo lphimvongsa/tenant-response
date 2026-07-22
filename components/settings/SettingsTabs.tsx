@@ -181,8 +181,8 @@ export default function SettingsTabs({
     return (
       <div>
         <div>
-          <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Settings</h1>
-          <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
+          <h1 className="text-lg font-bold [color:var(--color-on-glass)]">Settings</h1>
+          <p className="mt-1 text-sm [color:var(--color-on-glass-muted)]">
             Manage your profile, team, and notifications
           </p>
         </div>
@@ -213,12 +213,12 @@ export default function SettingsTabs({
         <form action={signOut} className="mt-6">
           <button
             type="submit"
-            className="flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-[var(--shadow-card)] transition-colors [border-color:var(--color-border)] [background:var(--color-bg-surface)] hover:[background:var(--color-danger-bg)]"
+            className="glass-panel glass-interactive flex w-full items-center gap-3 px-4 py-3.5 text-left"
           >
-            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:var(--color-danger-bg)] [color:var(--color-danger)]">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:rgba(214,69,69,0.24)] [color:#ffb4b4]">
               {SignOutIcon}
             </span>
-            <span className="flex-1 text-sm font-semibold [color:var(--color-danger)]">Sign out</span>
+            <span className="flex-1 text-sm font-semibold [color:#ffb4b4]">Sign out</span>
           </button>
         </form>
 
@@ -240,8 +240,8 @@ export default function SettingsTabs({
     <div>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-lg font-bold [color:var(--color-text-primary)]">Settings</h1>
-          <p className="mt-1 text-sm [color:var(--color-text-secondary)]">
+          <h1 className="text-lg font-bold [color:var(--color-on-glass)]">Settings</h1>
+          <p className="mt-1 text-sm [color:var(--color-on-glass-muted)]">
             Manage your profile, team, and notifications
           </p>
         </div>
@@ -250,7 +250,7 @@ export default function SettingsTabs({
             type="submit"
             form={saveTarget.formId}
             disabled={saveTarget.pending}
-            className="shrink-0 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition-shadow [background:var(--color-ink)] hover:shadow-[var(--shadow-button-hover)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="shrink-0 rounded-[var(--radius-sm)] px-4 py-2 text-sm font-semibold shadow-[var(--glass-shadow)] transition-colors [background:var(--color-lavender-300)] [color:var(--color-ink)] hover:[background:var(--color-lavender-200)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saveTarget.pending ? 'Saving…' : 'Save Changes'}
           </button>
@@ -260,7 +260,7 @@ export default function SettingsTabs({
       <nav
         role="tablist"
         aria-label="Settings sections"
-        className="mt-4 flex items-center gap-6 overflow-x-auto border-b [border-color:var(--color-border)]"
+        className="mt-4 flex items-center gap-6 overflow-x-auto border-b [border-color:var(--glass-border)]"
       >
         {tabs.map((tab) => {
           const active = tab.id === activeTab
@@ -275,8 +275,8 @@ export default function SettingsTabs({
               onClick={() => setActiveTab(tab.id)}
               className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 pb-3 text-sm font-semibold transition-colors ${
                 active
-                  ? '[border-color:var(--color-ink)] [color:var(--color-ink)]'
-                  : 'border-transparent [color:var(--color-text-secondary)] hover:[color:var(--color-text-primary)]'
+                  ? '[border-color:var(--color-on-glass)] [color:var(--color-on-glass)]'
+                  : 'border-transparent [color:var(--color-on-glass-muted)] hover:[color:var(--color-on-glass)]'
               }`}
             >
               {tab.icon}
@@ -291,7 +291,7 @@ export default function SettingsTabs({
         role="tabpanel"
         aria-labelledby={`settings-tab-${activeTab}`}
         aria-label={activeLabel}
-        className="mt-6 max-w-2xl rounded-2xl border p-6 shadow-[var(--shadow-card)] [background:var(--color-bg-surface)] [border-color:var(--color-border)]"
+        className="glass-panel mt-6 max-w-2xl p-6"
       >
         {activePanel}
       </div>
@@ -299,7 +299,7 @@ export default function SettingsTabs({
       <form action={signOut} className="mt-6">
         <button
           type="submit"
-          className="flex items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-sm font-semibold transition-colors [color:var(--color-danger)] hover:[background:var(--color-danger-bg)]"
+          className="flex items-center gap-2 rounded-[var(--radius-sm)] px-3 py-2 text-sm font-semibold transition-colors [color:#ffb4b4] hover:bg-white/10"
         >
           {SignOutIcon}
           Sign out

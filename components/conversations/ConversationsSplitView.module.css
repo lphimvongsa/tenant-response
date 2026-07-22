@@ -1,18 +1,28 @@
+/* Glass redesign: this .container is the conversations route's own root fill
+   container (the equivalent of the Overview page's root scroll div), so it
+   paints --gradient-app-bg to reveal the dark theme over .main's light base.
+   It doesn't scroll (the panes scroll internally), so the gradient reads as a
+   fixed backdrop that both panes float on. */
 .container {
   display: flex;
   flex: 1;
   overflow: hidden;
   height: 100%;
+  background: var(--gradient-app-bg);
 }
 
+/* Frosted-glass sidebar floating on the gradient. Translucent white fill +
+   backdrop blur + a hairline glass border where it meets the thread pane. */
 .listPane {
   width: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid var(--color-border);
-  background-color: var(--color-bg-surface);
+  border-right: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .detailPane {

@@ -1,23 +1,25 @@
+/* Primary CTA on glass: bright lavender pill + ink text (matches the
+   Settings-pass form-control convention). */
 .triggerBtn {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--color-btn-text);
-  background: var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-lavender-300);
   border: none;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  box-shadow: var(--shadow-button);
-  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: var(--glass-shadow);
+  transition: background-color 0.15s, transform 0.15s;
   white-space: nowrap;
 }
 
 .triggerBtn:hover {
-  opacity: 0.9;
+  background: var(--color-lavender-200);
   transform: translateY(-1px);
 }
 
-/* ── Modal ── */
+/* ── Modal (glass panel over a dark scrim) ── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -34,9 +36,12 @@
   max-width: 420px;
   max-height: 90vh;
   overflow-y: auto;
-  background-color: var(--color-bg-surface);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-modal);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 /* Full-width bottom sheet instead of a centered dialog on mobile. */
@@ -58,13 +63,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .modalTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--color-on-glass);
 }
 
 .closeBtn {
@@ -74,7 +79,7 @@
   width: 2rem;
   height: 2rem;
   flex-shrink: 0;
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   background: none;
   border: none;
   border-radius: var(--radius-sm);
@@ -83,8 +88,8 @@
 }
 
 .closeBtn:hover {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-sunken);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
 }
 
 /* ── Form ── */
@@ -108,8 +113,8 @@
   flex-shrink: 0;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-bg-sunken);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
 }
 
 .photo {
@@ -127,32 +132,36 @@
   padding: 0.45rem 0.875rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-ink);
-  background: none;
-  border: 1.5px solid var(--color-border-strong);
+  color: var(--color-on-glass);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s;
 }
 
 .photoBtn:hover {
-  background-color: var(--color-bg-sunken);
-  border-color: var(--color-ink);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 .input {
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
-  color: var(--color-text-primary);
-  background-color: var(--color-input-bg);
-  border: 1.5px solid var(--color-input-border);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-sm);
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+.input::placeholder {
+  color: var(--color-on-glass-subtle);
+}
+
 .input:focus {
-  border-color: var(--color-input-border-focus);
+  border-color: var(--color-lavender-300);
   box-shadow: var(--shadow-focus);
 }
 
@@ -187,34 +196,35 @@
   padding: 0.45rem 0.875rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--color-text-secondary);
-  background: none;
-  border: 1.5px solid var(--color-border);
+  color: var(--color-on-glass-muted);
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border-strong);
   border-radius: var(--radius-pill);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
 }
 
 .cancelBtn:hover {
-  color: var(--color-text-primary);
-  border-color: var(--color-input-border);
+  color: var(--color-on-glass);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-strong);
 }
 
 .submitBtn {
   padding: 0.45rem 1rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-btn-text);
-  background: var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-lavender-300);
   border: none;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  box-shadow: var(--shadow-button);
-  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: var(--glass-shadow);
+  transition: background-color 0.15s, transform 0.15s;
 }
 
 .submitBtn:hover:not(:disabled) {
-  opacity: 0.9;
+  background: var(--color-lavender-200);
   transform: translateY(-1px);
 }
 
@@ -226,5 +236,5 @@
 
 .error {
   font-size: 0.75rem;
-  color: var(--color-danger);
+  color: #ffb4b4;
 }

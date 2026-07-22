@@ -83,8 +83,8 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
       >
         <defs>
           <linearGradient id="trend-total-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" style={{ stopColor: 'var(--color-ink)' }} stopOpacity="0.14" />
-            <stop offset="100%" style={{ stopColor: 'var(--color-ink)' }} stopOpacity="0" />
+            <stop offset="0%" style={{ stopColor: 'var(--chart-line-primary)' }} stopOpacity="0.22" />
+            <stop offset="100%" style={{ stopColor: 'var(--chart-line-primary)' }} stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -98,12 +98,12 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
                 y1={y}
                 x2={W - PAD_R}
                 y2={y}
-                style={{ stroke: 'var(--color-border)' }}
+                style={{ stroke: 'var(--chart-grid)' }}
                 strokeWidth="1"
                 strokeDasharray="4 4"
                 vectorEffect="non-scaling-stroke"
               />
-              <text x={PAD_L - 8} y={y + 3} textAnchor="end" fontSize="10" style={{ fill: 'var(--color-text-muted)' }}>
+              <text x={PAD_L - 8} y={y + 3} textAnchor="end" fontSize="10" style={{ fill: 'var(--chart-axis-text)' }}>
                 {Math.round(v)}
               </text>
             </g>
@@ -117,7 +117,7 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
         <path
           d={smoothPath(outboundPts)}
           fill="none"
-          style={{ stroke: 'var(--color-text-muted)' }}
+          style={{ stroke: 'var(--chart-line-muted)' }}
           strokeWidth="2"
           strokeLinecap="round"
           strokeDasharray="5 5"
@@ -126,7 +126,7 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
         <path
           d={smoothPath(inboundPts)}
           fill="none"
-          style={{ stroke: 'var(--color-text-secondary)' }}
+          style={{ stroke: 'var(--chart-line-secondary)' }}
           strokeWidth="2.25"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
@@ -134,7 +134,7 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
         <path
           d={smoothPath(totalPts)}
           fill="none"
-          style={{ stroke: 'var(--color-ink)' }}
+          style={{ stroke: 'var(--chart-line-primary)' }}
           strokeWidth="2.75"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
@@ -142,7 +142,7 @@ export default function TrendChart({ data }: { data: TrendPoint[] }) {
       </svg>
 
       {/* X-axis timestamps */}
-      <div className="mt-1 flex pl-[34px] pr-4 text-[11px] font-medium [color:var(--color-text-muted)]">
+      <div className="mt-1 flex pl-[34px] pr-4 text-[11px] font-medium [color:var(--chart-axis-text)]">
         {data.map((d, i) => {
           const show = i % labelStep === 0 || i === n - 1
           const align = i === 0 ? 'text-left' : i === n - 1 ? 'text-right' : 'text-center'

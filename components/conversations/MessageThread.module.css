@@ -11,7 +11,7 @@
 }
 
 .empty {
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-muted);
   font-size: 0.875rem;
   text-align: center;
   margin-top: 3rem;
@@ -26,7 +26,7 @@
 .loadingOlder {
   text-align: center;
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-muted);
   padding: 0.5rem 0;
   margin: 0;
   flex-shrink: 0;
@@ -35,7 +35,7 @@
 .loadOlderError {
   text-align: center;
   font-size: 0.75rem;
-  color: var(--color-danger);
+  color: #ffb4b4;
   padding: 0.5rem 0;
   margin: 0;
   flex-shrink: 0;
@@ -58,13 +58,16 @@
 }
 
 /* ── Avatar ── */
+/* Inbound (tenant): frosted glass chip. Outbound (staff): solid lavender
+   accent — matches the outbound bubble so "you" reads consistently. */
 .avatar {
   flex-shrink: 0;
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--color-ink);
-  color: var(--color-btn-text);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  color: var(--color-on-glass);
   font-size: 0.6875rem;
   font-weight: 700;
   display: flex;
@@ -75,7 +78,9 @@
 }
 
 .avatarOutbound {
-  background: var(--color-ink);
+  background: var(--color-lavender-400);
+  border-color: transparent;
+  color: var(--color-lavender-50);
 }
 
 /* ── Message column (label + bubble + meta) ── */
@@ -95,12 +100,12 @@
 }
 
 .senderLabelInbound {
-  color: var(--color-ink);
+  color: var(--color-on-glass);
   text-align: left;
 }
 
 .senderLabelOutbound {
-  color: var(--color-text-secondary);
+  color: var(--color-on-glass-muted);
   text-align: right;
 }
 
@@ -113,19 +118,22 @@
   word-break: break-word;
 }
 
+/* Inbound = frosted glass chip (translucent white fill + hairline border).
+   Outbound = solid lavender accent so the two directions stay obviously
+   distinct and scannable against the dark gradient. */
 .bubbleInbound {
-  background: var(--color-bg-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
+  background: var(--glass-bg-strong);
+  color: var(--color-on-glass);
+  border: 1px solid var(--glass-border);
   border-radius: 4px 18px 18px 18px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--glass-shadow);
 }
 
 .bubbleOutbound {
-  background: var(--color-ink);
-  color: var(--color-btn-text);
+  background: var(--color-lavender-400);
+  color: var(--color-lavender-50);
   border-radius: 18px 4px 18px 18px;
-  box-shadow: var(--shadow-button);
+  box-shadow: var(--glass-shadow);
 }
 
 .body {
@@ -133,9 +141,11 @@
   white-space: pre-wrap;
 }
 
+/* Solid amber highlight with dark text so a search match pops inside either
+   bubble type (frosted-white inbound or solid-lavender outbound). */
 .highlight {
-  background: var(--color-warning-bg);
-  color: var(--color-text-primary);
+  background: #ffd166;
+  color: var(--color-ink);
   border-radius: 2px;
   padding: 0 1px;
 }
@@ -154,26 +164,26 @@
 
 .time {
   font-size: 0.625rem;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
 }
 
-/* Read receipt checkmark */
+/* Read receipt checkmark — brightens to full white once read. */
 .readCheck {
   display: flex;
   align-items: center;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   transition: color 0.15s;
 }
 
 .readCheckRead {
-  color: var(--color-ink);
+  color: var(--color-on-glass);
 }
 
 /* Mark read/unread toggle button */
 .readToggle {
   font-size: 0.625rem;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-on-glass-subtle);
   background: none;
   border: none;
   padding: 0;
@@ -189,5 +199,5 @@
 }
 
 .readToggle:hover {
-  color: var(--color-ink);
+  color: var(--color-on-glass);
 }

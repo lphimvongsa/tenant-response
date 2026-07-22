@@ -12,9 +12,9 @@ export default function Loading() {
           <div key={i} className={styles.card}>
             <div className={`${styles.photoWrap} animate-pulse`} />
             <div className={styles.cardBody}>
-              <div className="h-4 w-3/4 animate-pulse rounded [background:var(--color-bg-sunken)]" />
-              <div className="mt-1 h-3 w-full animate-pulse rounded [background:var(--color-bg-sunken)]" />
-              <div className="mt-2 h-3 w-1/2 animate-pulse rounded [background:var(--color-bg-sunken)]" />
+              <div className="h-4 w-3/4 animate-pulse rounded bg-white/10" />
+              <div className="mt-1 h-3 w-full animate-pulse rounded bg-white/10" />
+              <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-white/10" />
             </div>
           </div>
         ))}

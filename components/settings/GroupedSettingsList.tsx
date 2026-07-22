@@ -32,26 +32,26 @@ export default function GroupedSettingsList({ groups, onSelect }: Props) {
     <div className="mt-5 flex flex-col gap-6">
       {groups.map((group) => (
         <div key={group.title}>
-          <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide [color:var(--color-text-muted)]">
+          <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">
             {group.title}
           </p>
-          <div className="overflow-hidden rounded-2xl border shadow-[var(--shadow-card)] [border-color:var(--color-border)] [background:var(--color-bg-surface)]">
+          <div className="glass-panel overflow-hidden">
             {group.items.map((item, i) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => onSelect(item.id)}
-                className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:[background:var(--color-bg-sunken)] ${
-                  i !== group.items.length - 1 ? 'border-b [border-color:var(--color-border-subtle)]' : ''
+                className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/10 ${
+                  i !== group.items.length - 1 ? 'border-b [border-color:var(--glass-border)]' : ''
                 }`}
               >
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [background:var(--color-bg-sunken)] [color:var(--color-ink)]">
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 [color:var(--color-on-glass)]">
                   {item.icon}
                 </span>
-                <span className="flex-1 text-sm font-semibold [color:var(--color-text-primary)]">
+                <span className="flex-1 text-sm font-semibold [color:var(--color-on-glass)]">
                   {item.label}
                 </span>
-                <span className="[color:var(--color-text-muted)]">{ChevronIcon}</span>
+                <span className="[color:var(--color-on-glass-subtle)]">{ChevronIcon}</span>
               </button>
             ))}
           </div>

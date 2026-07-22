@@ -34,11 +34,11 @@ export default function ConversationSearchBar({
   }, [])
 
   return (
-    <div className="flex items-center gap-2.5 py-2.5 px-5 bg-input-bg border-b border-border shrink-0 text-text-muted">
+    <div className="flex items-center gap-2.5 py-2.5 px-5 [background:var(--glass-bg)] backdrop-blur-[var(--glass-blur)] border-b [border-color:var(--glass-border)] shrink-0 [color:var(--color-on-glass-muted)]">
       {SearchIcon}
       <input
         ref={inputRef}
-        className="flex-1 border-none bg-transparent text-base text-text-primary outline-none [font-family:inherit] placeholder:text-text-muted"
+        className="flex-1 border-none bg-transparent text-base [color:var(--color-on-glass)] outline-none [font-family:inherit] placeholder:[color:var(--color-on-glass-subtle)]"
         type="text"
         placeholder="Search messages…"
         value={query}
@@ -46,7 +46,7 @@ export default function ConversationSearchBar({
       />
       {query && (
         <button
-          className="flex items-center justify-center w-5 h-5 border-none bg-border rounded-full text-text-secondary cursor-pointer shrink-0 hover:bg-input-border"
+          className="flex items-center justify-center w-5 h-5 border-none [background:rgba(255,255,255,0.14)] rounded-full [color:var(--color-on-glass-muted)] cursor-pointer shrink-0 hover:[background:rgba(255,255,255,0.24)]"
           aria-label="Clear search"
           type="button"
           onClick={() => onQueryChange('')}
@@ -55,7 +55,7 @@ export default function ConversationSearchBar({
         </button>
       )}
       <button
-        className="text-xs font-semibold text-ink border-none bg-transparent cursor-pointer py-1 px-2 rounded-[6px] shrink-0 hover:bg-bg-sunken"
+        className="text-xs font-semibold [color:var(--color-on-glass)] border-none bg-transparent cursor-pointer py-1 px-2 rounded-[6px] shrink-0 hover:[background:rgba(255,255,255,0.1)]"
         type="button"
         onClick={onClose}
       >

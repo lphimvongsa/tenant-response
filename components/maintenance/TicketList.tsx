@@ -57,10 +57,17 @@ function statusLabel(status: TicketStatus): string {
 // Reuses the severity→color language from the old SEVERITY_STYLES, restyled as a
 // dot + label badge. null severity is treated as the "Normal" default.
 
-const PRIORITY: Record<'mild' | 'moderate' | 'severe', { label: string; dot: string; text: string }> = {
-  mild: { label: 'Mild', dot: 'var(--color-success)', text: 'var(--color-success)' },
-  moderate: { label: 'Moderate', dot: 'var(--color-text-secondary)', text: 'var(--color-text-secondary)' },
-  severe: { label: 'Severe', dot: 'var(--color-danger)', text: 'var(--color-danger)' },
+// `text` reads on light surfaces (the ticket detail modal); `glassText` is a
+// brightened tint that stays legible on the dark glass board (mirrors how the
+// Overview escalated chip pairs a saturated --color-danger dot with #ffb4b4
+// text). Severity hues follow the reference: green Mild / amber Moderate / red
+// Severe. null severity is treated as the "Moderate" default.
+type Priority = { label: string; dot: string; text: string; glassText: string }
+
+const PRIORITY: Record<'mild' | 'moderate' | 'severe', Priority> = {
+  mild: { label: 'Mild', dot: 'var(--color-success)', text: 'var(--color-success)', glassText: '#7ee7b0' },
+  moderate: { label: 'Moderate', dot: 'var(--color-warning)', text: 'var(--color-warning)', glassText: '#f5c97a' },
+  severe: { label: 'Severe', dot: 'var(--color-danger)', text: 'var(--color-danger)', glassText: '#ffb4b4' },
 }
 
 export const SEVERITY_OPTIONS: { value: 'mild' | 'moderate' | 'severe'; label: string }[] = [
@@ -71,18 +78,29 @@ export const SEVERITY_OPTIONS: { value: 'mild' | 'moderate' | 'severe'; label: s
 
 // severity is AI-generated free text with no DB-level enum, so it isn't always
 // exactly 'mild' | 'moderate' | 'severe' — fall back to showing the raw value.
-function priorityOf(severity: Ticket['severity']) {
+function priorityOf(severity: Ticket['severity']): Priority {
   if (!severity) return PRIORITY.moderate
   if (PRIORITY[severity]) return PRIORITY[severity]
-  return { label: severity.charAt(0).toUpperCase() + severity.slice(1), dot: 'var(--color-text-muted)', text: 'var(--color-text-secondary)' }
+  return {
+    label: severity.charAt(0).toUpperCase() + severity.slice(1),
+    dot: 'var(--color-text-muted)',
+    text: 'var(--color-text-secondary)',
+    glassText: 'var(--color-on-glass-muted)',
+  }
 }
 
-function PriorityBadge({ severity }: { severity: Ticket['severity'] }) {
+// `onGlass` switches the badge for a dark glass surface (translucent .glass-chip
+// fill + brightened text) vs a light surface (sunken fill + saturated text). Both
+// the board card and the (now glass) detail modal render it onGlass; the light
+// branch is kept so the badge stays reusable on any future light surface.
+function PriorityBadge({ severity, onGlass = false }: { severity: Ticket['severity']; onGlass?: boolean }) {
   const p = priorityOf(severity)
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full [background:var(--color-bg-sunken)] px-2.5 py-0.5 text-xs font-semibold"
-      style={{ color: p.text }}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+        onGlass ? 'glass-chip' : '[background:var(--color-bg-sunken)]'
+      }`}
+      style={{ color: onGlass ? p.glassText : p.text }}
     >
       <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: p.dot }} />
       {p.label}
@@ -105,15 +123,15 @@ function avatarColor(name: string): string {
 function AssigneeRow({ assignedTo }: { assignedTo: string | null }) {
   if (!assignedTo || !assignedTo.trim()) {
     return (
-      <div className="flex items-center gap-2 text-xs [color:var(--color-text-muted)]">
-        <span className="inline-block h-5 w-5 rounded-full border border-dashed [border-color:var(--color-border)]" />
+      <div className="flex items-center gap-2 text-xs [color:var(--color-on-glass-muted)]">
+        <span className="inline-block h-5 w-5 rounded-full border border-dashed [border-color:var(--glass-border-strong)]" />
         Unassigned
       </div>
     )
   }
   const letter = assignedTo.trim().charAt(0).toUpperCase()
   return (
-    <div className="flex items-center gap-2 text-xs font-medium [color:var(--color-text-primary)]">
+    <div className="flex items-center gap-2 text-xs font-medium [color:var(--color-on-glass)]">
       <span
         className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
         style={{ backgroundColor: avatarColor(assignedTo.trim()) }}
@@ -180,7 +198,7 @@ function KebabMenu({
           e.stopPropagation()
           onToggle()
         }}
-        className="flex h-6 w-6 items-center justify-center rounded-md [color:var(--color-text-secondary)] transition hover:[background:var(--color-bg-sunken)] hover:[color:var(--color-text-primary)]"
+        className="flex h-6 w-6 items-center justify-center rounded-md [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
         aria-label="Ticket actions"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -194,10 +212,10 @@ function KebabMenu({
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-7 z-20 w-40 overflow-hidden rounded-lg border [border-color:var(--color-border)] [background:var(--color-bg-surface)] py-1 shadow-[var(--shadow-card-hover)]"
+          className="absolute right-0 top-7 z-20 w-40 overflow-hidden rounded-lg border [border-color:var(--glass-border)] [background:rgba(36,28,84,0.92)] py-1 shadow-[var(--glass-shadow)] backdrop-blur-xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide [color:var(--color-text-muted)]">Move to</p>
+          <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide [color:var(--color-on-glass-subtle)]">Move to</p>
           {STATUS_OPTIONS.map((opt) => {
             const isCurrent =
               opt.value === ticket.status ||
@@ -209,10 +227,10 @@ function KebabMenu({
                 role="menuitem"
                 disabled={isCurrent || busy}
                 onClick={() => onMove(opt.value)}
-                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm [color:var(--color-text-primary)] transition hover:[background:var(--color-bg-sunken)] disabled:cursor-default disabled:[color:var(--color-text-muted)] disabled:hover:bg-transparent"
+                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-sm [color:var(--color-on-glass)] transition hover:bg-white/10 disabled:cursor-default disabled:[color:var(--color-on-glass-subtle)] disabled:hover:bg-transparent"
               >
                 {opt.label}
-                {isCurrent && <span className="text-[10px] [color:var(--color-text-muted)]">current</span>}
+                {isCurrent && <span className="text-[10px] [color:var(--color-on-glass-subtle)]">current</span>}
               </button>
             )
           })}
@@ -250,10 +268,10 @@ export function TicketCard({
           onSelect(ticket)
         }
       }}
-      className="w-full cursor-pointer rounded-xl border [border-color:var(--color-border)] [background:var(--color-bg-surface)] p-3 text-left shadow-[var(--shadow-card)] transition hover:[border-color:var(--color-ink)] hover:shadow-[var(--shadow-card-hover)]"
+      className="glass-panel glass-interactive w-full cursor-pointer p-3 text-left"
     >
       <div className="mb-1.5 flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-text-secondary)]">
+        <span className="flex items-center gap-1.5 text-xs font-semibold [color:var(--color-on-glass-subtle)]">
           {ticketRef(ticket.id)}
           {ticket.photo_url && (
             <svg
@@ -275,19 +293,19 @@ export function TicketCard({
         />
       </div>
 
-      <p className="line-clamp-2 text-sm font-bold [color:var(--color-text-primary)]">{ticketTitle(ticket)}</p>
-      <p className="mt-0.5 truncate text-xs [color:var(--color-text-secondary)]">{propertyName(ticket)}</p>
+      <p className="line-clamp-2 text-sm font-bold [color:var(--color-on-glass)]">{ticketTitle(ticket)}</p>
+      <p className="mt-0.5 truncate text-xs [color:var(--color-on-glass-muted)]">{propertyName(ticket)}</p>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-        <PriorityBadge severity={ticket.severity} />
+        <PriorityBadge severity={ticket.severity} onGlass />
         {ticket.category?.trim() && (
-          <span className="inline-flex rounded-full [background:var(--color-bg-sunken)] px-2.5 py-0.5 text-xs font-semibold [color:var(--color-text-secondary)]">
+          <span className="glass-chip inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold [color:var(--color-on-glass-muted)]">
             {maintenanceCategoryLabel(ticket.category)}
           </span>
         )}
       </div>
 
-      <div className="mt-3 border-t [border-color:var(--color-border-subtle)] pt-2.5">
+      <div className="mt-3 border-t [border-color:var(--glass-border)] pt-2.5">
         <AssigneeRow assignedTo={ticket.assigned_to} />
       </div>
     </div>
@@ -316,14 +334,14 @@ function BoardColumn({
   return (
     <div className="flex min-w-0 flex-1 flex-col">
       <div className="mb-3 flex items-center gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">{label}</h3>
-        <span className="rounded-full [background:var(--color-bg-sunken)] px-2 py-0.5 text-xs font-semibold [color:var(--color-text-secondary)]">
+        <h3 className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">{label}</h3>
+        <span className="glass-chip rounded-full px-2 py-0.5 text-xs font-semibold [color:var(--color-on-glass-muted)]">
           {tickets.length}
         </span>
       </div>
-      <div className="flex max-h-[calc(100vh-260px)] flex-col gap-2.5 overflow-y-auto rounded-[var(--radius-lg)] [background:var(--color-bg-sunken)] p-2.5">
+      <div className="flex max-h-[calc(100vh-260px)] flex-col gap-2.5 overflow-y-auto rounded-[var(--radius-lg)] [background:rgba(255,255,255,0.04)] p-2.5">
         {tickets.length === 0 ? (
-          <p className="px-2 py-6 text-center text-xs [color:var(--color-text-muted)]">No tickets</p>
+          <p className="px-2 py-6 text-center text-xs [color:var(--color-on-glass-subtle)]">No tickets</p>
         ) : (
           tickets.map((ticket) => (
             <TicketCard
@@ -403,17 +421,17 @@ function TicketModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-[var(--radius-xl)] [background:var(--color-bg-surface)] shadow-[var(--shadow-modal)] md:max-h-none md:rounded-[var(--radius-xl)]">
+      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-[var(--radius-xl)] border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] shadow-[var(--glass-shadow)] backdrop-blur-[var(--glass-blur)] md:max-h-none md:rounded-[var(--radius-xl)]">
         {/* Header */}
-        <div className="flex items-start justify-between border-b [border-color:var(--color-border)] px-6 py-4">
+        <div className="flex items-start justify-between border-b [border-color:var(--glass-border)] px-6 py-4">
           <div>
-            <p className="text-xs font-semibold [color:var(--color-text-secondary)]">{ticketRef(ticket.id)}</p>
-            <h2 className="mt-0.5 text-base font-bold [color:var(--color-text-primary)]">{ticketTitle(ticket)}</h2>
-            <p className="mt-0.5 text-sm [color:var(--color-text-secondary)]">{propertyName(ticket)}</p>
+            <p className="text-xs font-semibold [color:var(--color-on-glass-muted)]">{ticketRef(ticket.id)}</p>
+            <h2 className="mt-0.5 text-base font-bold [color:var(--color-on-glass)]">{ticketTitle(ticket)}</h2>
+            <p className="mt-0.5 text-sm [color:var(--color-on-glass-muted)]">{propertyName(ticket)}</p>
           </div>
           <button
             onClick={onClose}
-            className="ml-4 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [color:var(--color-text-secondary)] transition hover:[background:var(--color-bg-sunken)] hover:[color:var(--color-text-primary)]"
+            className="ml-4 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -427,8 +445,8 @@ function TicketModal({
         <div className="max-h-[calc(92vh-160px)] space-y-4 overflow-y-auto px-6 py-5 md:max-h-[70vh]">
           {/* Badges row */}
           <div className="flex flex-wrap items-center gap-2">
-            <PriorityBadge severity={ticket.severity} />
-            <span className="inline-flex rounded-full [background:var(--color-bg-sunken)] px-2.5 py-0.5 text-xs font-semibold [color:var(--color-ink)]">
+            <PriorityBadge severity={ticket.severity} onGlass />
+            <span className="glass-chip inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold [color:var(--color-on-glass)]">
               {statusLabel(ticket.status)}
             </span>
           </div>
@@ -436,29 +454,29 @@ function TicketModal({
           {/* Property / Unit / Tenant */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Property</p>
-              <p className="mt-1 text-sm font-medium [color:var(--color-text-primary)]">{propertyName(ticket)}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Property</p>
+              <p className="mt-1 text-sm font-medium [color:var(--color-on-glass)]">{propertyName(ticket)}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Unit</p>
-              <p className="mt-1 text-sm font-medium [color:var(--color-text-primary)]">
+              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Unit</p>
+              <p className="mt-1 text-sm font-medium [color:var(--color-on-glass)]">
                 {ticket.units?.unit_number ?? '—'}
               </p>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Tenant</p>
-              <p className="mt-1 text-sm font-medium [color:var(--color-text-primary)]">{tenantLabel(ticket.tenants)}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Tenant</p>
+              <p className="mt-1 text-sm font-medium [color:var(--color-on-glass)]">{tenantLabel(ticket.tenants)}</p>
             </div>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Created</p>
-              <p className="mt-1 text-sm font-medium [color:var(--color-text-primary)]">{formatDate(ticket.created_at)}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Created</p>
+              <p className="mt-1 text-sm font-medium [color:var(--color-on-glass)]">{formatDate(ticket.created_at)}</p>
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Description</p>
-            <p className="mt-1 text-sm leading-relaxed [color:var(--color-text-primary)]">
+            <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Description</p>
+            <p className="mt-1 text-sm leading-relaxed [color:var(--color-on-glass)]">
               {ticket.description ?? 'No description provided.'}
             </p>
           </div>
@@ -466,8 +484,8 @@ function TicketModal({
           {/* Photo */}
           {ticket.photo_url && (
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Photo</p>
-              <div className="mt-2 overflow-hidden rounded-xl border [border-color:var(--color-border)]">
+              <p className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Photo</p>
+              <div className="mt-2 overflow-hidden rounded-xl border [border-color:var(--glass-border)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={ticket.photo_url}
@@ -480,24 +498,24 @@ function TicketModal({
           )}
 
           {/* Editable title / category / status / assignee */}
-          <div className="space-y-3 rounded-xl [background:var(--color-bg-sunken)] px-4 py-3">
+          <div className="glass-chip space-y-3 rounded-xl px-4 py-3">
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Title</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Title</span>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Short summary"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className={`mt-1 w-full px-4 py-2 ${glassInputClass}`}
               />
             </label>
             <div className="grid grid-cols-2 gap-4">
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Category</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Category</span>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="">—</option>
                   {MAINTENANCE_CATEGORIES.map((c) => (
@@ -508,11 +526,11 @@ function TicketModal({
                 </select>
               </label>
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Status</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Status</span>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value as TicketStatus)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   {STATUS_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -523,28 +541,26 @@ function TicketModal({
               </label>
             </div>
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Assigned to</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Assigned to</span>
               <input
                 type="text"
                 value={assignedTo}
                 onChange={(e) => setAssignedTo(e.target.value)}
                 placeholder="Unassigned"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className={`mt-1 w-full px-4 py-2 ${glassInputClass}`}
               />
             </label>
           </div>
 
-          {error && (
-            <p className="rounded-lg [background:var(--color-danger-bg)] px-3 py-2 text-sm [color:var(--color-danger)]">{error}</p>
-          )}
+          {error && <p className={glassErrorClass}>{error}</p>}
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 border-t [border-color:var(--color-border)] px-6 py-4">
+        <div className="flex justify-end gap-2 border-t [border-color:var(--glass-border)] px-6 py-4">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-semibold [color:var(--color-text-secondary)] transition hover:[background:var(--color-bg-sunken)]"
+            className="rounded-lg px-4 py-2 text-sm font-semibold [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
           >
             Cancel
           </button>
@@ -552,7 +568,7 @@ function TicketModal({
             type="button"
             onClick={handleSave}
             disabled={!dirty || saving}
-            className="rounded-lg [background:var(--color-ink)] px-4 py-2 text-sm font-semibold text-white transition hover:[background:var(--color-ink-hover)] disabled:cursor-default disabled:opacity-50"
+            className="rounded-lg [background:var(--color-lavender-300)] px-4 py-2 text-sm font-semibold [color:var(--color-ink)] shadow-[var(--glass-shadow)] transition hover:[background:var(--color-lavender-200)] disabled:cursor-default disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save changes'}
           </button>
@@ -670,12 +686,12 @@ function NewTicketModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-[var(--radius-xl)] [background:var(--color-bg-surface)] shadow-[var(--shadow-modal)] md:max-h-none md:rounded-[var(--radius-xl)]">
-        <div className="flex items-center justify-between border-b [border-color:var(--color-border)] px-6 py-4">
-          <h2 className="text-base font-bold [color:var(--color-text-primary)]">New Ticket</h2>
+      <div className="relative max-h-[92vh] w-full max-w-lg overflow-hidden rounded-t-[var(--radius-xl)] border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] shadow-[var(--glass-shadow)] backdrop-blur-[var(--glass-blur)] md:max-h-none md:rounded-[var(--radius-xl)]">
+        <div className="flex items-center justify-between border-b [border-color:var(--glass-border)] px-6 py-4">
+          <h2 className="text-base font-bold [color:var(--color-on-glass)]">New Ticket</h2>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg [color:var(--color-text-secondary)] transition hover:[background:var(--color-bg-sunken)] hover:[color:var(--color-text-primary)]"
+            className="flex h-8 w-8 items-center justify-center rounded-lg [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
             aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -687,27 +703,27 @@ function NewTicketModal({
 
         {loadError ? (
           <div className="px-6 py-8">
-            <p className="rounded-lg [background:var(--color-danger-bg)] px-3 py-2 text-sm [color:var(--color-danger)]">{loadError}</p>
+            <p className={glassErrorClass}>{loadError}</p>
           </div>
         ) : properties === null ? (
-          <div className="px-6 py-10 text-center text-sm [color:var(--color-text-secondary)]">Loading properties…</div>
+          <div className="px-6 py-10 text-center text-sm [color:var(--color-on-glass-muted)]">Loading properties…</div>
         ) : (
           <form onSubmit={handleSubmit} className="max-h-[calc(92vh-72px)] space-y-4 overflow-y-auto px-6 py-5 md:max-h-[70vh]">
             {scopedProperty ? (
               <div className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Property</span>
-                <p className="mt-1 text-sm font-medium [color:var(--color-text-primary)]">{scopedProperty.name}</p>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Property</span>
+                <p className="mt-1 text-sm font-medium [color:var(--color-on-glass)]">{scopedProperty.name}</p>
               </div>
             ) : (
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Property</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Property</span>
                 <select
                   value={propertyId}
                   onChange={(e) => {
                     setPropertyId(e.target.value)
                     setUnitId('')
                   }}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="">Select a property…</option>
                   {properties.map((p) => (
@@ -720,12 +736,12 @@ function NewTicketModal({
             )}
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Unit</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Unit</span>
               <select
                 value={unitId}
                 onChange={(e) => setUnitId(e.target.value)}
                 disabled={!selectedProperty}
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none disabled:[background:var(--color-bg-sunken)] disabled:[color:var(--color-text-muted)]"
+                className={`mt-1 w-full disabled:cursor-not-allowed disabled:[color:var(--color-on-glass-subtle)] disabled:opacity-60 ${glassSelectClass}`}
               >
                 <option value="">{selectedProperty ? 'Select a unit…' : 'Select a property first'}</option>
                 {units.map((u) => (
@@ -737,8 +753,8 @@ function NewTicketModal({
             </label>
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">
-                Title <span className="[color:var(--color-danger)]">*</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">
+                Title <span className="[color:#ffb4b4]">*</span>
               </span>
               <input
                 type="text"
@@ -746,16 +762,16 @@ function NewTicketModal({
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 placeholder="e.g. Leaking faucet"
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className={`mt-1 w-full px-4 py-2 ${glassInputClass}`}
               />
             </label>
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Category</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Category</span>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as MaintenanceCategory | '')}
-                className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className={`mt-1 w-full ${glassSelectClass}`}
               >
                 <option value="">Select a category…</option>
                 {MAINTENANCE_CATEGORIES.map((c) => (
@@ -767,8 +783,8 @@ function NewTicketModal({
             </label>
 
             <label className="block">
-              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">
-                Description <span className="[color:var(--color-danger)]">*</span>
+              <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">
+                Description <span className="[color:#ffb4b4]">*</span>
               </span>
               <textarea
                 value={description}
@@ -776,17 +792,17 @@ function NewTicketModal({
                 required
                 rows={3}
                 placeholder="Describe the issue…"
-                className="mt-1 w-full resize-none rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                className={`mt-1 ${glassTextareaClass}`}
               />
             </label>
 
             <div className="grid grid-cols-2 gap-4">
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Priority</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Priority</span>
                 <select
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value as 'mild' | 'moderate' | 'severe')}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="mild">Low</option>
                   <option value="moderate">Normal</option>
@@ -794,33 +810,31 @@ function NewTicketModal({
                 </select>
               </label>
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Assigned to</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Assigned to</span>
                 <input
                   type="text"
                   value={assignedTo}
                   onChange={(e) => setAssignedTo(e.target.value)}
                   placeholder="Optional"
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full px-4 py-2 ${glassInputClass}`}
                 />
               </label>
             </div>
 
-            {submitError && (
-              <p className="rounded-lg [background:var(--color-danger-bg)] px-3 py-2 text-sm [color:var(--color-danger)]">{submitError}</p>
-            )}
+            {submitError && <p className={glassErrorClass}>{submitError}</p>}
 
             <div className="flex justify-end gap-2 pt-1">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg px-4 py-2 text-sm font-semibold [color:var(--color-text-secondary)] transition hover:[background:var(--color-bg-sunken)]"
+                className="rounded-lg px-4 py-2 text-sm font-semibold [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg [background:var(--color-ink)] px-4 py-2 text-sm font-semibold text-white transition hover:[background:var(--color-ink-hover)] disabled:cursor-default disabled:opacity-50"
+                className="rounded-lg [background:var(--color-lavender-300)] px-4 py-2 text-sm font-semibold [color:var(--color-ink)] shadow-[var(--glass-shadow)] transition hover:[background:var(--color-lavender-200)] disabled:cursor-default disabled:opacity-50"
               >
                 {submitting ? 'Creating…' : 'Create ticket'}
               </button>
@@ -851,6 +865,30 @@ function matchesSearch(ticket: Ticket, query: string): boolean {
     .toLowerCase()
   return haystack.includes(q)
 }
+
+// ── Glass toolbar controls ─────────────────────────────────────────────────────
+// Translucent pill inputs/selects that sit directly on the gradient (the desktop
+// toolbar). Follows the form-control-on-glass conventions established by the
+// Settings pass (see agent memory): glass-bg-strong fill, glass-border-strong,
+// lavender focus ring via --shadow-focus, and a dark on-theme <option> popup so
+// the native dropdown list stays readable.
+export const glassInputClass =
+  'rounded-full border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] backdrop-blur-md text-base [color:var(--color-on-glass)] placeholder:[color:var(--color-on-glass-subtle)] transition focus:[border-color:var(--color-lavender-300)] focus:shadow-[var(--shadow-focus)] focus:outline-none'
+
+export const glassSelectClass =
+  'rounded-full border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] backdrop-blur-md px-3.5 py-1.5 text-base font-medium [color:var(--color-on-glass)] transition [&>option]:[background:var(--color-ink)] [&>option]:[color:var(--color-on-glass)] focus:[border-color:var(--color-lavender-300)] focus:shadow-[var(--shadow-focus)] focus:outline-none'
+
+// Multi-line variant of glassInputClass for modal <textarea>s — same on-glass
+// token treatment (glass-bg-strong fill, glass-border-strong, on-glass text,
+// lavender --shadow-focus ring) but a rounded rectangle instead of a pill, since
+// a rounded-full multi-line field is unusable.
+const glassTextareaClass =
+  'w-full resize-none rounded-[var(--radius-md)] border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] backdrop-blur-md px-4 py-2 text-base [color:var(--color-on-glass)] placeholder:[color:var(--color-on-glass-subtle)] transition focus:[border-color:var(--color-lavender-300)] focus:shadow-[var(--shadow-focus)] focus:outline-none'
+
+// Inline error banner on the glass board (matches the Overview error card:
+// translucent danger fill + brightened light-red text).
+export const glassErrorClass =
+  'rounded-[var(--radius-md)] border [border-color:rgba(255,180,180,0.4)] [background:rgba(214,69,69,0.14)] px-3 py-2 text-sm [color:#ffb4b4]'
 
 export default function TicketBoard({
   tickets,
@@ -1020,13 +1058,13 @@ export default function TicketBoard({
       {/* Request Board heading + search + new ticket */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold [color:var(--color-text-primary)]">Request Board</h2>
-          <span className="text-sm [color:var(--color-text-secondary)]">{filtered.length} total</span>
+          <h2 className="text-base font-bold [color:var(--color-on-glass)]">Request Board</h2>
+          <span className="text-sm [color:var(--color-on-glass-muted)]">{filtered.length} total</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
             <svg
-              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 [color:var(--color-text-muted)]"
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 [color:var(--color-on-glass-subtle)]"
               width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
             >
               <circle cx="11" cy="11" r="8" />
@@ -1037,13 +1075,13 @@ export default function TicketBoard({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tenants"
-              className="w-56 rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-base [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+              className={`w-56 py-2 pl-8 pr-3 ${glassInputClass}`}
             />
           </div>
           <button
             type="button"
             onClick={() => setShowNew(true)}
-            className="whitespace-nowrap rounded-lg [background:var(--color-ink)] px-4 py-2 text-sm font-semibold text-white transition hover:[background:var(--color-ink-hover)]"
+            className="whitespace-nowrap rounded-full [background:var(--color-lavender-300)] px-4 py-2 text-sm font-semibold [color:var(--color-ink)] shadow-[var(--glass-shadow)] transition hover:[background:var(--color-lavender-200)]"
           >
             New Ticket
           </button>
@@ -1056,7 +1094,7 @@ export default function TicketBoard({
           <select
             value={propertyFilter}
             onChange={(e) => setPropertyFilter(e.target.value)}
-            className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+            className={glassSelectClass}
           >
             <option value="">All properties</option>
             {propertyOptions.map((p) => (
@@ -1069,7 +1107,7 @@ export default function TicketBoard({
         <select
           value={unitFilter}
           onChange={(e) => setUnitFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className={glassSelectClass}
         >
           <option value="">All units</option>
           {unitOptions.map((u) => (
@@ -1081,7 +1119,7 @@ export default function TicketBoard({
         <select
           value={severityFilter}
           onChange={(e) => setSeverityFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className={glassSelectClass}
         >
           <option value="">All severities</option>
           {SEVERITY_OPTIONS.map((s) => (
@@ -1093,7 +1131,7 @@ export default function TicketBoard({
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-1.5 text-base font-medium [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+          className={glassSelectClass}
         >
           <option value="">All categories</option>
           {MAINTENANCE_CATEGORIES.map((c) => (
@@ -1106,7 +1144,7 @@ export default function TicketBoard({
           <button
             type="button"
             onClick={clearFilters}
-            className="text-xs font-semibold [color:var(--color-ink)] transition hover:underline"
+            className="text-xs font-semibold [color:var(--chart-line-secondary)] transition hover:underline"
           >
             Clear filters
           </button>
@@ -1114,7 +1152,7 @@ export default function TicketBoard({
       </div>
 
       {moveError && (
-        <p className="mb-3 rounded-lg [background:var(--color-danger-bg)] px-3 py-2 text-sm [color:var(--color-danger)]">{moveError}</p>
+        <p className={`mb-3 ${glassErrorClass}`}>{moveError}</p>
       )}
 
       {/* Columns */}

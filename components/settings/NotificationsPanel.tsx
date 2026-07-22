@@ -34,7 +34,7 @@ function Toggle({ name, defaultChecked }: { name: string; defaultChecked: boolea
   return (
     <label className="relative inline-flex shrink-0 cursor-pointer items-center">
       <input type="checkbox" name={name} defaultChecked={defaultChecked} className="peer sr-only" />
-      <div className="relative h-6 w-11 rounded-full transition-colors [background:var(--color-input-border)] after:absolute after:left-[3px] after:top-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:content-[''] peer-checked:[background:var(--color-ink)] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--color-ink)]" />
+      <div className="relative h-6 w-11 rounded-full transition-colors [background:rgba(255,255,255,0.22)] after:absolute after:left-[3px] after:top-[3px] after:h-[18px] after:w-[18px] after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:content-[''] peer-checked:[background:var(--color-lavender-300)] peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-lavender-300)]" />
     </label>
   )
 }
@@ -53,7 +53,7 @@ export default function NotificationsPanel({
       <PushStatusRow />
 
       <div>
-        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-1 pb-1 text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">
+        <div className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-1 pb-1 text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">
           <span />
           <span className="text-center">Push</span>
           <span className="text-center">SMS</span>
@@ -64,13 +64,13 @@ export default function NotificationsPanel({
           return (
             <div
               key={event}
-              className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 border-t py-3 [border-color:var(--color-border-subtle)]"
+              className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 border-t py-3 [border-color:var(--glass-border)]"
             >
               <div className="min-w-0">
-                <p className="text-sm font-semibold [color:var(--color-text-primary)]">
+                <p className="text-sm font-semibold [color:var(--color-on-glass)]">
                   {EVENT_LABELS[event].title}
                 </p>
-                <p className="mt-0.5 text-sm [color:var(--color-text-secondary)]">
+                <p className="mt-0.5 text-sm [color:var(--color-on-glass-muted)]">
                   {EVENT_LABELS[event].description}
                 </p>
               </div>
@@ -85,12 +85,12 @@ export default function NotificationsPanel({
         })}
       </div>
 
-      <div className="h-px [background:var(--color-border-subtle)]" />
+      <div className="h-px [background:var(--glass-border)]" />
 
       <div className="flex items-center justify-between gap-6 py-2">
         <div className="min-w-0">
-          <p className="text-sm font-semibold [color:var(--color-text-primary)]">Email notifications</p>
-          <p className="mt-0.5 text-sm [color:var(--color-text-secondary)]">
+          <p className="text-sm font-semibold [color:var(--color-on-glass)]">Email notifications</p>
+          <p className="mt-0.5 text-sm [color:var(--color-on-glass-muted)]">
             Receive an email when tenants send new messages.
           </p>
         </div>

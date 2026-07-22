@@ -1,7 +1,7 @@
 import styles from '@/components/conversations/ConversationView.module.css'
 
 function Block({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse rounded [background:var(--color-bg-sunken)] ${className}`} />
+  return <div className={`animate-pulse rounded [background:rgba(255,255,255,0.10)] ${className}`} />
 }
 
 export default function Loading() {

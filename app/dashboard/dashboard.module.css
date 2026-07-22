@@ -1,9 +1,13 @@
+/* Dark purple gradient is the app-wide background for the dashboard. Every
+   page's own root container also paints --gradient-app-bg (so it can scroll
+   independently while the fixed gradient shows through), but it's declared
+   here too as the shell-level fallback now that every page has migrated. */
 .shell {
   display: flex;
   height: 100vh;
   height: 100dvh; /* avoids the address-bar jump on mobile Safari */
   overflow: hidden;
-  background: var(--color-bg-base);
+  background: var(--gradient-app-bg);
 }
 
 /* Column to the right of the icon sidebar */
@@ -21,7 +25,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--color-bg-base);
+  background: var(--gradient-app-bg);
 }
 
 .emptyState {

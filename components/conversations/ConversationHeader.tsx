@@ -58,12 +58,12 @@ const RefreshIcon = (
 // desktop-only Call button can override it (hidden on mobile) without a
 // conflicting display utility.
 const HEADER_BTN =
-  'items-center justify-center w-9 h-9 rounded-[10px] border-none bg-transparent text-text-secondary cursor-pointer transition-colors duration-150 hover:bg-border hover:text-text-primary focus-visible:[outline:2px_solid_var(--color-ink)] focus-visible:outline-offset-2'
+  'items-center justify-center w-9 h-9 rounded-[10px] border-none bg-transparent [color:var(--color-on-glass-muted)] cursor-pointer transition-colors duration-150 hover:[background:rgba(255,255,255,0.1)] hover:[color:var(--color-on-glass)] focus-visible:[outline:2px_solid_var(--color-on-glass)] focus-visible:outline-offset-2'
 
 // Kebab menu row — display class applied per-instance (mobile-only rows use
 // flex md:hidden).
 const MORE_MENU_ITEM =
-  'items-center gap-2.5 w-full py-2.5 px-3.5 border-none bg-transparent rounded-[8px] text-sm text-text-primary cursor-pointer text-left transition-colors duration-150 hover:bg-bg-sunken'
+  'items-center gap-2.5 w-full py-2.5 px-3.5 border-none bg-transparent rounded-[8px] text-sm [color:var(--color-on-glass)] cursor-pointer text-left transition-colors duration-150 hover:[background:rgba(255,255,255,0.1)]'
 
 type ConversationHeaderProps = {
   conversationId: string
@@ -179,17 +179,17 @@ export default function ConversationHeader({
   }
 
   return (
-    <header className="flex items-center justify-between px-4 h-16 shrink-0 bg-bg-surface border-b border-border gap-2 md:px-6 md:h-[72px] md:gap-4">
+    <header className="flex items-center justify-between px-4 h-16 shrink-0 [background:var(--glass-bg)] backdrop-blur-[var(--glass-blur)] border-b [border-color:var(--glass-border)] gap-2 md:px-6 md:h-[72px] md:gap-4">
       <div className="flex items-center gap-2.5 min-w-0 md:gap-3.5">
         <Link
           href="/dashboard/conversations"
-          className="flex items-center justify-center w-8 h-8 shrink-0 rounded-[10px] text-text-secondary transition-colors duration-150 hover:bg-bg-sunken hover:text-text-primary focus-visible:[outline:2px_solid_var(--color-ink)] focus-visible:outline-offset-2 md:hidden"
+          className="flex items-center justify-center w-8 h-8 shrink-0 rounded-[10px] [color:var(--color-on-glass-muted)] transition-colors duration-150 hover:[background:rgba(255,255,255,0.1)] hover:[color:var(--color-on-glass)] focus-visible:[outline:2px_solid_var(--color-on-glass)] focus-visible:outline-offset-2 md:hidden"
           aria-label="Back to conversations"
         >
           {BackIcon}
         </Link>
         <div
-          className="shrink-0 w-9 h-9 rounded-[13px] bg-ink text-btn-text text-xs font-bold flex items-center justify-center tracking-[0.02em] overflow-hidden md:w-[42px] md:h-[42px] md:text-sm"
+          className="shrink-0 w-9 h-9 rounded-[13px] [background:var(--glass-bg-strong)] border [border-color:var(--glass-border)] [color:var(--color-on-glass)] text-xs font-bold flex items-center justify-center tracking-[0.02em] overflow-hidden md:w-[42px] md:h-[42px] md:text-sm"
           aria-hidden="true"
         >
           {photoUrl ? (
@@ -201,13 +201,13 @@ export default function ConversationHeader({
         </div>
         <div className="flex flex-col gap-0.5 min-w-0">
           <div className="flex items-center gap-2.5">
-            <h1 className="text-base font-bold text-text-primary m-0 whitespace-nowrap overflow-hidden text-ellipsis">
+            <h1 className="text-base font-bold [color:var(--color-on-glass)] m-0 whitespace-nowrap overflow-hidden text-ellipsis">
               {displayName}
             </h1>
             <div className="relative shrink-0" ref={statusMenuWrapRef}>
               <button
-                className={`inline-flex items-center gap-1.5 text-[0.625rem] font-bold [font-family:inherit] border border-transparent rounded-pill py-[0.15rem] px-2 leading-[1.6] cursor-pointer transition duration-150 hover:enabled:border-current active:enabled:opacity-80 focus-visible:[outline:2px_solid_currentColor] focus-visible:outline-offset-2 disabled:cursor-default disabled:opacity-70 ${
-                  escalated ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'
+                className={`inline-flex items-center gap-1.5 text-[0.625rem] font-bold [font-family:inherit] border [border-color:var(--glass-border)] [background:var(--glass-bg-strong)] rounded-full py-[0.15rem] px-2 leading-[1.6] cursor-pointer transition duration-150 hover:enabled:border-current active:enabled:opacity-80 focus-visible:[outline:2px_solid_currentColor] focus-visible:outline-offset-2 disabled:cursor-default disabled:opacity-70 ${
+                  escalated ? '[color:#ffb4b4]' : '[color:#7ee0b8]'
                 }`}
                 type="button"
                 onClick={() => setStatusMenuOpen((prev) => !prev)}
@@ -223,52 +223,52 @@ export default function ConversationHeader({
               </button>
               {statusMenuOpen && (
                 <div
-                  className="absolute left-0 top-[calc(100%+6px)] bg-bg-surface border border-border rounded-[12px] shadow-card-hover p-1.5 min-w-[220px] z-[200]"
+                  className="absolute left-0 top-[calc(100%+6px)] [background:var(--glass-bg-strong)] backdrop-blur-[var(--glass-blur)] border [border-color:var(--glass-border)] rounded-[12px] shadow-[var(--glass-shadow)] p-1.5 min-w-[220px] z-[200]"
                   role="menu"
                 >
                   <button
-                    className="flex items-center gap-2.5 w-full py-2 px-3 border-none bg-transparent rounded-[8px] text-text-primary cursor-pointer text-left transition-colors duration-150 hover:bg-bg-sunken focus-visible:[outline:2px_solid_var(--color-ink)] focus-visible:-outline-offset-2"
+                    className="flex items-center gap-2.5 w-full py-2 px-3 border-none bg-transparent rounded-[8px] [color:var(--color-on-glass)] cursor-pointer text-left transition-colors duration-150 hover:[background:rgba(255,255,255,0.1)] focus-visible:[outline:2px_solid_var(--color-on-glass)] focus-visible:-outline-offset-2"
                     role="menuitemradio"
                     aria-checked={escalated}
                     type="button"
                     onClick={() => handleSetStatus('escalated')}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-danger shrink-0" aria-hidden="true" />
+                    <span className="w-1.5 h-1.5 rounded-full [background:#ffb4b4] shrink-0" aria-hidden="true" />
                     <span className="flex flex-col gap-[0.0625rem] flex-1 min-w-0">
                       <span className="text-[0.8125rem] font-semibold">Escalated</span>
-                      <span className="text-[0.6875rem] text-text-muted">AI bot paused</span>
+                      <span className="text-[0.6875rem] [color:var(--color-on-glass-subtle)]">AI bot paused</span>
                     </span>
                     {escalated && (
-                      <span className="inline-flex items-center text-ink shrink-0">{CheckIcon}</span>
+                      <span className="inline-flex items-center [color:var(--color-on-glass)] shrink-0">{CheckIcon}</span>
                     )}
                   </button>
                   <button
-                    className="flex items-center gap-2.5 w-full py-2 px-3 border-none bg-transparent rounded-[8px] text-text-primary cursor-pointer text-left transition-colors duration-150 hover:bg-bg-sunken focus-visible:[outline:2px_solid_var(--color-ink)] focus-visible:-outline-offset-2"
+                    className="flex items-center gap-2.5 w-full py-2 px-3 border-none bg-transparent rounded-[8px] [color:var(--color-on-glass)] cursor-pointer text-left transition-colors duration-150 hover:[background:rgba(255,255,255,0.1)] focus-visible:[outline:2px_solid_var(--color-on-glass)] focus-visible:-outline-offset-2"
                     role="menuitemradio"
                     aria-checked={!escalated}
                     type="button"
                     onClick={() => handleSetStatus('active')}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />
+                    <span className="w-1.5 h-1.5 rounded-full [background:#7ee0b8] shrink-0" aria-hidden="true" />
                     <span className="flex flex-col gap-[0.0625rem] flex-1 min-w-0">
                       <span className="text-[0.8125rem] font-semibold">AI Active</span>
-                      <span className="text-[0.6875rem] text-text-muted">Bot replies normally</span>
+                      <span className="text-[0.6875rem] [color:var(--color-on-glass-subtle)]">Bot replies normally</span>
                     </span>
                     {!escalated && (
-                      <span className="inline-flex items-center text-ink shrink-0">{CheckIcon}</span>
+                      <span className="inline-flex items-center [color:var(--color-on-glass)] shrink-0">{CheckIcon}</span>
                     )}
                   </button>
                 </div>
               )}
             </div>
           </div>
-          <p className="text-xs text-text-muted m-0 flex items-center gap-1.5">
+          <p className="text-xs [color:var(--color-on-glass-muted)] m-0 flex items-center gap-1.5">
             {phone}
             <span className="opacity-50">·</span>
             via SMS
           </p>
           {statusError && (
-            <p className="text-[0.6875rem] text-danger mt-0.5 mx-0 mb-0" role="alert">
+            <p className="text-[0.6875rem] [color:#ffb4b4] mt-0.5 mx-0 mb-0" role="alert">
               {statusError}
             </p>
           )}
@@ -277,7 +277,7 @@ export default function ConversationHeader({
 
       <div className="flex items-center gap-1 shrink-0">
         <button
-          className={`flex ${HEADER_BTN}${searchOpen ? ' bg-bg-sunken! text-ink!' : ''}`}
+          className={`flex ${HEADER_BTN}${searchOpen ? ' [background:var(--glass-bg-strong)]! [color:var(--color-on-glass)]!' : ''}`}
           aria-label="Search messages"
           aria-pressed={searchOpen}
           onClick={onToggleSearch}
@@ -293,7 +293,7 @@ export default function ConversationHeader({
         </span>
         <div className="relative" ref={moreMenuWrapRef}>
           <button
-            className={`flex ${HEADER_BTN}${moreMenuOpen ? ' bg-bg-sunken! text-ink!' : ''}`}
+            className={`flex ${HEADER_BTN}${moreMenuOpen ? ' [background:var(--glass-bg-strong)]! [color:var(--color-on-glass)]!' : ''}`}
             aria-label="More options"
             aria-haspopup="menu"
             aria-expanded={moreMenuOpen}
@@ -304,7 +304,7 @@ export default function ConversationHeader({
           </button>
           {moreMenuOpen && (
             <div
-              className="absolute right-0 top-[calc(100%+6px)] bg-bg-surface border border-border rounded-[12px] shadow-card-hover p-1.5 min-w-[180px] z-[200]"
+              className="absolute right-0 top-[calc(100%+6px)] [background:var(--glass-bg-strong)] backdrop-blur-[var(--glass-blur)] border [border-color:var(--glass-border)] rounded-[12px] shadow-[var(--glass-shadow)] p-1.5 min-w-[180px] z-[200]"
               role="menu"
             >
               {/* Call/Refresh are standalone header icons on desktop (see the

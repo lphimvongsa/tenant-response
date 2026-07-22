@@ -36,13 +36,15 @@ function truncate(text: string, max: number): string {
   return text.length > max ? text.slice(0, max) + '…' : text
 }
 
-// Deterministic avatar hue from a string
+// Deterministic avatar hue from a string. Glass-redesign: translucent tinted
+// chips with a bright matching label so each contact still reads distinctly
+// while every avatar sits as frosted glass on the dark gradient.
 const AVATAR_PALETTES = [
-  { bg: 'var(--color-ink)', text: 'var(--color-on-ink)' },
-  { bg: 'var(--color-success)', text: 'var(--color-on-ink)' },
-  { bg: 'var(--color-warning)', text: 'var(--color-on-ink)' },
-  { bg: 'var(--color-danger)', text: 'var(--color-on-ink)' },
-  { bg: 'var(--color-text-secondary)', text: 'var(--color-on-ink)' },
+  { bg: 'rgba(183, 166, 255, 0.28)', text: '#e4dcff' }, // lavender
+  { bg: 'rgba(90, 220, 170, 0.24)', text: '#a9f0d4' },  // mint
+  { bg: 'rgba(245, 190, 110, 0.24)', text: '#ffdcac' }, // amber
+  { bg: 'rgba(255, 130, 130, 0.24)', text: '#ffc2c2' }, // rose
+  { bg: 'rgba(140, 195, 255, 0.24)', text: '#c4ddff' }, // sky
 ]
 function avatarPalette(str: string) {
   const hash = str.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
@@ -127,7 +129,7 @@ export default function ConversationList({ conversations, basePath = '/dashboard
               {/* Avatar */}
               <div
                 className={styles.avatar}
-                style={{ background: active ? 'var(--color-ink)' : palette.bg, color: palette.text }}
+                style={{ background: palette.bg, color: palette.text }}
                 aria-hidden="true"
               >
                 {initials}

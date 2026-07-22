@@ -9,6 +9,9 @@ import {
   COLUMNS,
   SEVERITY_OPTIONS,
   TicketCard,
+  glassInputClass,
+  glassSelectClass,
+  glassErrorClass,
   type Ticket,
   type TicketStatus,
   type ScopedProperty,
@@ -111,21 +114,21 @@ export default function MobileTicketList({
       {/* Heading + New Ticket */}
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-base font-bold [color:var(--color-text-primary)]">Request Board</h2>
-          <span className="text-sm [color:var(--color-text-secondary)]">{tickets.length} total</span>
+          <h2 className="text-base font-bold [color:var(--color-on-glass)]">Request Board</h2>
+          <span className="text-sm [color:var(--color-on-glass-muted)]">{tickets.length} total</span>
         </div>
         <button
           type="button"
           onClick={onNewTicket}
           aria-label="New Ticket"
-          className="flex h-9 w-9 items-center justify-center rounded-full [background:var(--color-ink)] text-white shadow-[var(--shadow-button)]"
+          className="flex h-9 w-9 items-center justify-center rounded-full [background:var(--color-lavender-300)] [color:var(--color-ink)] shadow-[var(--glass-shadow)] transition hover:[background:var(--color-lavender-200)]"
         >
           {PlusIcon}
         </button>
       </div>
 
       {/* Segmented status control */}
-      <div className="mb-3 flex items-center gap-1 overflow-x-auto rounded-full [background:var(--color-bg-sunken)] p-1">
+      <div className="mb-3 flex items-center gap-1 overflow-x-auto rounded-full border [border-color:var(--glass-border)] [background:rgba(255,255,255,0.06)] p-1">
         {COLUMNS.map((col) => {
           const count = tickets.filter((t) => col.statuses.includes(t.status)).length
           const active = col.key === activeColumn.key
@@ -137,8 +140,8 @@ export default function MobileTicketList({
               aria-pressed={active}
               className={`flex-1 whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors ${
                 active
-                  ? '[background:var(--color-bg-surface)] [color:var(--color-ink)] shadow-[var(--shadow-card)]'
-                  : '[color:var(--color-text-secondary)]'
+                  ? '[background:var(--glass-bg-strong)] [color:var(--color-on-glass)] shadow-[var(--glass-shadow)]'
+                  : '[color:var(--color-on-glass-muted)]'
               }`}
             >
               {col.label} <span className="tabular-nums">{count}</span>
@@ -150,7 +153,7 @@ export default function MobileTicketList({
       {/* Search + Filters */}
       <div className="mb-3 flex items-center gap-2">
         <div className="relative flex-1">
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 [color:var(--color-text-muted)]">
+          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 [color:var(--color-on-glass-subtle)]">
             {SearchIcon}
           </span>
           <input
@@ -158,30 +161,30 @@ export default function MobileTicketList({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search tenants"
-            className="w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] py-2 pl-8 pr-3 text-base [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+            className={`w-full py-2 pl-8 pr-3 ${glassInputClass}`}
           />
         </div>
         <button
           type="button"
           onClick={() => setShowFilters(true)}
           aria-label="Filters"
-          className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] [color:var(--color-text-secondary)]"
+          className="relative flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] backdrop-blur-md [color:var(--color-on-glass-muted)]"
         >
           {FilterIcon}
           {filtersActive && (
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full [background:var(--color-ink)]" aria-hidden="true" />
+            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full [background:var(--color-lavender-300)]" aria-hidden="true" />
           )}
         </button>
       </div>
 
       {moveError && (
-        <p className="mb-3 rounded-lg [background:var(--color-danger-bg)] px-3 py-2 text-sm [color:var(--color-danger)]">{moveError}</p>
+        <p className={`mb-3 ${glassErrorClass}`}>{moveError}</p>
       )}
 
       {/* List */}
       <div className="flex flex-col gap-2.5 pb-[calc(var(--bottom-nav-height)+1rem)]">
         {visible.length === 0 ? (
-          <p className="px-2 py-10 text-center text-sm [color:var(--color-text-muted)]">No tickets</p>
+          <p className="px-2 py-10 text-center text-sm [color:var(--color-on-glass-subtle)]">No tickets</p>
         ) : (
           visible.map((ticket) => (
             <TicketCard
@@ -206,14 +209,14 @@ export default function MobileTicketList({
             if (e.target === e.currentTarget) setShowFilters(false)
           }}
         >
-          <div className="w-full max-h-[80vh] overflow-y-auto rounded-t-[var(--radius-xl)] [background:var(--color-bg-surface)] p-5 shadow-[var(--shadow-modal)]">
+          <div className="w-full max-h-[80vh] overflow-y-auto rounded-t-[var(--radius-xl)] border [border-color:var(--glass-border-strong)] [background:var(--glass-bg-strong)] p-5 shadow-[var(--glass-shadow)] backdrop-blur-[var(--glass-blur)]">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-base font-bold [color:var(--color-text-primary)]">Filters</h3>
+              <h3 className="text-base font-bold [color:var(--color-on-glass)]">Filters</h3>
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
                 aria-label="Close"
-                className="flex h-8 w-8 items-center justify-center rounded-lg [color:var(--color-text-secondary)] hover:[background:var(--color-bg-sunken)]"
+                className="flex h-8 w-8 items-center justify-center rounded-lg [color:var(--color-on-glass-muted)] transition hover:bg-white/10 hover:[color:var(--color-on-glass)]"
               >
                 {XIcon}
               </button>
@@ -222,11 +225,11 @@ export default function MobileTicketList({
             <div className="flex flex-col gap-3">
               {!scopeProperty && (
                 <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Property</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Property</span>
                   <select
                     value={propertyFilter}
                     onChange={(e) => onPropertyFilterChange(e.target.value)}
-                    className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                    className={`mt-1 w-full ${glassSelectClass}`}
                   >
                     <option value="">All properties</option>
                     {propertyOptions.map((p) => (
@@ -237,11 +240,11 @@ export default function MobileTicketList({
               )}
 
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Unit</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Unit</span>
                 <select
                   value={unitFilter}
                   onChange={(e) => onUnitFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="">All units</option>
                   {unitOptions.map((u) => (
@@ -253,11 +256,11 @@ export default function MobileTicketList({
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Severity</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Severity</span>
                 <select
                   value={severityFilter}
                   onChange={(e) => onSeverityFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="">All severities</option>
                   {SEVERITY_OPTIONS.map((s) => (
@@ -267,11 +270,11 @@ export default function MobileTicketList({
               </label>
 
               <label className="block">
-                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-text-secondary)]">Category</span>
+                <span className="text-xs font-semibold uppercase tracking-wide [color:var(--color-on-glass-muted)]">Category</span>
                 <select
                   value={categoryFilter}
                   onChange={(e) => onCategoryFilterChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border [border-color:var(--color-input-border)] [background:var(--color-input-bg)] px-2.5 py-2 text-base [color:var(--color-text-primary)] focus:[border-color:var(--color-input-border-focus)] focus:outline-none"
+                  className={`mt-1 w-full ${glassSelectClass}`}
                 >
                   <option value="">All categories</option>
                   {MAINTENANCE_CATEGORIES.map((c) => (
@@ -286,7 +289,7 @@ export default function MobileTicketList({
                 <button
                   type="button"
                   onClick={onClearFilters}
-                  className="text-sm font-semibold [color:var(--color-ink)]"
+                  className="text-sm font-semibold [color:var(--chart-line-secondary)] transition hover:underline"
                 >
                   Clear filters
                 </button>
@@ -294,7 +297,7 @@ export default function MobileTicketList({
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
-                className="rounded-lg [background:var(--color-ink)] px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-lg [background:var(--color-lavender-300)] px-4 py-2 text-sm font-semibold [color:var(--color-ink)] shadow-[var(--glass-shadow)] transition hover:[background:var(--color-lavender-200)]"
               >
                 Done
               </button>

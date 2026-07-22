@@ -14,7 +14,12 @@ interface BusinessSettingsPanelProps {
 }
 
 const inputClass =
-  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-base outline-none transition [background:var(--color-input-bg)] [border-color:var(--color-input-border)] [color:var(--color-text-primary)] placeholder:[color:var(--color-text-muted)] focus:[border-color:var(--color-input-border-focus)] focus:shadow-[var(--shadow-focus)]'
+  'w-full rounded-[var(--radius-sm)] border px-3 py-2 text-base outline-none transition [background:var(--glass-bg-strong)] [border-color:var(--glass-border-strong)] [color:var(--color-on-glass)] placeholder:[color:var(--color-on-glass-subtle)] focus:[border-color:var(--color-lavender-300)] focus:shadow-[var(--shadow-focus)]'
+
+// The dropdown popup inherits the control's text color, so pin readable
+// option colors explicitly — a white-on-white list would otherwise be
+// invisible in browsers that paint the popup with the select's own color.
+const selectClass = `${inputClass} [&>option]:[background:var(--color-ink)] [&>option]:[color:var(--color-on-glass)]`
 
 // Value = the 0=Sun..6=Sat convention BusinessHours.days already uses
 // (lib/utils/time.ts), displayed in natural Mon-first week order.
@@ -44,7 +49,7 @@ const TIMEZONES = [
 function FieldRow({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
-      <label htmlFor={htmlFor} className="text-sm font-medium [color:var(--color-text-secondary)] sm:w-32 sm:shrink-0 sm:pt-2">
+      <label htmlFor={htmlFor} className="text-sm font-medium [color:var(--color-on-glass-muted)] sm:w-32 sm:shrink-0 sm:pt-2">
         {label}
       </label>
       <div className="min-w-0 flex-1">{children}</div>
@@ -55,8 +60,8 @@ function FieldRow({ label, htmlFor, children }: { label: string; htmlFor: string
 function ReadOnlyValue({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
-      <p className="text-sm font-medium [color:var(--color-text-secondary)] sm:w-32 sm:shrink-0">{label}</p>
-      <p className="text-sm [color:var(--color-text-primary)]">{value || '—'}</p>
+      <p className="text-sm font-medium [color:var(--color-on-glass-muted)] sm:w-32 sm:shrink-0">{label}</p>
+      <p className="text-sm [color:var(--color-on-glass)]">{value || '—'}</p>
     </div>
   )
 }
@@ -77,7 +82,7 @@ export default function BusinessSettingsPanel({
 
     return (
       <div className="flex flex-col gap-4">
-        <p className="text-sm [color:var(--color-text-secondary)]">
+        <p className="text-sm [color:var(--color-on-glass-muted)]">
           Only admins can edit business hours and the escalation contact.
         </p>
         <ReadOnlyValue label="Timezone" value={businessHours?.timezone ?? ''} />
@@ -102,7 +107,7 @@ export default function BusinessSettingsPanel({
           name="timezone"
           required
           defaultValue={businessHours?.timezone ?? ''}
-          className={inputClass}
+          className={selectClass}
         >
           <option value="" disabled>
             Select a timezone
@@ -120,13 +125,14 @@ export default function BusinessSettingsPanel({
           {DAYS.map((day) => (
             <label
               key={day.value}
-              className="flex items-center gap-1.5 rounded-[var(--radius-sm)] border px-2.5 py-1.5 text-sm font-medium [border-color:var(--color-input-border)] [color:var(--color-text-primary)] has-[:checked]:[background:var(--color-bg-sunken)]"
+              className="flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border px-2.5 py-1.5 text-sm font-medium transition-colors [border-color:var(--glass-border)] [color:var(--color-on-glass)] has-[:checked]:[background:var(--color-lavender-300)] has-[:checked]:[border-color:var(--color-lavender-300)] has-[:checked]:[color:var(--color-ink)]"
             >
               <input
                 type="checkbox"
                 name="days"
                 value={day.value}
                 defaultChecked={businessHours?.days?.includes(day.value) ?? false}
+                className="accent-[var(--color-ink)]"
               />
               {day.label}
             </label>
@@ -154,12 +160,12 @@ export default function BusinessSettingsPanel({
           defaultValue={businessHours?.end ?? '17:00'}
           className={inputClass}
         />
-        <p className="mt-1.5 text-xs [color:var(--color-text-muted)]">
+        <p className="mt-1.5 text-xs [color:var(--color-on-glass-subtle)]">
           Drives the after-hours auto-reply and the end-of-day unread digest.
         </p>
       </FieldRow>
 
-      <div className="h-px [background:var(--color-border-subtle)]" />
+      <div className="h-px [background:var(--glass-border)]" />
 
       <FieldRow label="Escalation email" htmlFor="escalation-email">
         <input
@@ -181,7 +187,7 @@ export default function BusinessSettingsPanel({
           placeholder="Optional"
           className={inputClass}
         />
-        <p className="mt-1.5 text-xs [color:var(--color-text-muted)]">
+        <p className="mt-1.5 text-xs [color:var(--color-on-glass-subtle)]">
           Texted immediately when a tenant reports an emergency.
         </p>
       </FieldRow>

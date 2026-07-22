@@ -11,7 +11,7 @@ export default function FeedbackBanner({ state }: { state: SettingsActionState }
     return (
       <p
         role="alert"
-        className="rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium [background:var(--color-danger-bg)] [color:var(--color-danger)]"
+        className="rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-medium [background:rgba(214,69,69,0.16)] [border-color:rgba(255,180,180,0.4)] [color:#ffb4b4]"
       >
         {state.message}
       </p>
@@ -21,7 +21,7 @@ export default function FeedbackBanner({ state }: { state: SettingsActionState }
   return (
     <p
       role="status"
-      className="rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium [background:var(--color-success-bg)] [color:var(--color-success)]"
+      className="rounded-[var(--radius-sm)] border px-3 py-2 text-sm font-medium [background:rgba(30,158,108,0.16)] [border-color:rgba(110,231,183,0.38)] [color:#6ee7b7]"
     >
       {state.message}
     </p>
