@@ -73,7 +73,12 @@
 
   /* Layout */
   --header-height: 64px;
-  --bottom-nav-height: 60px;
+  /* The mobile tab bar floats --bottom-nav-gap above the screen edge, so the
+     total space every scrollable view must reserve is the bar itself plus
+     that gap — see components/sidebar/MobileTabBar.module.css. */
+  --bottom-nav-bar-height: 60px;
+  --bottom-nav-gap: 14px;
+  --bottom-nav-height: calc(var(--bottom-nav-bar-height) + var(--bottom-nav-gap));
 
   /* Radius */
   --radius-sm: 0.75rem;

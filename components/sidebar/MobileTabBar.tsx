@@ -19,6 +19,10 @@ type Props = {
 // Stays mounted on every dashboard route, including individual conversation
 // threads — MessageInput reserves space above it (see its mobile
 // padding-bottom) so the fixed bar never covers the composer.
+//
+// Icon-only, floating pill style: labels are visually hidden (still in the
+// DOM for screen readers) and the active item's icon lifts into a raised
+// circular bubble that overlaps the top of the bar.
 export default function MobileTabBar({ name, email }: Props) {
   const pathname = usePathname()
 
@@ -31,7 +35,9 @@ export default function MobileTabBar({ name, email }: Props) {
         if (item.profile) {
           return (
             <div key={item.href} className={className}>
-              <ProfileMenu name={name} email={email} />
+              <span className={styles.iconWrap}>
+                <ProfileMenu name={name} email={email} />
+              </span>
               <span className={styles.label}>{item.label}</span>
             </div>
           )
@@ -44,7 +50,7 @@ export default function MobileTabBar({ name, email }: Props) {
             className={className}
             aria-current={active ? 'page' : undefined}
           >
-            {item.icon}
+            <span className={styles.iconWrap}>{item.icon}</span>
             <span className={styles.label}>{item.label}</span>
           </Link>
         )
